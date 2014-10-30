@@ -1,0 +1,42 @@
+<html>
+<head>
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+		}
+	</style>
+</head>
+<body>
+	<div id="map" style="width: 100%; height: 100%"></div>
+	<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script>
+		var size = 16;
+		function initMap(param) {
+			var map = L.map('map', {
+				center : [0, 0],
+				zoomControl: false,
+				zoom : 2,
+				minZoom: 1,
+				maxZoom: param.maxZoom,
+				layers : [
+					L.tileLayer('map/{z}/{x}/{y}.png', {
+						tileSize: param.blockSize,
+						minZoom: 1,
+						maxZoom: 4,
+						noWrap: true,
+						tms: true,
+						continuousWorld : true,
+					})
+				]
+			});
+			L.marker([0, 0]).addTo(map);
+		}
+		$.getJSON("map/mapinfo.json", function(json) {
+			initMap(json);
+		});
+	</script>
+</body>
+</html>
