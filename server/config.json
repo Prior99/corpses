@@ -1,0 +1,5 @@
+{
+	"websocketPort" : "4733",
+	"telnetPort" : "8081",
+	"telnetHost" : "localhost"
+}
