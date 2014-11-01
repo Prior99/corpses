@@ -62,10 +62,29 @@
 			}
 		}
 		
+		div.systemstats {
+			width: 100%;
+			height: 18pt;
+			font-size: 14pt;
+			left: 0px;
+			bottom: 0px;
+			padding: 2pt 0 2pt 0;
+			text-align: center;
+			div {
+				color: grey;
+				width: 100%;
+				display: inline;
+				margin: 0 8pt 0 8pt;
+				span {
+					color: black;
+				}
+			}
+		}
+		
 		div.players {
 			right: 0px;
 			top: 32pt;
-			font-size: 12pt;
+			font-size: 14pt;
 			tr:first-child {
 				font-size: 18pt;
 				text-align: center;
@@ -95,6 +114,23 @@
 		</div>
 		<div>
 			Zombies <span id="zombies"><img height="20" src="img/loading.gif" /></span> 
+		</div>
+	</div>
+	<div class="systemstats container">
+		<div>
+			FPS <span id="fps"><img height="20" src="img/loading.gif" /></span> 
+		</div>
+		<div>
+			Memory <span id="memory"><img height="20" src="img/loading.gif" /></span> 
+		</div>
+		<div>
+			Chunks <span id="chunks"><img height="20" src="img/loading.gif" /></span> 
+		</div>
+		<div>
+			Entities <span id="entities"><img height="20" src="img/loading.gif" /></span> 
+		</div>
+		<div>
+			Items <span id="items"><img height="20" src="img/loading.gif" /></span> 
 		</div>
 	</div>
 	<div class="players container" id="players">
@@ -158,11 +194,17 @@
 			initMap(json);
 			
 			var players = {};
-			var playerCount;
+			var playerCount = 0;
 			
 			Websocket.addMessageListener("info", function(obj) {
 				$("#players").html(obj.players);
 				$("#zombies").html(obj.zombies);
+				
+				$("#fps").html(obj.fps);
+				$("#memory").html(parseInt(obj.memoryUsed*100/obj.memoryMax) + "% of " + obj.memoryMax + "MB");
+				$("#chunks").html(obj.chunks);
+				$("#entities").html(obj.entitiesLoaded + "/" + obj.entitiesOverall);
+				$("#items").html(obj.items);
 			});
 			Websocket.addMessageListener("spawningWanderingHorde", function(obj) {
 				console.log(obj);
@@ -223,19 +265,21 @@
 					var player = obj[i];
 					var marker;
 					var p = players[player.name];
-					if(p.marker == undefined) {
-						p.marker = L.marker([0, 0]).addTo(map);
+					if(p !== undefined) {
+						if(p.marker == undefined) {
+							p.marker = L.marker([0, 0]).addTo(map);
+						}
+						p.marker
+							.setLatLng([player.position.x, player.position.z]);
+						p.score = player.score;
+						p.deaths = player.deaths;
+						p.health = player.health;
+						p.zombieKills = player.zombieKills;
+						p.playerKills = player.playerKills;
+						p.position = player.position;
+						p.ping = player.ping;
+						updatePlayer(p);
 					}
-					p.marker
-						.setLatLng([player.position.x, player.position.z]);
-					p.score = player.score;
-					p.deaths = player.deaths;
-					p.health = player.health;
-					p.zombieKills = player.zombieKills;
-					p.playerKills = player.playerKills;
-					p.position = player.position;
-					p.ping = player.ping;
-					updatePlayer(p);
 				}
 			});
 			Websocket.addMessageListener("playerConnected", function(obj) {
