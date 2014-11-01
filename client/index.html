@@ -49,7 +49,6 @@
 			height: 24pt;
 			left: 0px;
 			top: 0px;
-			z-index: 1000;
 			padding: 4pt 0 4pt 0;
 			text-align: center;
 			div {
@@ -71,6 +70,11 @@
 				font-size: 18pt;
 				text-align: center;
 			}
+		}
+		
+		div#noplayers {
+			text-align: center;
+			width: 100%;
 		}
 		
 	</style>
@@ -100,14 +104,17 @@
 				<td style="background: darkgrey;">x</td>
 				<td style="background: darkgrey;">y</td>
 				<td style="background: darkgrey;">z</td>
-				<td>✝</td>
-				<td>☤</td>
-				<td>☠</td>
-				<td>✪</td>
-				<td>&#8986;</td>
-				<td>&#8987;</td>
+				<td>Deaths</td>
+				<td>Health</td>
+				<td>Kills</td>
+				<td>Score</td>
+				<td>Age</td>
+				<td>Ping</td>
 			</tr>
 		</table>
+		<div id="noplayers">
+			No players connected.
+		</div>
 	</div>
 	<script>
 		var size = 16;
@@ -151,6 +158,7 @@
 			initMap(json);
 			
 			var players = {};
+			var playerCount;
 			
 			Websocket.addMessageListener("info", function(obj) {
 				$("#players").html(obj.players);
@@ -193,7 +201,9 @@
 							player.ping = "?";
 							player.tableRow = $("<tr></tr>")
 								.appendTo("#playerTable");
+							playerCount++;
 							updatePlayer(player);
+							$("#noplayers").hide();
 						}
 						else {
 							var p = players[player.name];
@@ -238,6 +248,10 @@
 					map.removeLayer(player.marker);
 					player.tableRow.remove();
 					players[obj.name] = undefined;
+					playerCount--;
+					if(playerCount == 0) {
+						$("#noplayers").show();
+					}
 				}
 			});
 			Websocket.addOpenListener(function() {

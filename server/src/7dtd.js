@@ -37,6 +37,10 @@ Connection.prototype.triggerGetTime = function() {
 	this.client.write("gettime\n");
 };
 
+Connection.prototype.triggerMem = function() {
+	this.client.write("mem\n");
+};
+
 Connection.prototype.triggerListKnownPlayers = function() {
 	this.client.write("listknownplayers\n");
 };

@@ -102,6 +102,9 @@ function startTelnetClient() {
 		telnetClient.triggerGetTime();
 	}, 5000);
 	setInterval(function() {
+		telnetClient.triggerMem();
+	}, 3000);
+	setInterval(function() {
 		telnetClient.triggerListKnownPlayers();
 	}, 10000);
 	setInterval(function() {
