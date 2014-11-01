@@ -1,0 +1,18 @@
+{
+  "name": "7DTD-Webinterface",
+  "version": "0.0.0",
+  "description": "A webinterface for the 7DTD server.",
+  "main": "src/server.js",
+  "scripts": {
+    "test": "node src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.cronosx.de/prior/7dtd.git"
+  },
+  "author": "Prior <frederick@gnodtke.net>",
+  "license": "GPL",
+  "dependencies": {
+    "ws": "^0.4.32"
+  }
+}

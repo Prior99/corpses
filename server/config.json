@@ -1,5 +1,7 @@
 {
 	"websocketPort" : "4733",
 	"telnetPort" : "8081",
-	"telnetHost" : "localhost"
+	"telnetHost" : "localhost",
+	"clientDirectory" : "../client/",
+	"mapDirectory" : "/home/sdtd/instances/Roemmelbroemser/Random Gen/Roemmelbroemserland/map"
 }

@@ -38,7 +38,7 @@ var Regexes = {
 		'score=(\\d+),\\s' + 
 		'steamid=(\\d+),\\s' +
 		'ip=(.*?),\\s' + 
-		'ping=(\\d+)'
+		'ping=(\\d+)', 'g'
 		),
 	playerConnected : new RegExp(
 		'Player\\sconnected,\\s' + 

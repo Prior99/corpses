@@ -1,4 +1,3 @@
-
 var Connection = function(socket){
 	this.listeners = {};
 	this.closeListeners = [];
@@ -48,8 +47,7 @@ Connection.prototype = {
 		var obj = JSON.parse(message);
 		//console.log("received: " + message);
 		if(obj.type === undefined || obj.id === undefined){
-			console.error("received broken packet: " + 
-message + " - Required field missing");
+			console.error("received broken packet: " + message + " - Required field missing");
 			return;
 		}
 
@@ -57,29 +55,25 @@ message + " - Required field missing");
 			var listener = this.listeners[obj.key];
 			if(listener !== undefined){
 				if(listener.async){
-					listener.listener(obj.param, 
-function(ans){
+					listener.listener(obj.param, function(ans){
 						var answer = {
 							id: obj.id,
 							type: "res",
 							param: ans
 						};
 						if(!self.dead)
-						
-self.socket.send(JSON.stringify(answer));
+						self.socket.send(JSON.stringify(answer));
 					});
 				}
 				else{
-					var ans = 
-listener.listener(obj.param);
+					var ans = listener.listener(obj.param);
 					var answer = {
 						id: obj.id,
 						type: "res",
 						param: ans
 					};
 					if(!self.dead)
-					
-this.socket.send(JSON.stringify(answer));
+					this.socket.send(JSON.stringify(answer));
 				}
 			}
 		}
@@ -91,8 +85,7 @@ this.socket.send(JSON.stringify(answer));
 			}
 		}
 		else{
-			console.error("received broken packet: " + 
-message + " - Invalid type");
+			console.error("received broken packet: " + message + " - Invalid type");
 			return;
 		}
 	}

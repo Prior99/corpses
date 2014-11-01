@@ -16,8 +16,7 @@ var Websocket = {
 	init: function(){
 		this.id = 0;
 
-		this.socket = new WebSocket("ws://"+ location.hostname + 
-":" + _port + "/");
+		this.socket = new WebSocket("ws://"+ location.hostname + ":" + _port + "/");
 		var self = this;
 		this.socket.onmessage = function(evt){
 			self.onMessage(evt);
@@ -39,8 +38,7 @@ var Websocket = {
 		var obj = JSON.parse(evt.data);
 		//console.log("received: " + evt.data);
 		if(obj.type === undefined || obj.id === undefined){
-			console.error("received broken packet: " + 
-evt.data + " - Required field missing");
+			console.error("received broken packet: " + evt.data + " - Required field missing");
 			return;
 		}
 
@@ -48,27 +46,23 @@ evt.data + " - Required field missing");
 			var listener = this.messageListener[obj.key];
 			if(listener !== undefined){
 				if(listener.async){
-					listener.listener(obj.param, 
-function(ans){
+					listener.listener(obj.param, function(ans){
 						var answer = {
 							id: obj.id,
 							type: "res",
 							param: ans
 						};
-						
-self.socket.send(JSON.stringify(answer));
+						self.socket.send(JSON.stringify(answer));
 					});
 				}
 				else{
-					var ans = 
-listener.listener(obj.param);
+					var ans = listener.listener(obj.param);
 					var answer = {
 						id: obj.id,
 						type: "res",
 						param: ans
 					};
-					
-this.socket.send(JSON.stringify(answer));
+					this.socket.send(JSON.stringify(answer));
 				}
 			}
 		}
@@ -80,8 +74,7 @@ this.socket.send(JSON.stringify(answer));
 			}
 		}
 		else{
-			console.error("received broken packet: " + 
-message + " - Invalid type");
+			console.error("received broken packet: " + message + " - Invalid type");
 			return;
 		}
 	},
