@@ -16,11 +16,28 @@
 	<script src="js/websocket_client.js"></script>
 	<script>
 		var size = 16;
+		var map;
 		function initMap(param) {
-			var map = L.map('map', {
+			var nativeZoom = 4;
+			var projection = {
+				project: function (latlng) {
+					return new L.Point((latlng.lat + 2) / Math.pow(2, nativeZoom), (latlng.lng - 1) / Math.pow(2, nativeZoom));
+				},
+				unproject: function (point) {
+					return new L.LatLng(point.x * Math.pow(2, nativeZoom) - 2, point.y * Math.pow(2, nativeZoom) + 1);
+				}
+			};
+			var crs = L.extend({}, L.CRS.Simple, {
+				projection: projection,
+				scale: function (zoom) {
+					return Math.pow(2, zoom);
+				}
+			});
+			map = L.map('map', {
 				center : [0, 0],
 				zoomControl: false,
 				zoom : 2,
+				crs : crs,
 				minZoom: 1,
 				maxZoom: param.maxZoom,
 				layers : [
@@ -34,7 +51,6 @@
 					})
 				]
 			});
-			L.marker([0, 0]).addTo(map);
 		}
 		$.getJSON("map/mapinfo.json", function(json) {
 			initMap(json);
@@ -50,14 +66,29 @@
 			Websocket.addMessageListener("getTime", function(obj) {
 				console.log(obj);
 			});
+			var players = {};
+			
 			Websocket.addMessageListener("listPlayersExtended", function(obj) {
 				console.log(obj);
+				for(var i in obj) {
+					var player = obj[i];
+					var marker;
+					if(players[player.name] == undefined) {
+						players[player.name] = L.marker([0, 0]).addTo(map);
+					}
+					players[player.name]
+						.setLatLng([player.position.x, player.position.z]);
+				}
 			});
 			Websocket.addMessageListener("playerConnected", function(obj) {
 				console.log(obj);
 			});
 			Websocket.addMessageListener("playerDisconnected", function(obj) {
 				console.log(obj);
+				if(players[obj.name] !== undefined) {
+					map.removeLayer(players[obj.name]);
+					players[obj.name] = undefined;
+				}
 			});
 			Websocket.addOpenListener(function() {
 				console.log("Websocket connected!");
