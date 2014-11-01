@@ -1,5 +1,6 @@
-<html>
+﻿<html>
 <head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
 	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
 	<style type="text/less">
 		@import url(http://fonts.googleapis.com/css?family=Titillium+Web);
@@ -8,25 +9,49 @@
 			font-family: "Titillium Web";
 			padding: 0;
 			background: url('img/black-linen.png');
+			height: 100%;
 		}
 		
 		.leaflet-container {
 			background : transparent;
 		}
 		
-		div.serverstats {
+		div.container {
 			position: absolute;
+			font-size: 20pt;
+			box-shadow: 0px 2px 5px 0px;
+			color: black;
+			background: white;
+			
+			table {
+				border-spacing: 0;
+				border-collapse: separate;
+				font-size: inherit;
+				tr {
+					padding: 2pt 0 2pt 0;
+					td {
+						border-left: 1px solid grey;
+						padding: 0 4pt 0 4pt;
+					}
+					rd:last-child {
+						border: none;
+					}
+				}
+				tr:first-child {
+					color: white;
+					background: grey;
+				}
+			}
+		}
+		
+		div.serverstats {
 			width: 100%;
 			height: 24pt;
-			background: white;
 			left: 0px;
 			top: 0px;
 			z-index: 1000;
 			padding: 4pt 0 4pt 0;
-			color: black;
-			font-size: 20pt;
 			text-align: center;
-			box-shadow: 0px 2px 5px 0px;
 			div {
 				color: grey;
 				width: 100%;
@@ -37,6 +62,17 @@
 				}
 			}
 		}
+		
+		div.players {
+			right: 0px;
+			top: 32pt;
+			font-size: 12pt;
+			tr:first-child {
+				font-size: 18pt;
+				text-align: center;
+			}
+		}
+		
 	</style>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/less.js/1.7.5/less.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
@@ -46,7 +82,7 @@
 </head>
 <body>
 	<div id="map" style="width: 100%; height: 100%"></div>
-	<div class="serverstats">
+	<div class="serverstats container">
 		<div>
 			Time <span id="time"><img height="20" src="img/loading.gif" /></span> 
 		</div>
@@ -56,6 +92,22 @@
 		<div>
 			Zombies <span id="zombies"><img height="20" src="img/loading.gif" /></span> 
 		</div>
+	</div>
+	<div class="players container" id="players">
+		<table id="playerTable">
+			<tr>
+				<td>Name</td>
+				<td style="background: darkgrey;">x</td>
+				<td style="background: darkgrey;">y</td>
+				<td style="background: darkgrey;">z</td>
+				<td>✝</td>
+				<td>☤</td>
+				<td>☠</td>
+				<td>✪</td>
+				<td>&#8986;</td>
+				<td>&#8987;</td>
+			</tr>
+		</table>
 	</div>
 	<script>
 		var size = 16;
@@ -97,6 +149,9 @@
 		}
 		$.getJSON("map/mapinfo.json", function(json) {
 			initMap(json);
+			
+			var players = {};
+			
 			Websocket.addMessageListener("info", function(obj) {
 				$("#players").html(obj.players);
 				$("#zombies").html(obj.zombies);
@@ -104,24 +159,73 @@
 			Websocket.addMessageListener("spawningWanderingHorde", function(obj) {
 				console.log(obj);
 			});
+			
+			function updatePlayer(player) {
+				player.tableRow.html(
+					"<td>" + player.name + "</td>" +
+					"<td style='background: lightgrey;'>" + player.position.x + "</td>" +
+					"<td style='background: lightgrey;'>" + player.position.y + "</td>" +
+					"<td style='background: lightgrey;'>" + player.position.z + "</td>" +
+					"<td>" + player.deaths + "</td>" +
+					"<td>" + player.health + "</td>" +
+					"<td>" + player.zombieKills + "/" + player.playerKills + "</td>" +
+					"<td>" + player.score + "</td>" +
+					"<td>" + player.playtime + "min</td>" +
+					"<td>" + player.ping + "ms</td>");
+			}
+			
 			Websocket.addMessageListener("listKnownPlayers", function(obj) {
-				console.log(obj);
+				for(var i in obj) {
+					var player = obj[i];
+					if(player.online) {
+						if(players[player.name] == undefined) {
+							players[player.name] = player;
+							player.position = {
+								x : "?",
+								y : "?",
+								z : "?",
+							};
+							player.score = "?";
+							player.deaths = "?";
+							player.health = "?";
+							player.zombieKills = "?";
+							player.playerKills = "?";
+							player.ping = "?";
+							player.tableRow = $("<tr></tr>")
+								.appendTo("#playerTable");
+							updatePlayer(player);
+						}
+						else {
+							var p = players[player.name];
+							p.online = player.online;
+							p.playtime = player.playtime;
+						}
+					}
+				}
 			});
 			Websocket.addMessageListener("getTime", function(obj) {
 				$("#time").html("Day " + obj.day + ", " + obj.hour + ":" + obj.minute);
 			});
-			var players = {};
 			
 			Websocket.addMessageListener("listPlayersExtended", function(obj) {
 				console.log(obj);
 				for(var i in obj) {
 					var player = obj[i];
 					var marker;
-					if(players[player.name] == undefined) {
-						players[player.name] = L.marker([0, 0]).addTo(map);
+					var p = players[player.name];
+					if(p.marker == undefined) {
+						p.marker = L.marker([0, 0]).addTo(map);
 					}
-					players[player.name]
+					p.marker
 						.setLatLng([player.position.x, player.position.z]);
+					p.score = player.score;
+					p.deaths = player.deaths;
+					p.health = player.health;
+					p.zombieKills = player.zombieKills;
+					p.playerKills = player.playerKills;
+					p.position = player.position;
+					p.ping = player.ping;
+					updatePlayer(p);
 				}
 			});
 			Websocket.addMessageListener("playerConnected", function(obj) {
@@ -129,8 +233,10 @@
 			});
 			Websocket.addMessageListener("playerDisconnected", function(obj) {
 				console.log(obj);
-				if(players[obj.name] !== undefined) {
-					map.removeLayer(players[obj.name]);
+				var player;
+				if((player = players[obj.name]) !== undefined) {
+					map.removeLayer(player.marker);
+					player.tableRow.remove();
 					players[obj.name] = undefined;
 				}
 			});

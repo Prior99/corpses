@@ -99,8 +99,13 @@ function startTelnetClient() {
 		telnetClient.triggerListKnownPlayers();
 	});
 	setInterval(function() {
-		telnetClient.triggerListPlayersExtended();
 		telnetClient.triggerGetTime();
+	}, 5000);
+	setInterval(function() {
+		telnetClient.triggerListKnownPlayers();
+	}, 10000);
+	setInterval(function() {
+		telnetClient.triggerListPlayersExtended();
 	}, 1000);
 }
 
