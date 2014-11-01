@@ -1,6 +1,5 @@
 var Regexes = {
 	info : new RegExp(
-		'([+-]?\\d+\\.?\\d*)\\s' +
 		'Time:\\s([+-]?\\d+\\.?\\d*)m\\s' +
 		'FPS:\\s([+-]?\\d+\\.?\\d*)\\s' +
 		'Heap:\\s([+-]?\\d+\\.?\\d*)[KMGTP]?B\\s' +
@@ -13,7 +12,7 @@ var Regexes = {
 		'\\((\\d+)\\)\\s' +
 		'Items:\\s(\\d+)'),
 	spawningWanderingHorde : new RegExp(
-		'([+-]?\\d+\\.?\\d*)\\sSpawning\\sWandering\\sHorde\\.'),
+		'Spawning\\sWandering\\sHorde\\.'),
 	listKnownPlayers : new RegExp(
 		'\\d+\\.\\s(.*?),\\s' + 
 		'id=(\\d+),\\s' + 
@@ -42,13 +41,14 @@ var Regexes = {
 		'ping=(\\d+)'
 		),
 	playerConnected : new RegExp(
-		'([+-]?\\d+\\.?\\d*)\\sPlayer\\sconnected,\\s' + 
+		'Player\\sconnected,\\s' + 
 		'clientid=(\\d+),\\s' + 
 		'entityid=(\\d+),\\s' + 
 		'name=(.*?),\\s' + 
 		'steamid=(\\d+),\\s' + 
 		'ip=(.*)'),
 	playerDisconnected : new RegExp(
-		'([+-]?\\d+\\.?\\d*)\\sPlayer\\s(.*?)\\sdisconnected\\safter\\s([+-]?\\d+\\.?\\d*)\\sminutes')
+		'Player\\s(.*?)\\sdisconnected\\safter\\s([+-]?\\d+\\.?\\d*)\\sminutes')
 };
+console.log(Regexes.info.exec("*** Connected with 7DTD server.\r\n*** Dedicated server only build\r\n*** Allocs server fixes loaded\r\n\r\nServer IP:   Any\r\nServer port: 25000") ? "true" : "false")
 module.exports = Regexes;

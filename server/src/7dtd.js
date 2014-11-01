@@ -5,27 +5,54 @@ var Events = require('events');
 
 function Connection() {
 	this.client = new net.Socket();
-	this.client.on("data", function(data) {
-		this.parseMessage(data);
-	}.bind(this));
 	this.client.on("close", function() {
-		console.log("Telnetclient closed.");
+		this.emit("close");
+	}.bind(this));
+	this.buffer = "";
+	this.client.on("data", function(data) {
+		this.buffer += data.toString();
+		this.checkMessage();
 	}.bind(this));
 	this.client.connect(config.telnetPort, config.telnetHost, function() {
-		console.log("Telnetclient connected.");
+		this.emit("open");
 	}.bind(this));
 };
 
 Connection.prototype.__proto__ = Events.EventEmitter.prototype;
 
-Connection.prototype.parseMessage = function(data) {
+Connection.prototype.checkMessage = function() {
+	var index;
+	var reg = /^\d+\.\d\d\d\s/gm;
+	if((index = this.buffer.search(reg)) != -1) {
+		var msgs = this.buffer.split(reg);
+		for(var i = 0; i < msgs.length -1; i++) {
+			//console.log("CHUNK: +++" + msgs[i] + "+++");
+			this.parseMessage(msgs[i]);
+		}
+		this.buffer = msgs[msgs.length - 1];
+	}
+};
+
+Connection.prototype.triggerGetTime = function() {
+	this.client.write("gettime\n");
+};
+
+Connection.prototype.triggerListKnownPlayers = function() {
+	this.client.write("listknownplayers\n");
+};
+
+Connection.prototype.triggerListPlayersExtended = function() {
+	this.client.write("listplayersextended\n");
+};
+
+Connection.prototype.parseMessage = function(string) {
 	var result;
 	Events.EventEmitter.call(this);
-	var string = data.toString();
-	console.log("RECEIVED MSG: \"" + string + "\"");
+	//console.log("RECEIVED MSG: \"" + string + "\"");
 	for(var type in Regexes) {
 		var regex = Regexes[type];
-		if(result == regex.exec(string)) {
+		if(result = regex.exec(string)) {
+			//console.log("DETECTED:" + type + ":" + result);
 			if(type == "listPlayersExtended" || type == "listKnownPlayers") {
 				var array = [];
 				array.push(result);
@@ -46,18 +73,17 @@ Connection.prototype.computeMessage = function(type, array) {
 	switch(type) {
 		case "info": {
 			this.emit("info", {
-				upTime : array[1],
-				worldTime : array[2],
-				fps : array[3],
-				memoryUsed : array[4],
-				memoryMax : array[5],
-				chunks : array[6],
-				cgo : array[7],
-				players : array[8],
-				zombies : array[9],
-				entitiesLoaded : array[10],
-				entitiesOverall : array[11],
-				items : array[12]
+				worldTime : array[1],
+				fps : array[2],
+				memoryUsed : array[3],
+				memoryMax : array[4],
+				chunks : array[5],
+				cgo : array[6],
+				players : array[7],
+				zombies : array[8],
+				entitiesLoaded : array[9],
+				entitiesOverall : array[10],
+				items : array[11]
 			});
 			break;
 		}
@@ -123,20 +149,18 @@ Connection.prototype.computeMessage = function(type, array) {
 		}
 		case "playerConnected": {
 			this.emit("playerConnected", {
-				upTime : array[1],
-				clientID : array[2],
-				id : array[3],
-				name : array[4],
-				steamid : array[5],
-				ip : array[6]
+				clientID : array[1],
+				id : array[2],
+				name : array[3],
+				steamid : array[4],
+				ip : array[5]
 			});
 			break;
 		}
 		case "playerDisconnected": {
 			this.emit("playerDisconnected", {
-				upTime : array[1],
-				name : array[2],
-				playTime : array[3]
+				name : array[1],
+				playTime : array[2]
 			});
 			break;
 		}
