@@ -39,8 +39,7 @@ function startWebsocketServer() {
 					clients.push(client);
 					console.log("New client connected. Currently " + clients.length + " clients connected.");
 					client.addCloseListener(function() {
-						clients.splice(clients.indexOf(client), 1);
-						console.log("Client disconnected. Currently " + clients.length + " clients connected.");
+						removeClient(client);
 					});
 				})(new WebSocket(ws));
 			});
@@ -49,11 +48,21 @@ function startWebsocketServer() {
 	});
 }
 
+function removeClient(client) {
+	clients.splice(clients.indexOf(client), 1);
+	console.log("Client disconnected. Currently " + clients.length + " clients connected.");
+}
+
 function broadcast(type, data) {
 	console.log("Broadcastign event: " + type);
 	for(var key in clients) {
 		var client = clients[key];
-		client.send(type, data);
+		try {
+			client.send(type, data);
+		}
+		catch(e) {
+			removeClient(client);
+		}
 	}
 }
 
@@ -91,7 +100,8 @@ function startTelnetClient() {
 	});
 	setInterval(function() {
 		telnetClient.triggerListPlayersExtended();
-	}, 2000);
+		telnetClient.triggerGetTime();
+	}, 1000);
 }
 
 
