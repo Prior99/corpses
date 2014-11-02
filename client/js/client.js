@@ -225,7 +225,8 @@ function updatePlayerStats(obj) {
 				p.marker = L.marker([0, 0], {
 					icon: new L.NumberedDivIcon({
 						number: p.number
-					})
+					}),
+					zIndexOffset : 1000
 				}).addTo(map);
 			}
 			p.marker
