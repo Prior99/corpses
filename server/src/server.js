@@ -3,14 +3,21 @@ var WS = require("ws");
 var WebSocket = require("./websocket_server.js");
 var config = require("../config.json");
 var FS = require("fs");
+var Database = require("./database.js");
 
 var clients = [];
 var wsServer;
 var telnetClient;
+var database;
 
+startDatabase();
 startWebsocketServer();
 startTelnetClient();
 symlinkMap();
+
+function startDatabase() {
+	database = new Database();
+}
 
 function symlinkMap() {
 	FS.symlink(config.mapDirectory, config.clientDirectory + "/map", function(err) {
@@ -41,11 +48,39 @@ function startWebsocketServer() {
 					client.addCloseListener(function() {
 						removeClient(client);
 					});
+					database.getMarkers(function(err, markers) {
+						sendMarkers(client, markers);
+					});
+					client.addListener("addMarker", function(obj, async) {
+						if(!obj.icon || !obj.name || !obj.description || !obj.lat || !obj.lng) {
+							async({
+								okay : false
+							});
+						}
+						else {
+							database.addMarker(obj, function(err, result) {
+								broadcastMarkers([result]);
+								async({
+									okay : true
+								});
+							});
+						}
+					}, true);
 				})(new WebSocket(ws));
 			});
 			console.log("Websocketserver Started up!");
 		}
 	});
+}
+
+function broadcastMarkers(markers) {
+	for(var i in clients) {
+		sendMarkers(clients[i], markers);
+	}
+}
+
+function sendMarkers(client, markers) {
+	client.send("markers", markers);
 }
 
 function removeClient(client) {
@@ -108,5 +143,3 @@ function startTelnetClient() {
 		telnetClient.triggerListPlayersExtended();
 	}, 5000);
 }
-
-

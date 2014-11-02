@@ -13,6 +13,7 @@
   "author": "Prior <frederick@gnodtke.net>",
   "license": "GPL",
   "dependencies": {
+    "mysql": "^2.5.2",
     "ws": "^0.4.32"
   }
 }
