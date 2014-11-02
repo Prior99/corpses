@@ -54,7 +54,7 @@ function removeClient(client) {
 }
 
 function broadcast(type, data) {
-	console.log("Broadcastign event: " + type);
+	//console.log("Broadcastign event: " + type);
 	for(var key in clients) {
 		var client = clients[key];
 		try {
@@ -100,16 +100,13 @@ function startTelnetClient() {
 	});
 	setInterval(function() {
 		telnetClient.triggerGetTime();
-	}, 5000);
-	setInterval(function() {
-		telnetClient.triggerMem();
-	}, 3000);
+	}, 7000);
 	setInterval(function() {
 		telnetClient.triggerListKnownPlayers();
 	}, 10000);
 	setInterval(function() {
 		telnetClient.triggerListPlayersExtended();
-	}, 1000);
+	}, 5000);
 }
 
 
