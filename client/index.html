@@ -195,6 +195,7 @@
 			
 			var players = {};
 			var playerCount = 0;
+			var following;
 			
 			Websocket.addMessageListener("info", function(obj) {
 				$("#players").html(obj.players);
@@ -213,15 +214,35 @@
 			function updatePlayer(player) {
 				player.tableRow.html(
 					"<td>" + player.name + "</td>" +
-					"<td style='background: lightgrey;'>" + player.position.x + "</td>" +
-					"<td style='background: lightgrey;'>" + player.position.y + "</td>" +
-					"<td style='background: lightgrey;'>" + player.position.z + "</td>" +
+					"<td style='background: rgba(200, 200, 200, 0.5);'>" + parseInt(player.position.x) + "</td>" +
+					"<td style='background: rgba(200, 200, 200, 0.5);'>" + parseInt(player.position.y) + "</td>" +
+					"<td style='background: rgba(200, 200, 200, 0.5);'>" + parseInt(player.position.z) + "</td>" +
 					"<td>" + player.deaths + "</td>" +
 					"<td>" + player.health + "</td>" +
 					"<td>" + player.zombieKills + "/" + player.playerKills + "</td>" +
 					"<td>" + player.score + "</td>" +
 					"<td>" + player.playtime + "min</td>" +
 					"<td>" + player.ping + "ms</td>");
+				if(player == following) {
+					map.setView([player.position.x, player.position.z]);
+				}
+			}
+			
+			function followPlayer(player) {
+				if(following !== undefined) {
+					following.tableRow.css({
+						background : "transparent"
+					});
+				}
+				if(following == player) {
+					following = undefined;
+				}
+				else {
+					following = player;
+					following.tableRow.css({
+						background : "rgb(180, 180, 255)"
+					});
+				}
 			}
 			
 			Websocket.addMessageListener("listKnownPlayers", function(obj) {
@@ -241,8 +262,13 @@
 							player.zombieKills = "?";
 							player.playerKills = "?";
 							player.ping = "?";
-							player.tableRow = $("<tr></tr>")
-								.appendTo("#playerTable");
+							(function(player) {
+								player.tableRow = $("<tr></tr>")
+									.appendTo("#playerTable")
+									.click(function() {
+										followPlayer(player);
+									});
+							})(player);
 							playerCount++;
 							updatePlayer(player);
 							$("#noplayers").hide();
