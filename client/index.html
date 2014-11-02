@@ -2,141 +2,103 @@
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8">
 	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
-	<style type="text/less">
-		@import url(http://fonts.googleapis.com/css?family=Titillium+Web);
-		body {
-			margin: 0;
-			font-family: "Titillium Web";
-			padding: 0;
-			background: url('img/black-linen.png');
-			height: 100%;
-			overflow: hidden;
-		}
-		
-		.leaflet-container {
-			background : transparent;
-		}
-		
-		div.container {
-			position: absolute;
-			font-size: 20pt;
-			box-shadow: 0px 2px 5px 0px;
-			color: black;
-			background: white;
-			
-			table {
-				border-spacing: 0;
-				border-collapse: separate;
-				font-size: inherit;
-				tr {
-					padding: 2pt 0 2pt 0;
-					td {
-						border-left: 1px solid grey;
-						padding: 0 4pt 0 4pt;
-					}
-					rd:last-child {
-						border: none;
-					}
-				}
-				tr:first-child {
-					color: white;
-					background: grey;
-				}
-			}
-		}
-		
-		div.serverstats {
-			width: 100%;
-			height: 24pt;
-			left: 0px;
-			top: 0px;
-			padding: 4pt 0 4pt 0;
-			text-align: center;
-			div {
-				color: grey;
-				width: 100%;
-				display: inline;
-				margin: 0 8pt 0 8pt;
-				span {
-					color: black;
-				}
-			}
-		}
-		
-		div.systemstats {
-			width: 100%;
-			height: 18pt;
-			font-size: 14pt;
-			left: 0px;
-			bottom: 0px;
-			padding: 2pt 0 2pt 0;
-			text-align: center;
-			div {
-				color: grey;
-				width: 100%;
-				display: inline;
-				margin: 0 8pt 0 8pt;
-				span {
-					color: black;
-				}
-			}
-		}
-		
-		div.players {
-			right: 0px;
-			top: 32pt;
-			font-size: 14pt;
-			tr:first-child {
-				font-size: 18pt;
-				text-align: center;
-			}
-		}
-		
-		div#noplayers {
-			text-align: center;
-			width: 100%;
-		}
-		
-	</style>
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css" />
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.0/leaflet.awesome-markers.css" />
+	<link rel="stylesheet" href="style/numberedMarkers.css" />
+	<link rel="stylesheet"  type="text/less" href="style/style.less" />
 	<script src="//cdnjs.cloudflare.com/ajax/libs/less.js/1.7.5/less.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.0/leaflet.awesome-markers.min.js"></script>
 	<script src="port.js"></script>
 	<script src="js/websocket_client.js"></script>
+	<script src="js/client.js"></script>
+	<script src="js/numberedMarkers.js"></script>
+	<script type="text/html" id="templateCreateMarker">
+		<h1>Create new marker</h1>
+		<table>
+			<tr>
+				<td>Name:</td>
+				<td><input type="text" id="name" /></td>
+			</tr>
+			<tr>
+				<td>Description:</td>
+				<td><textarea id="description"></textarea></td>
+			</tr>
+			<tr>
+				<td>Icon:</td>
+				<td>
+					<select id="icon" style="font-family: 'FontAwesome'; font-size: 14pt;">
+						<option value="bus">				&#xf207; Public Transport 		</option>
+						<option value="futbol-o">			&#xf1e3; Recreational			</option>
+						<option value="paint-brush">		&#xf1fc; Paintshop 				</option>
+						<option value="plug">				&#xf1e6;Energy					</option>
+						<option value="trash">				&#xf1f8;Trash					</option>
+						<option value="anchor">				&#xf13d;Harbor					</option>
+						<option value="automobile">			&#xf1b9;Automobile				</option>
+						<option value="bank">				&#xf19c;Public					</option>
+						<option value="beer">				&#xf0fc;Bar						</option>
+						<option value="book">				&#xf02d;Library					</option>
+						<option value="building-o">			&#xf0f7;Sky scraper				</option>
+						<option value="camera">				&#xf030;Point of Interest		</option>
+						<option value="coffee">				&#xf0f4;Café					</option>
+						<option value="cutlery">			&#xf0f5;Restaurant				</option>
+						<option value="envelope">			&#xf0e0;Post					</option>
+						<option value="gavel">				&#xf0e3;Court					</option>
+						<option value="fire-extinguisher">	&#xf134;Fire station			</option>
+						<option value="flask">				&#xf0c3;Chemics					</option>
+						<option value="graduation-cap">		&#xf19d;Education				</option>
+						<option value="plane">				&#xf072;Airport					</option>
+						<option value="wrench">				&#xf0ad;Worksho 				</option>
+						<option value="home">				&#xf015;House					</option>
+						<option value="plus-square">		&#xf0fe;Medical					</option>
+						<option value="shopping-cart">		&#xf07a;Shop 					</option>
+						<option value="bomb">				&#xf1e2;Armory					</option>
+						<option value="heart">				&#xf004;Home					</option>
+					</scelect>
+				</td>
+			</tr>
+			<tr>
+				<td>Create:</td>
+				<td><button id="create">Okay</button></td>
+			</tr>
+		</table>
+	</script>
 </head>
 <body>
 	<div id="map" style="width: 100%; height: 100%"></div>
 	<div class="serverstats container">
 		<div>
-			Time <span id="time"><img height="20" src="img/loading.gif" /></span> 
+			Time <span id="time"><img height="20" src="img/loading.gif" /></span>
 		</div>
 		<div>
-			Players <span id="players"><img height="20" src="img/loading.gif" /></span> 
+			Players <span id="players"><img height="20" src="img/loading.gif" /></span>
 		</div>
 		<div>
-			Zombies <span id="zombies"><img height="20" src="img/loading.gif" /></span> 
+			Zombies <span id="zombies"><img height="20" src="img/loading.gif" /></span>
 		</div>
 	</div>
 	<div class="systemstats container">
 		<div>
-			FPS <span id="fps"><img height="20" src="img/loading.gif" /></span> 
+			FPS <span id="fps"><img height="20" src="img/loading.gif" /></span>
 		</div>
 		<div>
-			Memory <span id="memory"><img height="20" src="img/loading.gif" /></span> 
+			Memory <span id="memory"><img height="20" src="img/loading.gif" /></span>
 		</div>
 		<div>
-			Chunks <span id="chunks"><img height="20" src="img/loading.gif" /></span> 
+			Chunks <span id="chunks"><img height="20" src="img/loading.gif" /></span>
 		</div>
 		<div>
-			Entities <span id="entities"><img height="20" src="img/loading.gif" /></span> 
+			Entities <span id="entities"><img height="20" src="img/loading.gif" /></span>
 		</div>
 		<div>
-			Items <span id="items"><img height="20" src="img/loading.gif" /></span> 
+			Items <span id="items"><img height="20" src="img/loading.gif" /></span>
 		</div>
 	</div>
 	<div class="players container" id="players">
 		<table id="playerTable">
 			<tr>
+				<td>#</td>
 				<td>Name</td>
 				<td style="background: darkgrey;">x</td>
 				<td style="background: darkgrey;">y</td>
@@ -154,181 +116,8 @@
 		</div>
 	</div>
 	<script>
-		var size = 16;
-		var map;
-		function initMap(param) {
-			var nativeZoom = 4;
-			var projection = {
-				project: function (latlng) {
-					return new L.Point((latlng.lat + 2) / Math.pow(2, nativeZoom), (latlng.lng - 1) / Math.pow(2, nativeZoom));
-				},
-				unproject: function (point) {
-					return new L.LatLng(point.x * Math.pow(2, nativeZoom) - 2, point.y * Math.pow(2, nativeZoom) + 1);
-				}
-			};
-			var crs = L.extend({}, L.CRS.Simple, {
-				projection: projection,
-				scale: function (zoom) {
-					return Math.pow(2, zoom);
-				}
-			});
-			map = L.map('map', {
-				center : [0, 0],
-				zoomControl: false,
-				zoom : 2,
-				crs : crs,
-				minZoom: 1,
-				maxZoom: param.maxZoom,
-				layers : [
-					L.tileLayer('map/{z}/{x}/{y}.png', {
-						tileSize: param.blockSize,
-						minZoom: 1,
-						maxZoom: 4,
-						noWrap: true,
-						tms: true,
-						continuousWorld : true,
-					})
-				]
-			});
-		}
-		$.getJSON("map/mapinfo.json", function(json) {
-			initMap(json);
-			
-			var players = {};
-			var playerCount = 0;
-			var following;
-			
-			Websocket.addMessageListener("info", function(obj) {
-				$("#players").html(obj.players);
-				$("#zombies").html(obj.zombies);
-				
-				$("#fps").html(obj.fps);
-				$("#memory").html(parseInt(obj.memoryUsed*100/obj.memoryMax) + "% of " + obj.memoryMax + "MB");
-				$("#chunks").html(obj.chunks);
-				$("#entities").html(obj.entitiesLoaded + "/" + obj.entitiesOverall);
-				$("#items").html(obj.items);
-			});
-			Websocket.addMessageListener("spawningWanderingHorde", function(obj) {
-				console.log(obj);
-			});
-			
-			function updatePlayer(player) {
-				player.tableRow.html(
-					"<td>" + player.name + "</td>" +
-					"<td style='background: rgba(200, 200, 200, 0.5);'>" + parseInt(player.position.x) + "</td>" +
-					"<td style='background: rgba(200, 200, 200, 0.5);'>" + parseInt(player.position.y) + "</td>" +
-					"<td style='background: rgba(200, 200, 200, 0.5);'>" + parseInt(player.position.z) + "</td>" +
-					"<td>" + player.deaths + "</td>" +
-					"<td>" + player.health + "</td>" +
-					"<td>" + player.zombieKills + "/" + player.playerKills + "</td>" +
-					"<td>" + player.score + "</td>" +
-					"<td>" + player.playtime + "min</td>" +
-					"<td>" + player.ping + "ms</td>");
-				if(player == following) {
-					map.setView([player.position.x, player.position.z]);
-				}
-			}
-			
-			function followPlayer(player) {
-				if(following !== undefined) {
-					following.tableRow.css({
-						background : "transparent"
-					});
-				}
-				if(following == player) {
-					following = undefined;
-				}
-				else {
-					following = player;
-					following.tableRow.css({
-						background : "rgb(180, 180, 255)"
-					});
-				}
-			}
-			
-			Websocket.addMessageListener("listKnownPlayers", function(obj) {
-				for(var i in obj) {
-					var player = obj[i];
-					if(player.online) {
-						if(players[player.name] == undefined) {
-							players[player.name] = player;
-							player.position = {
-								x : "?",
-								y : "?",
-								z : "?",
-							};
-							player.score = "?";
-							player.deaths = "?";
-							player.health = "?";
-							player.zombieKills = "?";
-							player.playerKills = "?";
-							player.ping = "?";
-							(function(player) {
-								player.tableRow = $("<tr></tr>")
-									.appendTo("#playerTable")
-									.click(function() {
-										followPlayer(player);
-									});
-							})(player);
-							playerCount++;
-							updatePlayer(player);
-							$("#noplayers").hide();
-						}
-						else {
-							var p = players[player.name];
-							p.online = player.online;
-							p.playtime = player.playtime;
-						}
-					}
-				}
-			});
-			Websocket.addMessageListener("getTime", function(obj) {
-				$("#time").html("Day " + obj.day + ", " + obj.hour + ":" + obj.minute);
-			});
-			
-			Websocket.addMessageListener("listPlayersExtended", function(obj) {
-				console.log(obj);
-				for(var i in obj) {
-					var player = obj[i];
-					var marker;
-					var p = players[player.name];
-					if(p !== undefined) {
-						if(p.marker == undefined) {
-							p.marker = L.marker([0, 0]).addTo(map);
-						}
-						p.marker
-							.setLatLng([player.position.x, player.position.z]);
-						p.score = player.score;
-						p.deaths = player.deaths;
-						p.health = player.health;
-						p.zombieKills = player.zombieKills;
-						p.playerKills = player.playerKills;
-						p.position = player.position;
-						p.ping = player.ping;
-						updatePlayer(p);
-					}
-				}
-			});
-			Websocket.addMessageListener("playerConnected", function(obj) {
-				console.log(obj);
-			});
-			Websocket.addMessageListener("playerDisconnected", function(obj) {
-				console.log(obj);
-				var player;
-				if((player = players[obj.name]) !== undefined) {
-					map.removeLayer(player.marker);
-					player.tableRow.remove();
-					players[obj.name] = undefined;
-					playerCount--;
-					if(playerCount == 0) {
-						$("#noplayers").show();
-					}
-				}
-			});
-			Websocket.addOpenListener(function() {
-				console.log("Websocket connected!");
-			});
-			Websocket.init();
+		$(function() {
+			main();
 		});
 	</script>
 </body>

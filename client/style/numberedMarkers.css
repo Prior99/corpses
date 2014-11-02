@@ -1,0 +1,19 @@
+/*
+ * https://gist.github.com/comp615/2288108
+ */
+
+.leaflet-div-icon {
+	background: transparent;
+	border: none;
+}
+
+.leaflet-marker-icon .number{
+	position: relative;
+	top: -39px;
+	font-size: 12pt;
+	width: 25px;
+	text-align: center;
+	color: white;
+	font-weight: bold;
+	left: 4px;
+}

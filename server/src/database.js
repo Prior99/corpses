@@ -1,5 +1,5 @@
 var MySQL = require('mysql');
-var config = require('../config.js');
+var config = require('../config.json');
 
 function Database() {
 	this.pool = MySQL.createPool(config.database);
@@ -13,16 +13,17 @@ function Database() {
 	        console.log("Connecting to Database ... Done.");
 			process.stdout.write("Getting tables ready ... ");
 			this.pool.query(
-				"CREATE DATABASE IF NOT EXISTS Markers (" +
-					"id			INT NOT NULL PRIMARY KEY AUTO_INCREMENT," +
-					"name		VARCHAR(128)," +
+				"CREATE TABLE IF NOT EXISTS Markers (" +
+					"id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT," +
+					"name			VARCHAR(128) NOT NULL," +
 					"description	TEXT," +
-					"lat			FLOAT," +
-					"lng			FLOAT," +
-					"icon		VARCHAR(32))",
+					"lat			FLOAT NOT NULL," +
+					"lng			FLOAT NOT NULL," +
+					"icon			VARCHAR(32) NOT NULL)",
 				function(err) {
 					if(err) {
-						console.log("Failed.");
+						console.log("Failed:");
+						console.error(err);
 					}
 					else {
 						console.log("Okay.");
@@ -30,7 +31,7 @@ function Database() {
 				}
 			);
 	    }
-	});
+	}.bind(this));
 };
 
 Database.prototype.addMarker = function(obj, callback) {
@@ -47,8 +48,21 @@ Database.prototype.addMarker = function(obj, callback) {
 	});
 };
 
+Database.prototype.removeMarker = function(id, callback) {
+	this.pool.query("DELETE FROM Markers WHERE id = ?", [id], function(err) {
+		if(err) {
+			console.error("Unable to remove Marker:");
+			console.error(err);
+			callback(err);
+		}
+		else {
+			callback(undefined);
+		}
+	});
+}
+
 Database.prototype.fetchMarkers = function(callback) {
-	this.pool.query("SELECT name, description, lat, lng, icon FROM Markers", function(err, rows) {
+	this.pool.query("SELECT id, name, description, lat, lng, icon FROM Markers", function(err, rows) {
 		if(err) {
 			console.error("Unable to fetch Markers:");
 			console.error(err);

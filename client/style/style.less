@@ -1,0 +1,93 @@
+@import url(http://fonts.googleapis.com/css?family=Titillium+Web);
+body {
+	margin: 0;
+	font-family: "Titillium Web";
+	padding: 0;
+	background: url('../img/black-linen.png');
+	height: 100%;
+	overflow: hidden;
+}
+
+.leaflet-container {
+	background : transparent;
+}
+
+div.container {
+	position: absolute;
+	font-size: 20pt;
+	box-shadow: 0px 2px 5px 0px;
+	color: black;
+	background: white;
+
+	table {
+		border-spacing: 0;
+		border-collapse: separate;
+		font-size: inherit;
+		tr {
+			padding: 2pt 0 2pt 0;
+			td {
+				border-left: 1px solid grey;
+				padding: 0 4pt 0 4pt;
+			}
+			rd:last-child {
+				border: none;
+			}
+		}
+		tr:first-child {
+			color: white;
+			background: grey;
+		}
+	}
+}
+
+div.serverstats {
+	width: 100%;
+	height: 24pt;
+	left: 0px;
+	top: 0px;
+	padding: 4pt 0 4pt 0;
+	text-align: center;
+	div {
+		color: grey;
+		width: 100%;
+		display: inline;
+		margin: 0 8pt 0 8pt;
+		span {
+			color: black;
+		}
+	}
+}
+
+div.systemstats {
+	width: 100%;
+	height: 18pt;
+	font-size: 14pt;
+	left: 0px;
+	bottom: 0px;
+	padding: 2pt 0 2pt 0;
+	text-align: center;
+	div {
+		color: grey;
+		width: 100%;
+		display: inline;
+		margin: 0 8pt 0 8pt;
+		span {
+			color: black;
+		}
+	}
+}
+
+div.players {
+	right: 0px;
+	top: 32pt;
+	font-size: 14pt;
+	tr:first-child {
+		font-size: 18pt;
+		text-align: center;
+	}
+}
+
+div#noplayers {
+	text-align: center;
+	width: 100%;
+}

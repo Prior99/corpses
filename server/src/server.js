@@ -48,10 +48,11 @@ function startWebsocketServer() {
 					client.addCloseListener(function() {
 						removeClient(client);
 					});
-					database.getMarkers(function(err, markers) {
+					database.fetchMarkers(function(err, markers) {
 						sendMarkers(client, markers);
 					});
 					client.addListener("addMarker", function(obj, async) {
+						console.log("Got request to add marker:", obj);
 						if(!obj.icon || !obj.name || !obj.description || !obj.lat || !obj.lng) {
 							async({
 								okay : false
@@ -66,11 +67,33 @@ function startWebsocketServer() {
 							});
 						}
 					}, true);
+					client.addListener("removeMarker", function(obj, async) {
+						console.log("Got request to remove marker:", obj);
+						if(!obj.id) {
+							async({
+								okay : false
+							});
+						}
+						else {
+							database.removeMarker(obj.id, function(err, result) {
+								broadcastRemoveMarker(obj.id);
+								async({
+									okay : true
+								});
+							})
+						}
+					}, true);
 				})(new WebSocket(ws));
 			});
 			console.log("Websocketserver Started up!");
 		}
 	});
+}
+
+function broadcastRemoveMarker(id) {
+	for(var i in clients) {
+		clients[i].send("removeMarker", id);
+	}
 }
 
 function broadcastMarkers(markers) {
