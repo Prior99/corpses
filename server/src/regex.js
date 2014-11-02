@@ -50,5 +50,4 @@ var Regexes = {
 	playerDisconnected : new RegExp(
 		'Player\\s(.*?)\\sdisconnected\\safter\\s([+-]?\\d+\\.?\\d*)\\sminutes')
 };
-console.log(Regexes.info.exec("*** Connected with 7DTD server.\r\n*** Dedicated server only build\r\n*** Allocs server fixes loaded\r\n\r\nServer IP:   Any\r\nServer port: 25000") ? "true" : "false")
 module.exports = Regexes;
