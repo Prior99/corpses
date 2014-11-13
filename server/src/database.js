@@ -25,7 +25,7 @@ function Database() {
 					"description	TEXT," +
 					"lat			FLOAT NOT NULL," +
 					"lng			FLOAT NOT NULL," +
-					"private		BOOL NOT NULL DEFAULT(FALSE), " +
+					"visibility		ENUM('private', 'friends', 'public') NOT NULL DEFAULT(FALSE), " +
 					"author			INT NOT NULL, " +
 					"icon			VARCHAR(32) NOT NULL," +
 					"FOREIGN KEY(author) REFERENCES Users(id) ON DELETE CASCADE", handleError);
