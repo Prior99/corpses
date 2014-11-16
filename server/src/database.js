@@ -73,8 +73,8 @@ Database.prototype.addMarker = function(obj, callback) {
 	});
 };
 
-Database.prototype.removeMarker = function(id, callback) {
-	this.pool.query("DELETE FROM Markers WHERE id = ?", [id], function(err) {
+Database.prototype.removeMarker = function(id, userid, callback) {
+	this.pool.query("DELETE FROM Markers WHERE id = ? AND author = ?", [id, userid], function(err) {
 		if(err) {
 			console.error("Unable to remove Marker:");
 			console.error(err);
@@ -86,9 +86,57 @@ Database.prototype.removeMarker = function(id, callback) {
 	});
 };
 
+Database.prototype.validateLogin = function(username, password, callback) {
+	if(username !== undefined && password !== undefined) {
+		this.pool.query("SELECT id FROM Users WHERE name = ? AND password = ?", [username, password], function(err, rows) {
+			if(err) {
+				console.error("Unable to validate user:");
+				console.error(err);
+				callback(err);
+			}
+			else {
+				callback(undefined, rows !== undefined && rows.length == 1);
+			}
+		});
+	}
+	else {
+		console.error("Unable to validate user:");
+		console.error("either username, password or both were not supplied.");
+		callback(err);
+	}
+};
+
+Database.prototype.getFriendsOf = function(id, callback) {
+	this.pool.query("SELECT u.id AS id, u.name AS name FROM Friends f LEFT JOIN Users u ON f.user = u.id WHERE u.id = ?", [id], function(err, rows) {
+		if(err) {
+			console.error("Unable to get friends of:");
+			console.error(err);
+			callback(err);
+		}
+		else {
+			callback(undefined, rows);
+		}
+	});
+};
+
+Database.prototype.getFriendsBy = function(id, callback) {
+	this.pool.query("SELECT u.id AS id, u.name AS name FROM Friends f LEFT JOIN Users u ON f.friend = u.id WHERE u.id = ?", [id], function(err, rows) {
+		if(err) {
+			console.error("Unable to get friends by:");
+			console.error(err);
+			callback(err);
+		}
+		else {
+			callback(undefined, rows);
+		}
+	});
+};
+
 Database.prototype.fetchMarkers = function(id, callback) {
 	if(id === undefined) {
-		this.pool.query("SELECT id, name, description, lat, lng, icon FROM Markers WHERE private = FALSE", function(err, rows) {
+		this.pool.query("SELECT id, name, description, lat, lng, visibility, author, icon " +
+						"FROM markers " +
+						"WHERE visibility = 'public'", function(err, rows) {
 			if(err) {
 				console.error("Unable to fetch Markers:");
 				console.error(err);
@@ -100,7 +148,23 @@ Database.prototype.fetchMarkers = function(id, callback) {
 		});
 	}
 	else {
-
+		this.pool.query("SELECT id, name, description, lat, lng, visibility, author, icon " +
+							"FROM markers " +
+							"WHERE author = ? OR (" +
+								"visibility = 'public' OR (" +
+									"visibility = 'friends' AND " +
+									"author IN (SELECT friend FROM friends WHERE user = ?)" +
+								")" +
+							") AND NOT id IN (SELECT marker FROM markerIgnore WHERE user = ?)", [id, id, id], function(err, rows) {
+			if(err) {
+				console.error("Unable to fetch Markers:");
+				console.error(err);
+				callback(err);
+			}
+			else {
+				callback(undefined, rows);
+			}
+		});
 	}
 };
 
@@ -117,8 +181,8 @@ Database.prototype.addUser = function(obj, callback) {
 	});
 };
 
-Database.prototype.addFriend = function(obj, callback) {
-	this.pool.query("INSERT INTO Friends(user, friend) VALUES(?, ?)", [obj.user, obj.friend], function(err) {
+Database.prototype.addFriend = function(user, friend, callback) {
+	this.pool.query("INSERT INTO Friends(user, friend) VALUES(?, ?)", [user, friend], function(err) {
 		if(err) {
 			console.error("Could not add friend:");
 			console.error(err);
@@ -130,8 +194,8 @@ Database.prototype.addFriend = function(obj, callback) {
 	});
 };
 
-Database.prototype.removeFriend = function(obj, callback) {
-	this.pool.query("DELETE FROM Friends WHERE user = ? AND friend = ?", [obj.user, obj.friend], function(err) {
+Database.prototype.removeFriend = function(user, friend, callback) {
+	this.pool.query("DELETE FROM Friends WHERE user = ? AND friend = ?", [user, friend], function(err) {
 		if(err) {
 			console.error("Could not remove friend:");
 			console.error(err);
@@ -195,8 +259,46 @@ Database.prototype.disableUser = function(id, callback) {
 	});
 };
 
-Database.prototype.ignoreMarker = function(obj, callback) {
-	this.pool.query("INSERT INTO MarkerIgnore(user, marker) VALUES(?, ?)", [obj.user, obj.marker], function(err) {
+Database.prototype.validateAdmin = function(id, callback) {
+	if(username !== undefined && password !== undefined) {
+		this.pool.query("SELECT id FROM Admins WHERE user = ?", [id], function(err, rows) {
+			if(err) {
+				console.error("Could not validate admin:");
+				console.error(err);
+				callback(err);
+			}
+			else {
+				callback(undefined, rows !== undefined && rows.length == 1);
+			}
+		});
+	}
+	else {
+		console.error("Unable to validate user:");
+		console.error("either username, password or both were not supplied.");
+		callback(err);
+	}
+};
+
+Database.prototype.getUserByName = function(username, callback) {
+	this.pool.query("SELECT id, name, steamid, enabled, password FROM Users WHERE name = ?", [username], function(err, rows) {
+		if(err) {
+			console.error("Could not get user by username:");
+			console.error(err);
+			callback(err);
+		}
+		else {
+			if(rows == undefined || rows.length != 1) {
+				callback();
+			}
+			else {
+				callback(undefined, rows[0]);
+			}
+		}
+	});
+};
+
+Database.prototype.ignoreMarker = function(user, marker, callback) {
+	this.pool.query("INSERT INTO MarkerIgnore(user, marker) VALUES(?, ?)", [user, marker], function(err) {
 		if(err) {
 			console.error("Could not ignore marker:");
 			console.error(err);
