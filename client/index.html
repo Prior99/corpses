@@ -1,133 +1,144 @@
-﻿<html>
-<head>
-	<meta http-equiv="content-type" content="text/html; charset=utf-8">
-	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
-	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css" />
-	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.0/leaflet.awesome-markers.css" />
-	<link rel="stylesheet" href="style/numberedMarkers.css" />
-	<link rel="stylesheet"  type="text/less" href="style/style.less" />
-	<script src="//cdnjs.cloudflare.com/ajax/libs/less.js/1.7.5/less.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.0/leaflet.awesome-markers.min.js"></script>
-	<script src="port.js"></script>
-	<script src="js/websocket_client.js"></script>
-	<script src="js/client.js"></script>
-	<script src="js/numberedMarkers.js"></script>
-	<script type="text/html" id="templateCreateMarker">
-		<h1>Create new marker</h1>
-		<table>
-			<tr>
-				<td>Name:</td>
-				<td><input type="text" id="name" /></td>
-			</tr>
-			<tr>
-				<td>Description:</td>
-				<td><textarea id="description"></textarea></td>
-			</tr>
-			<tr>
-				<td>Icon:</td>
-				<td>
-					<select id="icon" style="font-family: 'FontAwesome'; font-size: 14pt;">
-						<optgroup label="Loot">
-							<option value="trash">				&#xf1f8; Trash					</option>
-							<option value="archive">			&#xf187; Chest					</option>
-							<option value="globe">				&#xf0ac; Resources				</option>
-							<option value="leaf">				&#xf06c; Natural				</option>
-							<option value="pagelines">			&#xf18c; Farming				</option>
-						<optgroup label="Markers">
-							<option value="heart">				&#xf004; Home					</option>
-							<option value="binoculars">			&#xf1e5; Viewpoint				</option>
-							<option value="thumb-tack">			&#xf08d; Point					</option>
-						<optgroup label="Buildings">
-							<option value="bus">				&#xf207; Public Transport 		</option>
-							<option value="futbol-o">			&#xf1e3; Recreational			</option>
-							<option value="paint-brush">		&#xf1fc; Paintshop 				</option>
-							<option value="plug">				&#xf1e6; Energy					</option>
-							<option value="anchor">				&#xf13d; Harbor					</option>
-							<option value="automobile">			&#xf1b9; Automobile				</option>
-							<option value="bank">				&#xf19c; Public					</option>
-							<option value="beer">				&#xf0fc; Bar					</option>
-							<option value="book">				&#xf02d; Library				</option>
-							<option value="building-o">			&#xf0f7; Sky scraper			</option>
-							<option value="camera">				&#xf030; Point of Interest		</option>
-							<option value="coffee">				&#xf0f4; Café					</option>
-							<option value="cutlery">			&#xf0f5; Restaurant				</option>
-							<option value="envelope">			&#xf0e0; Post					</option>
-							<option value="gavel">				&#xf0e3; Court					</option>
-							<option value="fire-extinguisher">	&#xf134; Fire station			</option>
-							<option value="flask">				&#xf0c3; Chemics				</option>
-							<option value="graduation-cap">		&#xf19d; Education				</option>
-							<option value="plane">				&#xf072; Airport				</option>
-							<option value="wrench">				&#xf0ad; Workshop 				</option>
-							<option value="home">				&#xf015; House					</option>
-							<option value="plus-square">		&#xf0fe; Medical				</option>
-							<option value="shopping-cart">		&#xf07a; Shop 					</option>
-							<option value="bomb">				&#xf1e2; Armory					</option>
-					</scelect>
-				</td>
-			</tr>
-			<tr>
-				<td>Create:</td>
-				<td><button id="create">Okay</button></td>
-			</tr>
-		</table>
-	</script>
-</head>
-<body>
-	<div id="map" style="width: 100%; height: 100%"></div>
-	<div class="serverstats container">
-		<div>
-			Time <span id="time"><img height="20" src="img/loading.gif" /></span>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+		<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+		<script src="port.js"></script>
+		<script src="js/websocket_client.js"></script>
+		
+	</head>
+	<body>
+		<div class="header">
+			Welcome to the 7 days to die map for Land der toten Römmelbrömser
+		</div>
+		<div id="form">
+			<div id="loginDiv">
+				<span id="loginError" class="error"></span>
+				Username: <input type="text" id="loginName"></input><br/>
+				Password: <input type="text" id="loginPassword"></input><br/>
+				<input type="checkbox" id="loginRemember" value="bla"> Remember my login data</input><br/>
+				<button id="login">Login</button>
+			</div>
+			
+			<div id="registerDiv" class="error">
+				<span id="registerError"></span>
+				Username: <input id="registerName"></input><br/>
+				Steam64 ID: <input id="registerSteamID"></input> <a id="registerSteamIDHelp" class="tipstrip"> ? </a><span id="registerSteamIDHelpText" class="help">tolle help</span><br/>
+				Password: <input id="registerPassword"></input> <a id="registerPasswordHelp" class="tipstrip"> ? </a><span id="registerPasswordHelpText" class="help">tolle help</span><br/>
+				Repeated password: <input id="registerPasswordRepeat"></input><br/>
+				<input type="checkbox" id="registerRemember"> Remember my login data</input><br/>
+				<button id="register">Register</button>
+			</div>
 		</div>
 		<div>
-			Players <span id="players"><img height="20" src="img/loading.gif" /></span>
+			<a href="#" id="gotoRegister"> Not registered jet? </a>
+			<a href="#" id="gotoLogin"> I suddenly remembered my login! </a>
 		</div>
-		<div>
-			Zombies <span id="zombies"><img height="20" src="img/loading.gif" /></span>
-		</div>
-	</div>
-	<div class="systemstats container">
-		<div>
-			FPS <span id="fps"><img height="20" src="img/loading.gif" /></span>
-		</div>
-		<div>
-			Memory <span id="memory"><img height="20" src="img/loading.gif" /></span>
-		</div>
-		<div>
-			Chunks <span id="chunks"><img height="20" src="img/loading.gif" /></span>
-		</div>
-		<div>
-			Entities <span id="entities"><img height="20" src="img/loading.gif" /></span>
-		</div>
-		<div>
-			Items <span id="items"><img height="20" src="img/loading.gif" /></span>
-		</div>
-	</div>
-	<div class="players container" id="players">
-		<table id="playerTable">
-			<tr>
-				<td>#</td>
-				<td>Name</td>
-				<td style="background: darkgrey;">x</td>
-				<td style="background: darkgrey;">y</td>
-				<td style="background: darkgrey;">z</td>
-				<td>Deaths</td>
-				<td>Health</td>
-				<td>Kills</td>
-				<td>Score</td>
-				<td>Age</td>
-				<td>Ping</td>
-			</tr>
-		</table>
-		<div id="noplayers">
-			No players connected.
-		</div>
-	</div>
-	<script>
-		$(function() {
-			main();
-		});
-	</script>
-</body>
+		
+		<script>
+			function showRegister(animationLength){
+				$(".help").hide();
+				
+				$("#gotoRegister").hide(animationLength);
+				$("#gotoLogin").show(animationLength);
+				
+				$("#loginDiv").hide(animationLength);
+				$("#registerDiv").show(animationLength);
+			}
+			
+			function showLogin(animationLength){
+				$(".help").hide();
+				
+				$("#gotoLogin").hide(animationLength);
+				$("#gotoRegister").show(animationLength);
+				
+				$("#registerDiv").hide(animationLength);
+				$("#loginDiv").show(animationLength);
+			}
+			
+			function gotoMap(){
+				window.location.href = "map.html";
+			}
+			
+			function showHelp(markerID, show, animationLength){
+				var span = $("#" + markerID + "Text");
+				if(show){
+					span.show(animationLength);
+				}
+				else{
+					span.hide(animationLength);
+				}
+			}
+			
+			storeLoginData(remember, name, password){
+				if(remember){
+					localStorage.setItem("name", name);
+					localStorage.setItem("password", password);
+				}
+			}
+			
+			retreiveLoginData(){
+				if(localStorage.setItem["name"] !== undefined && password: localStorage["password"] !== undefined){
+					return {
+						name: localStorage.setItem["name"],
+						password: localStorage["password"]
+					};
+				}
+				else{
+					return undefined;
+				}
+			}
+			
+			$(function(){
+				showLogin(0);
+				
+				//Websocket.init();
+				
+				$(".tipstrip").hover(function(){ showHelp($(this).attr("id"), true, 100); }, function(){ showHelp($(this).attr("id"), false, 100); });
+				
+				$("#gotoRegister").click(function(){
+					showRegister(100);
+				});
+				$("#gotoLogin").click(function(){
+					showLogin(100);
+				});
+				
+				$("#register").click(function(){
+					Websocket.send("register", {
+							name: $("#registerName").val(),
+							steamid: $("#registerSteamID").val(),
+							password: $("#registerPassword").val()
+						},
+						function(obj){
+							if(obj.okay == true){
+								storeLoginData($("#registerRemember").is(":checked"), $("#registerName").val(), $("#registerPassword").val());
+								gotoMap();
+							}
+							else{
+								$("#registerError").html(obj.reason);
+							}
+						}
+					);
+				});
+				
+				$("#login").click(function(){
+					Websocket.send("login", {
+							name: $("#loginName").val(),
+							password: $("#loginPassword").val()
+						},
+						function(obj){
+							if(obj.okay == true){
+								storeLoginData($("#loginRemember").is(":checked"), $("#registerName").val(), $("#registerPassword").val());
+								gotoMap();
+							}
+							else{
+								$("#loginError").html(obj.reason);
+							}
+						}
+					);
+				});
+				
+				
+			});
+		</script>
+	</body>
 </html>
