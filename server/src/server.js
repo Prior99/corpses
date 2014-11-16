@@ -4,6 +4,7 @@ var WebSocket = require("./websocket_server.js");
 var config = require("../config.json");
 var FS = require("fs");
 var Database = require("./database.js");
+var addClientListeners = require("./clientlisteners.js");
 
 var clients = [];
 var wsServer;
@@ -45,44 +46,10 @@ function startWebsocketServer() {
 				(function(client) {
 					clients.push(client);
 					console.log("New client connected. Currently " + clients.length + " clients connected.");
+					addClientListeners(client, database);
 					client.addCloseListener(function() {
 						removeClient(client);
 					});
-					database.fetchMarkers(function(err, markers) {
-						sendMarkers(client, markers);
-					});
-					client.addListener("addMarker", function(obj, async) {
-						console.log("Got request to add marker:", obj);
-						if(!obj.icon || !obj.name || !obj.description || !obj.lat || !obj.lng) {
-							async({
-								okay : false
-							});
-						}
-						else {
-							database.addMarker(obj, function(err, result) {
-								broadcastMarkers([result]);
-								async({
-									okay : true
-								});
-							});
-						}
-					}, true);
-					client.addListener("removeMarker", function(obj, async) {
-						console.log("Got request to remove marker:", obj);
-						if(!obj.id) {
-							async({
-								okay : false
-							});
-						}
-						else {
-							database.removeMarker(obj.id, function(err, result) {
-								broadcastRemoveMarker(obj.id);
-								async({
-									okay : true
-								});
-							})
-						}
-					}, true);
 				})(new WebSocket(ws));
 			});
 			console.log("Websocketserver Started up!");
