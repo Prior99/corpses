@@ -4,7 +4,7 @@ var WebSocket = require("./websocket_server.js");
 var config = require("../config.json");
 var FS = require("fs");
 var Database = require("./database.js");
-var addClientListeners = require("./clientlisteners.js");
+var addClientListeners = require("./client.js");
 
 var clients = [];
 var wsServer;
