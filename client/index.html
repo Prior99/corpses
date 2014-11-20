@@ -1,45 +1,56 @@
 <html>
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+		
+		<link rel="stylesheet" type="text/less" href="style/mainstyle.less" />
+		
 		<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/less.js/1.7.5/less.min.js"></script>
 		<script src="port.js"></script>
 		<script src="js/websocket_client.js"></script>
-		
 	</head>
 	<body>
 		<div class="header">
 			Welcome to the 7 days to die map for Land der toten Römmelbrömser
 		</div>
 		<div id="form">
-			<div id="loginDiv">
+			<div id="loginDiv" class="form">
 				<span id="loginError" class="error"></span>
-				Username: <input type="text" id="loginName"></input><br/>
-				Password: <input type="text" id="loginPassword"></input><br/>
+				<table>
+					<tr>
+						<td>Username:</td>
+						<td><input type="text" id="loginName"></input></td>
+					</tr>
+					<tr>
+						<td>Password:</td>
+						<td><input type="text" id="loginPassword"></input></td>
+					</tr>
+				</table>
 				<input type="checkbox" id="loginRemember" value="bla"> Remember my login data</input><br/>
-				<button id="login">Login</button>
+				<button id="login">Login</button><br/>
+				
+				<a href="#" id="gotoRegister"> Not registered jet? </a>
 			</div>
 			
-			<div id="registerDiv" class="error">
-				<span id="registerError"></span>
+			<div id="registerDiv" class="form">
+				<span id="registerError" class="error"></span>
 				Username: <input id="registerName"></input><br/>
 				Steam64 ID: <input id="registerSteamID"></input> <a id="registerSteamIDHelp" class="tipstrip"> ? </a><span id="registerSteamIDHelpText" class="help">tolle help</span><br/>
 				Password: <input id="registerPassword"></input> <a id="registerPasswordHelp" class="tipstrip"> ? </a><span id="registerPasswordHelpText" class="help">tolle help</span><br/>
 				Repeated password: <input id="registerPasswordRepeat"></input><br/>
 				<input type="checkbox" id="registerRemember"> Remember my login data</input><br/>
-				<button id="register">Register</button>
+				<button id="register">Register</button><br/>
+				<a href="#" id="gotoLogin"> I suddenly remembered my login! </a>
 			</div>
-		</div>
-		<div>
-			<a href="#" id="gotoRegister"> Not registered jet? </a>
-			<a href="#" id="gotoLogin"> I suddenly remembered my login! </a>
+			
 		</div>
 		
 		<script>
 			function showRegister(animationLength){
 				$(".help").hide();
 				
-				$("#gotoRegister").hide(animationLength);
-				$("#gotoLogin").show(animationLength);
+				//gotoRegister").hide(animationLength);
+				//$("#gotoLogin").show(animationLength);
 				
 				$("#loginDiv").hide(animationLength);
 				$("#registerDiv").show(animationLength);
@@ -48,8 +59,8 @@
 			function showLogin(animationLength){
 				$(".help").hide();
 				
-				$("#gotoLogin").hide(animationLength);
-				$("#gotoRegister").show(animationLength);
+				//$("#gotoLogin").hide(animationLength);
+				//$("#gotoRegister").show(animationLength);
 				
 				$("#registerDiv").hide(animationLength);
 				$("#loginDiv").show(animationLength);
@@ -69,17 +80,17 @@
 				}
 			}
 			
-			storeLoginData(remember, name, password){
+			function storeLoginData(remember, name, password){
 				if(remember){
 					localStorage.setItem("name", name);
 					localStorage.setItem("password", password);
 				}
 			}
 			
-			retreiveLoginData(){
-				if(localStorage.setItem["name"] !== undefined && password: localStorage["password"] !== undefined){
+			function retreiveLoginData(){
+				if(localStorage["name"] !== undefined && localStorage["password"] !== undefined){
 					return {
-						name: localStorage.setItem["name"],
+						name: localStorage["name"],
 						password: localStorage["password"]
 					};
 				}
