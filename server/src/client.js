@@ -192,7 +192,7 @@ function Client(websocket, database, server) {
 				}
 			}.bind(this));
 		}
-	}.bind(this)));
+	}.bind(this));
 
 	/*
 	 * Listener for Callback removeFriend
@@ -219,7 +219,7 @@ function Client(websocket, database, server) {
 				}
 			}.bind(this));
 		}
-	}.bind(this)));
+	}.bind(this));
 
 	websocket.addListener("enableUser", function(username, async) {
 		//TODO

@@ -1,1 +1,4 @@
 node_modules/
+client/map
+client/port.js
+server/config.json
