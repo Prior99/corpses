@@ -36,7 +36,7 @@ var Websocket = {
 	onMessage: function(evt){
 		var self = this;
 		var obj = JSON.parse(evt.data);
-		//console.log("received: " + evt.data);
+		console.log("received: " + evt.data);
 		if(obj.type === undefined || obj.id === undefined){
 			console.error("received broken packet: " + evt.data + " - Required field missing");
 			return;
@@ -123,7 +123,7 @@ var Websocket = {
 			id: this.id
 		};
 		this.responses[this.id] = handler;
-		//console.log("send: " + JSON.stringify(meta));
+		console.log("send: " + JSON.stringify(meta));
 		this.socket.send(JSON.stringify(meta));
 		this.id++;
 	}

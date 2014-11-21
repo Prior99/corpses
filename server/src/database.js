@@ -112,7 +112,7 @@ Database.prototype.removeMarker = function(id, userid, callback) {
 	});
 };
 
-Database.prototype.validateLogin = function(username, password, callback) {
+Database.prototype.validateUser = function(username, password, callback) {
 	if(username !== undefined && password !== undefined) {
 		this.pool.query("SELECT id FROM Users WHERE name = ? AND password = ?", [username, password], function(err, rows) {
 			if(err) {

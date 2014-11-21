@@ -18,7 +18,7 @@ function Client(websocket, database, server) {
 				else {
 					async({
 						okay : false,
-						reason : "name_already_taken"
+						reason : "username_or_password_wrong"
 					});
 				}
 			}
@@ -28,7 +28,7 @@ function Client(websocket, database, server) {
 	/*
 	 * Listener for Callback register
 	 */
-	websocket.addListener("register", function(obj, asyc) {
+	websocket.addListener("register", function(obj, async) {
 		if(obj.name && obj.steamid && obj.password && obj.name.length > 3) {
 			database.addUser(obj, function(err) {
 				if(err) {
@@ -221,7 +221,7 @@ function Client(websocket, database, server) {
 		}
 	}.bind(this));
 	websocket.addCloseListener(function() {
-		this.server.removeClient(client);
+		server.removeClient(this);
 	}.bind(this));
 	/*
 	 * Listener for enabeling an user
@@ -275,7 +275,7 @@ function Client(websocket, database, server) {
 			});
 		}.bind(this), async);
 	}.bind(this), true);
-}
+};
 
 Client.prototype.checkAdmin = function(callback, async) {
 	this.database.validateAdmin(this.user.id, function(err, admin) {
@@ -283,24 +283,24 @@ Client.prototype.checkAdmin = function(callback, async) {
 			callback(admin);
 		}
 	});
-}
+};
 
 function checkError(err, async) {
 	if(!err) {
-		return true;
+		return undefined;
 	}
 	else {
 		async({
 			okay : false,
 			reason : "internal_error"
 		});
-		return false;
+		return err;
 	}
-}
+};
 
 Client.prototype.isLoggedIn = function() {
 	return this.user !== undefined;
-}
+};
 
 Client.prototype.checkLoggedIn = function(async) {
 	if(this.user === undefined) {
@@ -313,10 +313,14 @@ Client.prototype.checkLoggedIn = function(async) {
 	else {
 		return true;
 	}
-}
+};
+
+Client.prototype.sendEvent = function(action, obj) {
+	//TODO: This is a stub
+};
 
 Client.prototype.loadUser = function(username) {
-	database.getUserByName(username, function(err, user) {
+	this.database.getUserByName(username, function(err, user) {
 		if(!err) {
 			this.user = user;
 		}
