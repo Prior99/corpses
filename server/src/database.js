@@ -126,9 +126,7 @@ Database.prototype.validateUser = function(username, password, callback) {
 		});
 	}
 	else {
-		console.error("Unable to validate user:");
-		console.error("either username, password or both were not supplied.");
-		callback(err);
+		callback(undefined, false);
 	}
 };
 
