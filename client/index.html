@@ -1,64 +1,99 @@
 <html>
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+		<link rel="stylesheet"  type="text/less" href="style/index.less" />
 		<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/less.js/1.7.5/less.min.js"></script>
 		<script src="port.js"></script>
 		<script src="js/websocket_client.js"></script>
-		
+		<script src="js/user.js"></script>
+
 	</head>
 	<body>
 		<div class="header">
-			Welcome to the 7 days to die map for Land der toten Römmelbrömser
+			7 Days To Die Interactive Map
 		</div>
-		<div id="form">
+		<div id="form" class="form">
 			<div id="loginDiv">
-				<span id="loginError" class="error"></span>
-				Username: <input type="text" id="loginName"></input><br/>
-				Password: <input type="text" id="loginPassword"></input><br/>
-				<input type="checkbox" id="loginRemember" value="bla"> Remember my login data</input><br/>
-				<button id="login">Login</button>
+				<h1>Login</h1>
+				<table>
+					<tr>
+						<th colspan="2"><span id="loginError" class="error"></span></th>
+					</tr>
+					<tr>
+						<td>Username:</td>
+						<td><input type="text" id="loginName"></input><br/></td>
+					</tr>
+					<tr>
+						<td>Password:</td>
+						<td><input type="text" id="loginPassword"></input><br/></td>
+					</tr>
+					<tr>
+						<td>Remember me:</td>
+						<td><input type="checkbox" id="loginRemember"></input></td>
+					</tr>
+					<tr>
+						<th colspan="2"><button id="login">Login</button></th>
+					</tr>
+				</table>
+				<a href="#">Not registered yet?</a>
 			</div>
-			
+
 			<div id="registerDiv" class="error">
+				<h1>Register</h1>
 				<span id="registerError"></span>
-				Username: <input id="registerName"></input><br/>
-				Steam64 ID: <input id="registerSteamID"></input> <a id="registerSteamIDHelp" class="tipstrip"> ? </a><span id="registerSteamIDHelpText" class="help">tolle help</span><br/>
-				Password: <input id="registerPassword"></input> <a id="registerPasswordHelp" class="tipstrip"> ? </a><span id="registerPasswordHelpText" class="help">tolle help</span><br/>
-				Repeated password: <input id="registerPasswordRepeat"></input><br/>
-				<input type="checkbox" id="registerRemember"> Remember my login data</input><br/>
-				<button id="register">Register</button>
+				<table>
+					<tr>
+						<th colspan="2"></th>
+					</tr>
+					<tr>
+						<td>Username:</td>
+						<td><input id="registerName"></input></td>
+					</tr>
+					<tr>
+						<td>Steam64 ID:</td>
+						<td>
+							<input id="registerSteamID"></input>
+							<a id="registerSteamIDHelp" class="tipstrip">?</a>
+							<span id="registerSteamIDHelpText" class="help">
+								Please enter your Steam ID 64 here so the webinterface can identify
+								you ingame. If you don't know your Steam ID, you may look it up
+								on pages like <a href="http://steamidconverter.com/">http://steamidconverter.com/</a>.
+							</span>
+						</td>
+					</tr>
+					<tr>
+						<td>Password:</td>
+						<td>
+							<input id="registerPassword"></input>
+							<a id="registerPasswordHelp" class="tipstrip">?</a>
+							<span id="registerPasswordHelpText" class="help">
+								As we assume that you are grown up enough to choose a wise password.
+								There are no restrictions for passwords here. Please keep in mind,
+								that a stolen account may have negative impacts on you.
+							</span>
+						</td>
+					</tr>
+					<tr>
+						<td>Repeated password:</td>
+						<td><input id="registerPasswordRepeat"></input></td>
+					</tr>
+					<tr>
+						<td>Remember me:</td>
+						<td><input type="checkbox" id="registerRemember"></input></td>
+					</tr>
+					<tr>
+						<th colspan="2"><button id="register">Register</button></th>
+					</tr>
+				</table>
+				<a href="#">I suddenly remembered my login!</a>
 			</div>
 		</div>
-		<div>
-			<a href="#" id="gotoRegister"> Not registered jet? </a>
-			<a href="#" id="gotoLogin"> I suddenly remembered my login! </a>
-		</div>
-		
 		<script>
-			function showRegister(animationLength){
-				$(".help").hide();
-				
-				$("#gotoRegister").hide(animationLength);
-				$("#gotoLogin").show(animationLength);
-				
-				$("#loginDiv").hide(animationLength);
-				$("#registerDiv").show(animationLength);
-			}
-			
-			function showLogin(animationLength){
-				$(".help").hide();
-				
-				$("#gotoLogin").hide(animationLength);
-				$("#gotoRegister").show(animationLength);
-				
-				$("#registerDiv").hide(animationLength);
-				$("#loginDiv").show(animationLength);
-			}
-			
-			function gotoMap(){
+			function gotoMap() {
 				window.location.href = "map.html";
 			}
-			
+
 			function showHelp(markerID, show, animationLength){
 				var span = $("#" + markerID + "Text");
 				if(show){
@@ -68,40 +103,33 @@
 					span.hide(animationLength);
 				}
 			}
-			
-			storeLoginData(remember, name, password){
-				if(remember){
-					localStorage.setItem("name", name);
-					localStorage.setItem("password", password);
-				}
+
+			function showRegister(animationLength){
+				$(".help").hide();
+				$("#loginDiv").hide(animationLength);
+				$("#registerDiv").show(animationLength);
 			}
-			
-			retreiveLoginData(){
-				if(localStorage.setItem["name"] !== undefined && password: localStorage["password"] !== undefined){
-					return {
-						name: localStorage.setItem["name"],
-						password: localStorage["password"]
-					};
-				}
-				else{
-					return undefined;
-				}
+
+			function showLogin(animationLength){
+				$(".help").hide();
+				$("#registerDiv").hide(animationLength);
+				$("#loginDiv").show(animationLength);
 			}
-			
+
 			$(function(){
 				showLogin(0);
-				
-				//Websocket.init();
-				
+
+				Websocket.init();
+
 				$(".tipstrip").hover(function(){ showHelp($(this).attr("id"), true, 100); }, function(){ showHelp($(this).attr("id"), false, 100); });
-				
+
 				$("#gotoRegister").click(function(){
 					showRegister(100);
 				});
 				$("#gotoLogin").click(function(){
 					showLogin(100);
 				});
-				
+
 				$("#register").click(function(){
 					Websocket.send("register", {
 							name: $("#registerName").val(),
@@ -119,7 +147,7 @@
 						}
 					);
 				});
-				
+
 				$("#login").click(function(){
 					Websocket.send("login", {
 							name: $("#loginName").val(),
@@ -136,8 +164,6 @@
 						}
 					);
 				});
-				
-				
 			});
 		</script>
 	</body>
