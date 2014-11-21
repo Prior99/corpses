@@ -90,7 +90,7 @@ function Client(websocket, database, server) {
 			}
 			else {
 				database.removeMarker(id, this.user.id, function(err, result) {
-					broadcastRemoveMarker(id);
+					this.server.broadcastRemoveMarker(id);
 					if(!checkError(err, async)) {
 						async({
 							okay : true
@@ -220,7 +220,9 @@ function Client(websocket, database, server) {
 			}.bind(this));
 		}
 	}.bind(this));
-
+	websocket.addCloseListener(function() {
+		this.server.removeClient(client);
+	}.bind(this));
 	websocket.addListener("enableUser", function(username, async) {
 		//TODO
 	}.bind(this), true);
