@@ -5,9 +5,11 @@ var config = require("../config.json");
 var FS = require("fs");
 var Database = require("./database.js");
 var Client = require("./client.js");
+var Cache = require("./cache.js");
 
 function Server() {
 	this.wsServer = null;
+	this.cache = new Cache();
 	this.telnetClient = new TelnetClient();
 	this.database = new Database();
 	this.clients = [];
@@ -90,6 +92,7 @@ Server.prototype.initTelnetClient = function() {
 	this.telnetClient.on("open", function() {
 		console.log("Connection to 7DTD established.");
 		me.telnetClient.triggerListKnownPlayers();
+		cache.connectionEstablished();
 	});
 	this.telnetClient.on("playerConnected", function(evt) {
 		me.broadcast("playerConnected", evt);
