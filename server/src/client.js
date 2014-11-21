@@ -223,8 +223,57 @@ function Client(websocket, database, server) {
 	websocket.addCloseListener(function() {
 		this.server.removeClient(client);
 	}.bind(this));
+	/*
+	 * Listener for enabeling an user
+	 */
 	websocket.addListener("enableUser", function(username, async) {
-		//TODO
+		this.checkAdmin(function(admin) {
+			database.getUserByName(username, function(err, toEnable) {
+				if(!checkError(err, async)) {
+					if(toEnable !== undefined) {
+						database.enableUser(toEnable.id, function(err) {
+							if(!checkError(err, async)) {
+								async({
+									okay : true
+								});
+							}
+						});
+					}
+					else {
+						async({
+							okay : false,
+							reason : "user_unknown"
+						});
+					}
+				}
+			});
+		}.bind(this), async);
+	}.bind(this), true);
+	/*
+	 * Listener for disabeling users
+	 */
+	websocket.addListener("disableUser", function(username, async) {
+		this.checkAdmin(function(admin) {
+			database.getUserByName(username, function(err, toEnable) {
+				if(!checkError(err, async)) {
+					if(toEnable !== undefined) {
+						database.disableUser(toEnable.id, function(err) {
+							if(!checkError(err, async)) {
+								async({
+									okay : true
+								});
+							}
+						});
+					}
+					else {
+						async({
+							okay : false,
+							reason : "user_unknown"
+						});
+					}
+				}
+			});
+		}.bind(this), async);
 	}.bind(this), true);
 }
 
