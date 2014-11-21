@@ -77,32 +77,32 @@ Server.prototype.startTelnetClient = function() {
 	console.log("Starting Telnetclient...");
 	this.telnetClient = new TelnetClient();
 	var me = this;
-	telnetClient.on("info", function(evt) {
+	this.telnetClient.on("info", function(evt) {
 		me.broadcast("info", evt);
 	});
-	telnetClient.on("spawningWanderingHorde", function(evt) {
+	this.telnetClient.on("spawningWanderingHorde", function(evt) {
 		me.broadcast("spawningWanderingHorde", evt);
 	});
-	telnetClient.on("listKnownPlayers", function(evt) {
+	this.telnetClient.on("listKnownPlayers", function(evt) {
 		me.broadcast("listKnownPlayers", evt);
 	});
-	telnetClient.on("getTime", function(evt) {
+	this.telnetClient.on("getTime", function(evt) {
 		me.broadcast("getTime", evt);
 	});
-	telnetClient.on("listPlayersExtended", function(evt) {
+	this.telnetClient.on("listPlayersExtended", function(evt) {
 		me.broadcast("listPlayersExtended", evt);
 	});
-	telnetClient.on("playerConnected", function(evt) {
+	this.telnetClient.on("playerConnected", function(evt) {
 		me.broadcast("playerConnected", evt);
 	});
-	telnetClient.on("playerDisconnected", function(evt) {
+	this.telnetClient.on("playerDisconnected", function(evt) {
 		me.broadcast("playerDisconnected", evt);
 	});
-	telnetClient.on("close", function() {
+	this.telnetClient.on("close", function() {
 		console.log("Connection to 7DTD closed. Restarting it!");
 		me.startTelnetClient();
 	});
-	telnetClient.on("open", function() {
+	this.telnetClient.on("open", function() {
 		console.log("Connection to 7DTD established.");
 		me.telnetClient.triggerListKnownPlayers();
 	});
@@ -116,3 +116,5 @@ Server.prototype.startTelnetClient = function() {
 		me.telnetClient.triggerListPlayersExtended();
 	}, 5000);
 }
+
+module.exports = Server;
