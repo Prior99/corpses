@@ -8,11 +8,11 @@ var Client = require("./client.js");
 
 function Server() {
 	this.wsServer = null;
-	this.telnetClient = null;
-	this.database = new Database();;
+	this.telnetClient = new TelnetClient();
+	this.database = new Database();
 	this.clients = [];
 	this.startWebsocketServer();
-	this.startTelnetClient();
+	this.initTelnetClient();
 	this.symlinkMap();
 }
 
@@ -80,24 +80,16 @@ Server.prototype.broadcast = function(name, obj) {
 	}
 };
 
-Server.prototype.startTelnetClient = function() {
-	console.log("Starting Telnetclient...");
-	this.telnetClient = new TelnetClient();
+Server.prototype.initTelnetClient = function() {
+	console.log("Initializing Telnetclient...");
 	var me = this;
-	this.telnetClient.on("info", function(evt) {
-		me.broadcast("info", evt);
+	this.telnetClient.on("close", function() {
+		console.log("Connection to 7DTD closed. Restarting it!");
+		cache.connectionLost();
 	});
-	this.telnetClient.on("spawningWanderingHorde", function(evt) {
-		me.broadcast("spawningWanderingHorde", evt);
-	});
-	this.telnetClient.on("listKnownPlayers", function(evt) {
-		me.broadcast("listKnownPlayers", evt);
-	});
-	this.telnetClient.on("getTime", function(evt) {
-		me.broadcast("getTime", evt);
-	});
-	this.telnetClient.on("listPlayersExtended", function(evt) {
-		me.broadcast("listPlayersExtended", evt);
+	this.telnetClient.on("open", function() {
+		console.log("Connection to 7DTD established.");
+		me.telnetClient.triggerListKnownPlayers();
 	});
 	this.telnetClient.on("playerConnected", function(evt) {
 		me.broadcast("playerConnected", evt);
@@ -105,23 +97,22 @@ Server.prototype.startTelnetClient = function() {
 	this.telnetClient.on("playerDisconnected", function(evt) {
 		me.broadcast("playerDisconnected", evt);
 	});
-	this.telnetClient.on("close", function() {
-		console.log("Connection to 7DTD closed. Restarting it!");
-		me.startTelnetClient();
+	this.telnetClient.on("spawningWanderingHorde", function(evt) {
+		me.broadcast("spawningWanderingHorde", evt);
 	});
-	this.telnetClient.on("open", function() {
-		console.log("Connection to 7DTD established.");
-		me.telnetClient.triggerListKnownPlayers();
+	this.telnetClient.on("info", function(evt) {
+		me.broadcast("updated", "info");
 	});
-	setInterval(function() {
-		me.telnetClient.triggerGetTime();
-	}, 7000);
-	setInterval(function() {
-		me.telnetClient.triggerListKnownPlayers();
-	}, 10000);
-	setInterval(function() {
-		me.telnetClient.triggerListPlayersExtended();
-	}, 5000);
+	this.telnetClient.on("listKnownPlayers", function(evt) {
+		me.broadcast("updated", "knownPlayers");
+	});
+	this.telnetClient.on("getTime", function(evt) {
+		me.broadcast("updated", "time");
+	});
+	this.telnetClient.on("listPlayersExtended", function(evt) {
+		me.broadcast("updated", "playersExtended");
+	});
+
 }
 
 module.exports = Server;

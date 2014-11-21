@@ -316,7 +316,7 @@ Client.prototype.checkLoggedIn = function(async) {
 };
 
 Client.prototype.sendEvent = function(action, obj) {
-	//TODO: This is a stub
+	websocket.send(action, obj);
 };
 
 Client.prototype.loadUser = function(username) {
