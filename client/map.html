@@ -13,6 +13,8 @@
 	<script src="port.js"></script>
 	<script src="js/websocket_client.js"></script>
 	<script src="js/client.js"></script>
+	<!--<script src="js/map.js"></script>-->
+	<script src="js/interface.js"></script>
 	<script src="js/numberedMarkers.js"></script>
 	<script type="text/html" id="templateCreateMarker">
 		<h1>Create new marker</h1>
@@ -139,13 +141,12 @@
 	</div>
 	<script>
 		$(function() {
-			main();
 			var sidebar;
 			sidebar = $(".sidebar");
 			sidebar.opened = false;
 			sidebar.click(function() {
 				if(sidebar.opened) {
-					sidebar.css({"left" : "-180px"});
+					sidebar.css({"left" : "-190px"});
 					sidebar.opened = false;
 				}
 				else {
