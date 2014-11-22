@@ -55,3 +55,39 @@ Login.checkLogin = function(callback) {
 		);
 	}
 };
+
+Login.encrypt = function(key, msg){
+	var encrypter = new jsSHA(msg, "TEXT");
+	return encrypter.getHMAC(key, "TEXT", "SHA-256", "HEX");
+};
+
+Login.login = function(name, password, remember, callback){
+	var passwdEnc = Login.encrypt(name, password);
+	Websocket.send("login", {
+			name: name,
+			password: passwdEnc
+		},
+		function(obj){
+			if(obj.okay == true && remember == true){
+				Login.storeLoginData(name, passwdEnc);
+			}
+			callback(obj);
+		}
+	);
+};
+
+Login.register = function(name, password, steamID, remember, callback){
+	var passwdEnc = Login.encrypt(name, password);
+	Websocket.send("register", {
+			name: name,
+			password: passwdEnc,
+			steamid: steamID
+		},
+		function(obj){
+			if(obj.okay == true && remember == true){
+				Login.storeLoginData(name, passwdEnc);
+			}
+			callback(obj);
+		}
+	);
+};

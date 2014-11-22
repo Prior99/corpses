@@ -4,6 +4,7 @@
 		<link rel="stylesheet"  type="text/less" href="style/index.less" />
 		<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 		<script src="//cdnjs.cloudflare.com/ajax/libs/less.js/1.7.5/less.min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/jsSHA/1.5.0/sha256.js"></script>
 		<script src="port.js"></script>
 		<script src="js/websocket_client.js"></script>
 		<script src="js/login.js"></script>
@@ -111,7 +112,7 @@
 				$("#registerDiv").hide(animationLength);
 				$("#loginDiv").show(animationLength);
 			}
-
+			
 			$(function(){
 				showLogin(0);
 
@@ -127,42 +128,30 @@
 				});
 
 				$("#register").click(function(){
-					Websocket.send("register", {
-							name: $("#registerName").val(),
-							steamid: $("#registerSteamID").val(),
-							password: $("#registerPassword").val()
-						},
-						function(obj){
+					if($("#registerPassword").val() == $("#registerPasswordRepeat").val()){
+						Login.register($("#registerName").val(), $("#registerPassword").val(), $("#registerSteamID").val(), $("#registerRemember").is(":checked"), function(obj){
 							if(obj.okay == true){
-								if($("#registerRemember").is(":checked")){
-									Login.storeLoginData($("#registerName").val(), $("#registerPassword").val());
-								}
 								window.location.href = "map.html";
 							}
 							else{
 								$("#registerError").html(obj.reason);
 							}
-						}
-					);
+						});
+					}
+					else{
+						$("#registerError").html("Passwords do not match");
+					}
 				});
 
 				$("#login").click(function(){
-					Websocket.send("login", {
-							name: $("#loginName").val(),
-							password: $("#loginPassword").val()
-						},
-						function(obj){
-							if(obj.okay == true){
-								if($("#loginRemember").is(":checked")){
-									Login.storeLoginData($("#loginName").val(), $("#loginPassword").val());
-								}
-								window.location.href = "map.html";
-							}
-							else{
-								$("#loginError").html(obj.reason);
-							}
+					Login.login($("#loginName").val(), $("#loginPassword").val(), $("#loginRemember").is(":checked"), function(obj){
+						if(obj.okay){
+							window.location.href = "map.html";
 						}
-					);
+						else{
+							$("#loginError").html(obj.reason);
+						}
+					});
 				});
 			});
 		</script>
