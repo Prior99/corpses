@@ -51,7 +51,7 @@ function Client(websocket, database, server) {
 				reason : "invalid_arguments"
 			});
 		}
-	}.bind(this));
+	}.bind(this), true);
 
 	/*
 	 * Listener for Callback addMarker
