@@ -49,15 +49,30 @@ NET.refreshAll = function() {
 }
 
 NET.displayHordeWarning = function() {
-	//TODO
+	UI.firePopup({
+		headline : "Horde spawned",
+		text : "A wandering horde was spawned from the server.",
+		icon : "fa-warning",
+		timeout : 30
+	});
 };
 
 NET.displayPlayerJoinedWarning = function(player) {
-	//TODO
+	UI.firePopup({
+		headline : "Player joined",
+		text : "The player " + player.name + " has connected to the game.",
+		icon : "fa-user",
+		timeout : 8
+	});
 };
 
 NET.displayPlayerDisconnectedWarning = function(player) {
-	//TODO
+	UI.firePopup({
+		headline : "Player left",
+		text : "The player " + player.name + " has disconnected from the game.",
+		icon : "fa-user",
+		timeout : 8
+	});
 };
 
 $(function() {

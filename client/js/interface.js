@@ -50,4 +50,23 @@ UI.updatePlayer = function(player) {
 		"<td>" + player.playtime + "min</td>" +
 		"<td>" + player.ping + "ms</td>"
 	);
+};
+
+UI.firePopup = function(obj) {
+	var popup = $($("#templatePopup").html()).prependTo($(".stack"));
+	popup.find("h1").html(obj.headline ? obj.headline : "");
+	popup.find(".text").html(obj.text ? obj.text : "");
+	popup.find(".icon").addClass(obj.icon ? obj.icon : "fa-bell");
+	popup.find(".close").click(function() {
+		popup.close();
+	});
+	popup.close = function() {
+		popup.css({"opacity" : "0"});
+		setTimeout(function() {
+			popup.remove();
+		}, 300);
+	};
+	setTimeout(function() {
+		popup.close();
+	}, obj.timeout ? obj.timeout*1000 : 10000);
 }
