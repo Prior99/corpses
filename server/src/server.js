@@ -12,6 +12,15 @@ function Server() {
 	this.cache = new Cache();
 	this.telnetClient = new TelnetClient();
 	this.telnetClient.on("open", function(){
+		console.log("Connection to 7DTD established.");
+		try{
+			this.telnetClient.triggerListKnownPlayers();
+			this.cache.connectionEstablished(this.telnetClient);
+		}
+		catch(error){
+			console.error("Error opening TelnetClient: " + error);
+		}
+	
 		this.database = new Database();
 		this.clients = [];
 		this.startWebsocketServer();
@@ -94,16 +103,6 @@ Server.prototype.initTelnetClient = function() {
 		}
 		catch(error){
 			console.err("Error closing TelnetClient: " + error);
-		}
-	});
-	this.telnetClient.on("open", function() {
-		console.log("Connection to 7DTD established.");
-		try{
-			me.telnetClient.triggerListKnownPlayers();
-			me.cache.connectionEstablished(me.telnetClient);
-		}
-		catch(error){
-			console.err("Error opening TelnetClient: " + error);
 		}
 	});
 	this.telnetClient.on("playerConnected", function(evt) {
