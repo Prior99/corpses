@@ -143,6 +143,24 @@ Database.prototype.getFriendsOf = function(id, callback) {
 	});
 };
 
+Database.prototype.isFriendOf = function(me, friendOf, callback) {
+	this.pool.query("SELECT id FROM Friends WHERE user = ? AND friend = ?", [friendOf, me], function(err, rows) {
+		if(err) {
+			console.error("Unable to check, if someone is someones friend:");
+			console.error(err);
+			callback(err);
+		}
+		else {
+			if(rows == undefined || rows.length < 1) {
+				callback(undefined, false);
+			}
+			else {
+				callback(undefined, true);
+			}
+		}
+	});
+};
+
 Database.prototype.getFriendsBy = function(id, callback) {
 	this.pool.query("SELECT u.id AS id, u.name AS name FROM Friends f LEFT JOIN Users u ON f.friend = u.id WHERE u.id = ?", [id], function(err, rows) {
 		if(err) {
@@ -307,6 +325,24 @@ Database.prototype.getUserByName = function(username, callback) {
 	this.pool.query("SELECT id, name, steamid, enabled, password FROM Users WHERE name = ?", [username], function(err, rows) {
 		if(err) {
 			console.error("Could not get user by username:");
+			console.error(err);
+			callback(err);
+		}
+		else {
+			if(rows == undefined || rows.length != 1) {
+				callback();
+			}
+			else {
+				callback(undefined, rows[0]);
+			}
+		}
+	});
+};
+
+Database.prototype.getUserBySteamID = function(steamid, callback) {
+	this.pool.query("SELECT id, name, steamid, enabled, password FROM Users WHERE steamid = ?", [steamid], function(err, rows) {
+		if(err) {
+			console.error("Could not get user by steamid:");
 			console.error(err);
 			callback(err);
 		}

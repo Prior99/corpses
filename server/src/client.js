@@ -275,6 +275,85 @@ function Client(websocket, database, server) {
 			});
 		}.bind(this), async);
 	}.bind(this), true);
+	/*
+	 * Listener for getTime
+	 */
+	websocket.addListener("getTime", function(obj) {
+		return server.cache.time;
+	});
+	/*
+	 * Listener for getKnownPlayers
+	 */
+	websocket.addListener("getKnownPlayers", function(obj) {
+		return server.cache.knownPlayers;
+	});
+	/*
+	 * Listener for getInfo
+	 */
+	websocket.addListener("getInfo", function(obj) {
+		return server.cache.info;
+	});
+	/*
+	 *	Listener for getPlayers
+	 */
+	websocket.addListener("getPlayers", function(obj, async) {
+		if(this.checkLoggedIn(async)) {
+			var visiblePlayers = [];
+			var counter = 0;
+
+			function done() {
+				async({
+					okay : true,
+					players : visiblePlayers
+				});
+			}
+
+			function decCounter() {
+				counter--;
+				if(counter == 0) {
+					done();
+				}
+				if(counter < 0) {
+					console.error("Error: Counter lower than 0");
+				}
+			}
+
+			for(var i in server.cache.playersExtended) {
+				var player = server.cache.playersExtended[i];
+				if(player.steamid == this.user.steamid) {
+					visiblePlayers.push(player);
+				}
+				else {
+					counter++;
+					database.getUserBySteamID(player.steamid, function(err, playerDB) {
+						if(!checkError(err, async)) {
+							if(playerDB == undefined) {
+								decCounter();
+								console.error("Unknown player on the server");
+								async({
+									okay : false,
+									reason : "internal_error"
+								});
+							}
+							else {
+								database.isFriendOf(this.user.id, playerDB.id, function(err, f) {
+									decCounter();
+									if(!checkError(err)) {
+										if(f) {
+											visiblePlayers.push(player);
+										}
+									}
+								})
+							}
+						}
+						else {
+							decCounter();
+						}
+					});
+				}
+			}
+		}
+	}.bind(this), true);
 };
 
 Client.prototype.checkAdmin = function(callback, async) {
@@ -316,7 +395,7 @@ Client.prototype.checkLoggedIn = function(async) {
 };
 
 Client.prototype.sendEvent = function(action, obj) {
-	//TODO: This is a stub
+	websocket.send(action, obj);
 };
 
 Client.prototype.loadUser = function(username) {
