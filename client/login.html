@@ -137,7 +137,7 @@
 								if($("#registerRemember").is(":checked")){
 									Login.storeLoginData($("#registerName").val(), $("#registerPassword").val());
 								}
-								gotoMap();
+								window.location.href = "map.html";
 							}
 							else{
 								$("#registerError").html(obj.reason);

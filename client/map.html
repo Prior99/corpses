@@ -124,9 +124,35 @@
 			No players connected.
 		</div>
 	</div>
+	<div class="sidebar container">
+		<h1>Known Players</h1>
+		<div id="knownPlayers">
+
+		</div>
+		<h1>Friends</h1>
+		<div id="friends">
+
+		</div>
+		<div class="handle">
+			|||
+		</div>
+	</div>
 	<script>
 		$(function() {
 			main();
+			var sidebar;
+			sidebar = $(".sidebar");
+			sidebar.opened = false;
+			sidebar.click(function() {
+				if(sidebar.opened) {
+					sidebar.css({"left" : "-180px"});
+					sidebar.opened = false;
+				}
+				else {
+					sidebar.css({"left" : "0px"});
+					sidebar.opened = true;
+				}
+			});
 		});
 	</script>
 </body>
