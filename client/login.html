@@ -135,7 +135,7 @@
 						function(obj){
 							if(obj.okay == true){
 								Login.storeLoginData($("#registerName").val(), $("#registerPassword").val());
-								gotoMap();
+								window.location.href = "index.html";
 							}
 							else{
 								$("#registerError").html(obj.reason);
