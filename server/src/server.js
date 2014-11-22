@@ -87,12 +87,12 @@ Server.prototype.initTelnetClient = function() {
 	var me = this;
 	this.telnetClient.on("close", function() {
 		console.log("Connection to 7DTD closed. Restarting it!");
-		cache.connectionLost();
+		me.cache.connectionLost();
 	});
 	this.telnetClient.on("open", function() {
 		console.log("Connection to 7DTD established.");
 		me.telnetClient.triggerListKnownPlayers();
-		cache.connectionEstablished();
+		me.cache.connectionEstablished(me.telnetClient);
 	});
 	this.telnetClient.on("playerConnected", function(evt) {
 		me.broadcast("playerConnected", evt);
@@ -115,7 +115,6 @@ Server.prototype.initTelnetClient = function() {
 	this.telnetClient.on("listPlayersExtended", function(evt) {
 		me.broadcast("updated", "playersExtended");
 	});
-
 }
 
 module.exports = Server;

@@ -395,7 +395,7 @@ Client.prototype.checkLoggedIn = function(async) {
 };
 
 Client.prototype.sendEvent = function(action, obj) {
-	websocket.send(action, obj);
+	this.websocket.send(action, obj);
 };
 
 Client.prototype.loadUser = function(username) {

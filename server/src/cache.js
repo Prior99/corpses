@@ -6,14 +6,14 @@ function Cache(server) {
 	this.intervals = {};
 }
 
-Cache.connectionLost = function() {
+Cache.prototype.connectionLost = function() {
 	this.telnetClient = undefined;
 	clearInterval(this.intervals.timeInterval);
 	clearInterval(this.intervals.knownPlayersInterval);
 	clearInterval(this.intervals.playersExtendedInterval);
 };
 
-Cache.connectionEstablished = function(telnetClient) {
+Cache.prototype.connectionEstablished = function(telnetClient) {
 	this.telnetClient = telnetClient;
 	var me = this;
 	this.intervals.timeInterval = setInterval(function() {
