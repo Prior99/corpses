@@ -3,15 +3,24 @@ var Login = {};
 Login.restoreLoginData = function() {
 	if(localStorage["login"] !== undefined) {
 		Login.loginData = JSON.parse(localStorage["login"]);
+		
+		if(localStorage["logged_in"] !== undefined) {
+			Login.loggedIn = JSON.parse(localStorage["logged_in"]);
+		}
+		else{
+			Login.loggedIn = false;
+		}
 	}
 };
 
-Login.storeLoginData = function(name, password) {
+Login.storeLoginData = function(name, password, remember) {
 	Login.loginData = {
 		name : name,
-		password : password
+		password : password,
+		remember: remember
 	};
 	localStorage["login"] = JSON.stringify(Login.loginData);
+	localStorage["logged_in"] = true;
 };
 
 Login.retreiveLoginData = function() {
@@ -30,13 +39,20 @@ Login.isLoginDataAvailable = function() {
 	}
 }
 
-Login.logout = function() {
-	delete localStorage["login"];
+Login.logout = function(forever) {
+	if(forever || Login.loginData.remember == false){
+		Login.deleteStoredLoginData();
+	}
+	else{
+		localStorgae["logged_in"] = false;
+	}
 	window.location.href = "index.html";
+	
 }
 
 Login.deleteStoredLoginData = function() {
-	localStorage["login"] = undefined;
+	delete localStorage["login"];
+	delete localStorage["logged_in"];
 }
 
 Login.checkLogin = function(callback) {
@@ -46,7 +62,7 @@ Login.checkLogin = function(callback) {
 	if(!Login.isLoginDataAvailable()) {
 		callback(false);
 	}
-	else {
+	else if(Login.loginData.remember == true || Login.loggedIn == true){
 		Websocket.send("login", {
 				name: Login.loginData.name,
 				password: Login.loginData.password
@@ -59,6 +75,10 @@ Login.checkLogin = function(callback) {
 			}
 		);
 	}
+	else{
+		Login.deleteStoredLoginData();
+		callback(false);
+	}
 };
 
 Login.encrypt = function(key, msg){
@@ -66,17 +86,20 @@ Login.encrypt = function(key, msg){
 	return encrypter.getHMAC(key, "TEXT", "SHA-256", "HEX");
 };
 
-Login.login = function(name, password, remember, callback){
+Login.login = function(name, password, remember){
 	var passwdEnc = Login.encrypt(name, password);
 	Websocket.send("login", {
 			name: name,
 			password: passwdEnc
 		},
 		function(obj){
-			if(obj.okay == true && remember == true){
-				Login.storeLoginData(name, passwdEnc);
+			if(obj.okay == true){
+				Login.storeLoginData(name, passwdEnc, remember);
+				window.location.href = "map.html";
 			}
-			callback(obj);
+			else{
+				window.location.href = "index.html";
+			}
 		}
 	);
 };
@@ -89,10 +112,13 @@ Login.register = function(name, password, steamID, remember, callback){
 			steamid: steamID
 		},
 		function(obj){
-			if(obj.okay == true && remember == true){
-				Login.storeLoginData(name, passwdEnc);
+			if(obj.okay == true){
+				Login.storeLoginData(name, passwdEnc, remember);
+				window.location.href = "map.html";
 			}
-			callback(obj);
+			else{
+				window.location.href = "index.html";
+			}
 		}
 	);
 };

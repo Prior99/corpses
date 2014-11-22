@@ -171,8 +171,14 @@
 			});
 		});
 		$(".logout").click(function() {
-			Login.logout();
+			Login.logout(true);
 		});
+		
+		$(window).on('beforeunload', function(){
+			alert("bye");
+			Login.logout(false);
+		});
+		
 		Websocket.addOpenListener(function() {
 			Login.checkLogin(function(okay) {
 				if(!okay) {
@@ -180,6 +186,7 @@
 				}
 			});
 		});
+		Websocket.init();
 	</script>
 </body>
 </html>

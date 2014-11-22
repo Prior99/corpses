@@ -128,29 +128,12 @@
 
 				$("#register").click(function(){
 					if($("#registerPassword").val() == $("#registerPasswordRepeat").val()){
-						Login.register($("#registerName").val(), $("#registerPassword").val(), $("#registerSteamID").val(), $("#registerRemember").is(":checked"), function(obj){
-							if(obj.okay == true){
-								window.location.href = "map.html";
-							}
-							else{
-								$("#registerError").html(obj.reason);
-							}
-						});
-					}
-					else{
-						$("#registerError").html("Passwords do not match");
+						Login.register($("#registerName").val(), $("#registerPassword").val(), $("#registerSteamID").val(), $("#registerRemember").is(":checked"));
 					}
 				});
 
 				$("#login").click(function(){
-					Login.login($("#loginName").val(), $("#loginPassword").val(), $("#loginRemember").is(":checked"), function(obj){
-						if(obj.okay){
-							window.location.href = "map.html";
-						}
-						else{
-							$("#loginError").html(obj.reason);
-						}
-					});
+					Login.login($("#loginName").val(), $("#loginPassword").val(), $("#loginRemember").is(":checked"));
 				});
 			});
 		</script>
