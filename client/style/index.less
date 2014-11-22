@@ -29,9 +29,11 @@ body {
 			border : none;
 			td {
 				border: none;
+				padding-left: 5px;
 			}
 			th {
 				border: none;
+				padding-left: 5px;
 			}
 		}
 	}
@@ -45,8 +47,17 @@ body {
 }
 
 .help {
+	.container;
 	position: fixed;
 	z-index: 100;
-	background: white;
-	border: 2px solid;
+	border: 1px solid grey;
+	border-radius: 10px;
+	border-top-left-radius: 0px;
+	font-size: 12pt;
+	padding: 5px;
+}
+
+.error {
+	font-size: 12pt;
+	color: red;
 }
