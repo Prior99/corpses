@@ -85,5 +85,5 @@ $(function() {
 	Websocket.addOpenListener(function() {
 		NET.refreshAll();
 	});
-	Websocket.init();
+	//Websocket.init();
 });

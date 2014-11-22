@@ -128,3 +128,7 @@ var Websocket = {
 		this.id++;
 	}
 };
+
+$(function(){
+	Websocket.init();
+});
