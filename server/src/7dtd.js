@@ -12,15 +12,21 @@ function Connection() {
 	}
 	
 	this.client.on("close", function() {
+		// console.log("[Telnet] CLOSE!");
 		this.emit("close");
+		// console.log("[Telnet] close finished");
 	}.bind(this));
 	this.buffer = "";
 	this.client.on("data", function(data) {
+		// console.log("[Telnet] DATA!");
 		this.buffer += data.toString();
 		this.checkMessage();
+		// console.log("[Telnet] data finished");
 	}.bind(this));
 	this.client.connect(config.telnetPort, config.telnetHost, function() {
+		// console.log("[Telnet] CONNECT!");
 		this.emit("open");
+		// console.log("[Telnet] connect finished");
 	}.bind(this));
 };
 

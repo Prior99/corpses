@@ -11,11 +11,13 @@ function Server() {
 	this.wsServer = null;
 	this.cache = new Cache();
 	this.telnetClient = new TelnetClient();
-	this.database = new Database();
-	this.clients = [];
-	this.startWebsocketServer();
-	this.initTelnetClient();
-	this.symlinkMap();
+	this.telnetClient.on("open", function(){
+		this.database = new Database();
+		this.clients = [];
+		this.startWebsocketServer();
+		this.initTelnetClient();
+		this.symlinkMap();
+	}.bind(this));
 }
 
 Server.prototype.broadcastRemoveMarker = function(id) {
