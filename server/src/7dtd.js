@@ -4,7 +4,13 @@ var Regexes = require("./regex.js");
 var Events = require('events');
 
 function Connection() {
-	this.client = new net.Socket();
+	try{
+		this.client = new net.Socket();
+	}
+	catch(error){
+		throw "Error connecting to 7 days to die server!";
+	}
+	
 	this.client.on("close", function() {
 		this.emit("close");
 	}.bind(this));
