@@ -30,6 +30,11 @@ Login.isLoginDataAvailable = function() {
 	}
 }
 
+Login.logout = function() {
+	delete localStorage["login"];
+	window.location.href = "index.html";
+}
+
 Login.deleteStoredLoginData = function() {
 	localStorage["login"] = undefined;
 }

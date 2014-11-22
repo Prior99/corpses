@@ -13,6 +13,7 @@
 	<script src="port.js"></script>
 	<script src="js/websocket_client.js"></script>
 	<script src="js/client.js"></script>
+	<script src="js/login.js"></script>
 	<!--<script src="js/map.js"></script>-->
 	<script src="js/interface.js"></script>
 	<script src="js/numberedMarkers.js"></script>
@@ -90,6 +91,9 @@
 	</div>
 	<div id="map" style="width: 100%; height: 100%"></div>
 	<div class="serverstats container">
+		<div class="logout">
+			<i class="fa fa-sign-out"></i>
+		</div>
 		<div>
 			Time <span id="time"><img height="20" src="img/loading.gif" /></span>
 		</div>
@@ -163,6 +167,16 @@
 				else {
 					sidebar.css({"left" : "0px"});
 					sidebar.opened = true;
+				}
+			});
+		});
+		$(".logout").click(function() {
+			Login.logout();
+		});
+		Websocket.addOpenListener(function() {
+			Login.checkLogin(function(okay) {
+				if(!okay) {
+					window.location.href = "index.html";
 				}
 			});
 		});
