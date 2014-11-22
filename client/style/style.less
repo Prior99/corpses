@@ -56,6 +56,7 @@ div.serverstats {
 			color: black;
 		}
 	}
+	z-index: 20;
 }
 
 div.systemstats {
@@ -75,6 +76,7 @@ div.systemstats {
 			color: black;
 		}
 	}
+	z-index: 20;
 }
 
 div.players {
@@ -90,4 +92,31 @@ div.players {
 div#noplayers {
 	text-align: center;
 	width: 100%;
+}
+
+.sidebar {
+	.container;
+	width: 200px;
+	height: auto;
+	left: -180px;
+	top: 0px;
+	bottom: 0px;
+	padding-top: 30px;
+	padding-bottom: 24px;
+	padding-left: 10px;
+	padding-right: 10px;
+	transition: left 0.2s linear;
+	h1 {
+		font-size: 20pt;
+		color: grey;
+		font-weight: normal;
+	}
+	.handle {
+		letter-spacing: -2px;
+		position: absolute;
+		left: 195px;
+		width: 5px;
+		color: grey;
+		top: 50%;
+	}
 }
