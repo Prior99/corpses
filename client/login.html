@@ -134,7 +134,9 @@
 						},
 						function(obj){
 							if(obj.okay == true){
-								Login.storeLoginData($("#registerName").val(), $("#registerPassword").val());
+								if($("#registerRemember").is(":checked")){
+									Login.storeLoginData($("#registerName").val(), $("#registerPassword").val());
+								}
 								gotoMap();
 							}
 							else{
@@ -151,8 +153,10 @@
 						},
 						function(obj){
 							if(obj.okay == true){
-								Login.storeLoginData($("#loginName").val(), $("#loginPassword").val());
-								window.location.href = "index.html";
+								if($("#loginRemember").is(":checked")){
+									Login.storeLoginData($("#loginName").val(), $("#loginPassword").val());
+								}
+								window.location.href = "map.html";
 							}
 							else{
 								$("#loginError").html(obj.reason);
