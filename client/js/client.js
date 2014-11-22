@@ -51,7 +51,7 @@ NET.refreshAll = function() {
 NET.displayHordeWarning = function() {
 	UI.firePopup({
 		headline : "Horde spawned",
-		text : "A wandering horde was spawned from the server.",
+		text : "A wandering horde was spawned by the server.",
 		icon : "fa-warning",
 		timeout : 30
 	});
