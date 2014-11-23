@@ -14,7 +14,7 @@
 	<script src="js/websocket_client.js"></script>
 	<script src="js/client.js"></script>
 	<script src="js/login.js"></script>
-	<!--<script src="js/map.js"></script>-->
+	<script src="js/map.js"></script>
 	<script src="js/interface.js"></script>
 	<script src="js/numberedMarkers.js"></script>
 	<script type="text/html" id="templatePopup">
@@ -173,12 +173,12 @@
 		$(".logout").click(function() {
 			Login.logout(true);
 		});
-		
+
 		$(window).on('beforeunload', function(){
 			alert("bye");
 			Login.logout(false);
 		});
-		
+
 		Websocket.addOpenListener(function() {
 			Login.checkLogin(function(okay) {
 				if(!okay) {
@@ -186,6 +186,8 @@
 				}
 			});
 		});
+
+		Map.init();
 		//Websocket.init();
 	</script>
 </body>

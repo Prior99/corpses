@@ -10,7 +10,7 @@ function Connection() {
 	catch(error){
 		throw "Error connecting to 7 days to die server!";
 	}
-	
+
 	this.client.on("close", function() {
 		// console.log("[Telnet] CLOSE!");
 		this.emit("close");
@@ -34,7 +34,7 @@ Connection.prototype.__proto__ = Events.EventEmitter.prototype;
 
 Connection.prototype.checkMessage = function() {
 	var index;
-	var reg = /^\d+\.\d\d\d\s/gm;
+	var reg = /^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\s\d+\.\d\d\d\s/gm;
 	if((index = this.buffer.search(reg)) != -1) {
 		var msgs = this.buffer.split(reg);
 		for(var i = 0; i < msgs.length -1; i++) {
@@ -118,7 +118,7 @@ Connection.prototype.computeMessage = function(type, array) {
 					online : player[4] == "True",
 					ip : player[5],
 					playtime : player[6],
-					seen : player[7] 
+					seen : player[7]
 				});
 			}
 			this.emit("listKnownPlayers", results);
