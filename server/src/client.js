@@ -357,7 +357,7 @@ function Client(websocket, database, server) {
 	/*
 	 * Listener for getUser
 	 */
-	Websocket.addListener("getUserData", function(obj, async) {
+	websocket.addListener("getUserData", function(obj, async) {
 		if(this.checkLoggedIn(async)) {
 			return {
 				okay : true,
