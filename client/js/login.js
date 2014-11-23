@@ -48,7 +48,7 @@ Login.logout = function(forever) {
 		Login.deleteStoredLoginData();
 	}
 	else{
-		localStorgae["logged_in"] = false;
+		localStorage["logged_in"] = false;
 	}
 	window.location.href = "index.html";
 
