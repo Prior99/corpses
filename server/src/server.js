@@ -20,7 +20,7 @@ function Server() {
 		catch(error){
 			console.error("Error opening TelnetClient: " + error);
 		}
-	
+
 		this.database = new Database();
 		this.clients = [];
 		this.startWebsocketServer();
@@ -37,7 +37,7 @@ Server.prototype.broadcastRemoveMarker = function(id) {
 
 Server.prototype.broadcastMarkers = function(markers) {
 	for(var i in this.clients) {
-		clients[i].sendMarker(markers);
+		this.clients[i].sendMarkers(markers);
 	}
 };
 

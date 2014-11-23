@@ -3,10 +3,10 @@ var Map = {
 	nativeZoom : 4,
 	projection : {
 		project: function (latlng) {
-			return new L.Point((latlng.lat + 2) / Math.pow(2, nativeZoom), (latlng.lng - 1) / Math.pow(2, nativeZoom));
+			return new L.Point((latlng.lat + 2) / Math.pow(2, Map.nativeZoom), (latlng.lng - 1) / Math.pow(2, Map.nativeZoom));
 		},
 		unproject: function (point) {
-			return new L.LatLng(point.x * Math.pow(2, nativeZoom) - 2, point.y * Math.pow(2, nativeZoom) + 1);
+			return new L.LatLng(point.x * Math.pow(2,Map. nativeZoom) - 2, point.y * Math.pow(2, Map.nativeZoom) + 1);
 		}
 	},
 	markerIcons : {},
@@ -44,7 +44,7 @@ Map.initLeaflet = function(param) {
 			})
 		]
 	});
-	map.on("contextmenu", function(e) {
+	Map.map.on("contextmenu", function(e) {
 		Map.displayCreateMarkerInterface(e.latlng);
 	});
 };
@@ -123,7 +123,8 @@ Map.displayCreateMarkerInterface = function(latlng) {
 			lng : latlng.lng,
 			name : elem.find("#name").val(),
 			description : elem.find("#description").val(),
-			icon : elem.find("#icon").val()
+			icon : elem.find("#icon").val(),
+			visibility : elem.find("#visibility").val()
 		}, function(okay) {
 			if(okay) {
 				Map.map.removeLayer(popup);
@@ -137,5 +138,5 @@ Map.displayCreateMarkerInterface = function(latlng) {
 	popup = L.popup()
 		.setLatLng(latlng)
 		.setContent(wrapper[0])
-		.openOn(map);
+		.openOn(Map.map);
 };

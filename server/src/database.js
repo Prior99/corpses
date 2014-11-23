@@ -85,9 +85,9 @@ function Database() {
 	}.bind(this));
 };
 
-Database.prototype.addMarker = function(obj, callback) {
-	this.pool.query("INSERT INTO Markers (name, description, lat, lng, icon) VALUES(?, ?, ?, ?, ?)",
-		[obj.name, obj.description, obj.lat, obj.lng, obj.icon], function(err, result) {
+Database.prototype.addMarker = function(obj, author, callback) {
+	this.pool.query("INSERT INTO Markers (name, description, lat, lng, icon, visibility, author) VALUES(?, ?, ?, ?, ?, ?, ?)",
+		[obj.name, obj.description, obj.lat, obj.lng, obj.icon, obj.visibility, author], function(err, result) {
 		if(err) {
 			console.error("Unable to create Marker:");
 			console.error(err);

@@ -58,14 +58,14 @@ function Client(websocket, database, server) {
 	 */
 	websocket.addListener("addMarker", function(obj, async) {
 		if(this.checkLoggedIn(async)) {
-			if(!obj.icon || !obj.name || !obj.description || !obj.lat || !obj.lng) {
+			if(!obj.icon || !obj.lat || !obj.lng) {
 				async({
 					okay : false,
 					reason : "invalid_arguments"
 				});
 			}
 			else {
-				database.addMarker(obj, function(err, result) {
+				database.addMarker(obj, this.user.id, function(err, result) {
 					if(!checkError(err, async)) {
 						this.server.broadcastMarkers([result]);
 						async({
@@ -337,12 +337,12 @@ function Client(websocket, database, server) {
 							}
 							else {
 								database.isFriendOf(this.user.id, playerDB.id, function(err, f) {
-									decCounter();
 									if(!checkError(err)) {
 										if(f) {
 											visiblePlayers.push(player);
 										}
 									}
+									decCounter();
 								})
 							}
 						}
@@ -415,6 +415,32 @@ Client.prototype.loadUser = function(username) {
 			this.user = user;
 		}
 	}.bind(this));
-}
+};
+
+Client.prototype.sendRemoveMarker = function(id) {
+	this.websocket.send("removeMarker", id);
+};
+
+Client.prototype.sendMarkers = function(markers) {
+	var send = [];
+	var counter = 0;
+	for(var i in markers) {
+		var marker = markers[i];
+		if(marker.visibility == "public") {
+			send.push(marker);
+		}
+		else if(marker.visibility == "friends") {
+			this.database.isFriendOf(this.user.id, marker.author, function(err, okay) {
+
+			});
+		}
+		else if(marker.visibility == "private") {
+			if(marker.author == this.user.id) send.push(marker);
+		}
+		else {
+			console.error("Assert failed: invalid visibility of marker");
+		}
+	}
+};
 
 module.exports = Client;
