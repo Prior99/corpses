@@ -359,10 +359,10 @@ function Client(websocket, database, server) {
 	 */
 	websocket.addListener("getUserData", function(obj, async) {
 		if(this.checkLoggedIn(async)) {
-			return {
+			async({
 				okay : true,
 				user : this.user
-			}
+			});
 		}
 	}.bind(this), true);
 };
