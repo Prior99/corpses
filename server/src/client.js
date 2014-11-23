@@ -354,6 +354,17 @@ function Client(websocket, database, server) {
 			}
 		}
 	}.bind(this), true);
+	/*
+	 * Listener for getUser
+	 */
+	Websocket.addListener("getUserData", function(obj, async) {
+		if(this.checkLoggedIn(async)) {
+			return {
+				okay : true,
+				user : this.user
+			}
+		}
+	}.bind(this), true);
 };
 
 Client.prototype.checkAdmin = function(callback, async) {

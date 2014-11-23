@@ -1,7 +1,7 @@
 var Login = {};
 
 Login.getUser = function() {
-
+	return Login.userData;
 };
 
 Login.restoreLoginData = function() {
@@ -75,7 +75,11 @@ Login.checkLogin = function(callback) {
 				if(!obj.okay) {
 					Login.deleteStoredLoginData();
 				}
-				callback(obj.okay);
+				Websocket.send("getUserData", {}, function(obj) {
+					//TODO: Check Error
+					Login.userData = obj.user;
+					callback(obj.okay);
+				});
 			}
 		);
 	}

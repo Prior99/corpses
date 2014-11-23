@@ -17,6 +17,20 @@ NET.onUpdate = function(what) {
 	};
 };
 
+NET.addMarker = function(obj, callback) {
+	Websocket.send("addMarker", obj, function(answer) {
+		callback(answer.okay);
+	});
+}
+
+NET.removeMarker = function(id, callback) {
+	//TODO
+};
+
+NET.ignoreMarker = function(id, callback) {
+	//TODO
+};
+
 NET.refreshInfo = function() {
 	Websocket.send("getInfo", undefined, function(obj) {
 		UI.updateInfo(obj);
