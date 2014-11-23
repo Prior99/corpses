@@ -1,9 +1,13 @@
 var Login = {};
 
+Login.getUser = function() {
+
+};
+
 Login.restoreLoginData = function() {
 	if(localStorage["login"] !== undefined) {
 		Login.loginData = JSON.parse(localStorage["login"]);
-		
+
 		if(localStorage["logged_in"] !== undefined) {
 			Login.loggedIn = JSON.parse(localStorage["logged_in"]);
 		}
@@ -47,7 +51,7 @@ Login.logout = function(forever) {
 		localStorgae["logged_in"] = false;
 	}
 	window.location.href = "index.html";
-	
+
 }
 
 Login.deleteStoredLoginData = function() {
