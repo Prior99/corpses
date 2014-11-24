@@ -20,11 +20,15 @@ NET.onUpdate = function(what) {
 NET.addMarker = function(obj, callback) {
 	Websocket.send("addMarker", obj, function(answer) {
 		callback(answer.okay);
+		//TODO: Error management
 	});
 }
 
 NET.removeMarker = function(id, callback) {
-	//TODO
+	Websocket.send("removeMarker", id, function(obj) {
+		callback(obj.okay);
+		//TODO: Error management
+	});
 };
 
 NET.ignoreMarker = function(id, callback) {

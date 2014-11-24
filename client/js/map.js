@@ -28,6 +28,9 @@ Map.init = function() {
 	Websocket.addMessageListener("marker", function(obj) {
 		Map.displayMarker(obj);
 	});
+	Websocket.addMessageListener("removeMarker", function(id) {
+		Map.removeMarker(id);
+	});
 };
 
 Map.initLeaflet = function(param) {
@@ -71,9 +74,17 @@ Map.getMarkerIcon = function(iconID) {
 		Map.markerIcons[iconID] = icon;
 	}
 	return icon;
-}
+};
 
-Map.removeMarker = function(marker, popup) {
+Map.removeMarker = function(id) {
+	var marker = Map.markers[id];
+	if(marker) {
+		Map.map.removeLayer(marker.markerElement);
+		delete Map.markers[id];
+	}
+};
+
+Map.invokeRemoveMarker = function(marker, popup) {
 	NET.removeMarker(marker.id, function() {
 		Map.map.removeLayer(popup);
 	});
@@ -94,7 +105,7 @@ Map.displayMarker = function(marker) {
 	if(marker.author === Login.getUser().id) {
 		elem.append($("<a href='#'>Remove</a>").click(function() {
 			elem.html("<img src='img/loading.gif' />");
-			Map.removeMarker(marker, popup);
+			Map.invokeRemoveMarker(marker, popup);
 		}));
 	}
 	else {
