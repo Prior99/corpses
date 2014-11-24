@@ -64,11 +64,11 @@ Connection.prototype.triggerListPlayersExtended = function() {
 Connection.prototype.parseMessage = function(string) {
 	var result;
 	Events.EventEmitter.call(this);
-	console.log("RECEIVED MSG: \"" + string + "\"");
+	//console.log("RECEIVED MSG: \"" + string + "\"");
 	for(var type in Regexes) {
 		var regex = Regexes[type];
 		if(result = regex.exec(string)) {
-			console.log("DETECTED:" + type + ":" + result);
+			//console.log("DETECTED:" + type + ":" + result);
 			if(type == "listPlayersExtended" || type == "listKnownPlayers") {
 				var array = [];
 				array.push(result);
@@ -177,6 +177,18 @@ Connection.prototype.computeMessage = function(type, array) {
 			this.emit("playerDisconnected", {
 				name : array[1],
 				playTime : array[2]
+			});
+			break;
+		}
+		case "playerSetOnline": {
+			this.emit("playerSetOnline", {
+				steamid : array[1]
+			});
+			break;
+		}
+		case "playerSetOffline": {
+			this.emit("playerSetOffline", {
+				steamid : array[1]
 			});
 			break;
 		}

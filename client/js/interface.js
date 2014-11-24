@@ -1,5 +1,6 @@
 var UI = {
-	playerRowMapping : {}
+	playerMapping : {},
+	playerNumbers : [],
 };
 
 UI.updateInfo = function(obj) {
@@ -27,18 +28,60 @@ UI.updateKnownPlayers = function(players) {
 	}
 };
 
-UI.updatePlayers = function(players) {
-
+UI.generatePlayerNumber = function() {
+	for(var number = 0;;number ++) {
+		if(UI.playerNumbers.indexOf(number) == -1) {
+			UI.playerNumbers.push(number);
+			return number;
+		}
+	}
 };
 
-UI.updatePlayer = function(player) {
-	var row;
-	if((row = UI.playerRowMapping[player.id]) == undefined) {
-		row = $("<tr></tr>").appendTo("#playerTable");
-		UI.playerRowMapping[player.id] = row;
+UI.freePlayerNumber = function(number) {
+	UI.playerNumbers.splice(UI.playerNumbers.indexOf(number), 1);
+};
+
+UI.generatePlayerRow = function() {
+	return $("<tr></tr>").appendTo("#playerTable");
+};
+
+UI.newPlayerMapping = function(player) {
+	if(UI.playerNumbers.length == 0) {
+		$("#noplayers").hide();
 	}
-	row.html(
-		"<td>" + player.number + "</td>" +
+	var mapping = {
+		number : UI.generatePlayerNumber(),
+		row : UI.generatePlayerRow(),
+		playerObject : player
+	};
+	UI.playerMapping[player.steamid] = mapping;
+};
+
+UI.removePlayerMapping = function(steamid) {
+	var mapping = UI.playerMapping[steamid];
+	mapping.row.remove();
+	UI.freePlayerNumber(mapping.number);
+	delete UI.playerMapping[steamid];
+	if(UI.playerNumbers.length == 0) {
+		$("#noplayers").show();
+	}
+};
+
+UI.updatePlayers = function(players) {
+	for(var i in players) {
+		var player = players[i];
+		var mapping;
+		if(!(mapping = UI.playerMapping[player.steamid])) {
+			UI.newPlayerMapping(player);
+		}
+		UI.updatePlayer(mapping);
+	}
+};
+
+UI.updatePlayer = function(mapping) {
+	var player = mapping.playerObject;
+	mapping.row.html(
+		"<td>" + mapping.number + "</td>" +
 		"<td>" + player.name + "</td>" +
 		"<td style='background: rgba(200, 200, 200, 0.5);'>" + parseInt(player.position.x) + "</td>" +
 		"<td style='background: rgba(200, 200, 200, 0.5);'>" + parseInt(player.position.y) + "</td>" +

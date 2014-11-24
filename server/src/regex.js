@@ -48,6 +48,10 @@ var Regexes = {
 		'steamid=(\\d+),\\s' +
 		'ip=(.*)'),
 	playerDisconnected : new RegExp(
-		'Player\\s(.*?)\\sdisconnected\\safter\\s([+-]?\\d+\\.?\\d*)\\sminutes')
+		'Player\\s(.*?)\\sdisconnected\\safter\\s([+-]?\\d+\\.?\\d*)\\sminutes'),
+	playerSetOnline : new RegExp(
+		'Player\\sset\\sto\\sonline:\\s(\\d+)'),
+	playerSetOffline : new RegExp(
+		'Player\\sset\\sto\\soffline:\\s(\\d+)')
 };
 module.exports = Regexes;

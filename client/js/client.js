@@ -96,10 +96,15 @@ NET.displayPlayerDisconnectedWarning = function(player) {
 	});
 };
 
+NET.playerOffline = function(evt) {
+	UI.removePlayerMapping(evt.steamid);
+};
+
 $(function() {
 	Websocket.addMessageListener("spawningWanderingHorde", NET.displayHordeWarning);
 	Websocket.addMessageListener("playerConnected", NET.displayPlayerJoinedWarning);
 	Websocket.addMessageListener("playerDisconnected", NET.displayPlayerDisconnectedWarning);
+	Websocket.addMessageListener("playerSetOffline", NET.playerOffline);
 	//Websocket.addMessageListener("markers", ); //TODO
 	//Websocket.addMessageListener("removeMarker", removeMarker); //TODO
 	Websocket.addMessageListener("updated", NET.onUpdate);

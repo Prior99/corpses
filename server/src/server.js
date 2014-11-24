@@ -111,6 +111,12 @@ Server.prototype.initTelnetClient = function() {
 	this.telnetClient.on("playerDisconnected", function(evt) {
 		me.broadcast("playerDisconnected", evt);
 	});
+	this.telnetClient.on("playerSetOnline", function(evt) {
+		me.broadcast("playerSetOnline", evt);
+	});
+	this.telnetClient.on("playerSetOffline", function(evt) {
+		me.broadcast("playerSetOffline", evt);
+	});
 	this.telnetClient.on("spawningWanderingHorde", function(evt) {
 		me.broadcast("spawningWanderingHorde", evt);
 	});
