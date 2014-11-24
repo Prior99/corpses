@@ -94,6 +94,8 @@ Database.prototype.addMarker = function(obj, author, callback) {
 			callback(err);
 		}
 		else {
+			obj.id = result.insertId;
+			obj.author = author;
 			callback(undefined, obj);
 		}
 	});

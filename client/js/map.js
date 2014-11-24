@@ -16,6 +16,17 @@ var Map = {
 Map.init = function() {
 	$.getJSON("map/mapinfo.json", function(json) {
 		Map.initLeaflet(json);
+		Websocket.send("fetchMarkers", {}, function(obj) {
+			if(obj.okay) {
+				Map.displayMarkers(obj.markers);
+			}
+			else {
+				//TODO Error handling
+			}
+		});
+	});
+	Websocket.addMessageListener("marker", function(obj) {
+		Map.displayMarker(obj);
 	});
 };
 
@@ -80,7 +91,7 @@ Map.displayMarker = function(marker) {
 	//TODO: Change content of popup depended of marker ownerage
 	var elem = $("<div></div>")
 	elem.append($("<h1>" + marker.name + "</h1><p>" + marker.description + "</p>"));
-	if(marker.owner === Login.getUser().id) {
+	if(marker.author === Login.getUser().id) {
 		elem.append($("<a href='#'>Remove</a>").click(function() {
 			elem.html("<img src='img/loading.gif' />");
 			Map.removeMarker(marker, popup);

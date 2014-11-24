@@ -67,7 +67,7 @@ function Client(websocket, database, server) {
 			else {
 				database.addMarker(obj, this.user.id, function(err, result) {
 					if(!checkError(err, async)) {
-						this.server.broadcastMarkers([result]);
+						this.server.broadcastMarker(result);
 						async({
 							okay : true
 						});
@@ -421,25 +421,26 @@ Client.prototype.sendRemoveMarker = function(id) {
 	this.websocket.send("removeMarker", id);
 };
 
-Client.prototype.sendMarkers = function(markers) {
-	var send = [];
-	var counter = 0;
-	for(var i in markers) {
-		var marker = markers[i];
-		if(marker.visibility == "public") {
-			send.push(marker);
+Client.prototype.sendMarker = function(marker) {
+	var me = this;
+	function send() {
+		me.websocket.send("marker", marker);
+	};
+	if(marker.visibility == "public") {
+		send();
+	}
+	else if(marker.visibility == "friends") {
+		this.database.isFriendOf(this.user.id, marker.author, function(err, okay) {
+			send();
+		});
+	}
+	else if(marker.visibility == "private") {
+		if(marker.author == this.user.id) {
+			send();
 		}
-		else if(marker.visibility == "friends") {
-			this.database.isFriendOf(this.user.id, marker.author, function(err, okay) {
-
-			});
-		}
-		else if(marker.visibility == "private") {
-			if(marker.author == this.user.id) send.push(marker);
-		}
-		else {
-			console.error("Assert failed: invalid visibility of marker");
-		}
+	}
+	else {
+		console.error("Assert failed: invalid visibility of marker");
 	}
 };
 

@@ -35,9 +35,9 @@ Server.prototype.broadcastRemoveMarker = function(id) {
 	}
 };
 
-Server.prototype.broadcastMarkers = function(markers) {
+Server.prototype.broadcastMarker = function(marker) {
 	for(var i in this.clients) {
-		this.clients[i].sendMarkers(markers);
+		this.clients[i].sendMarker(marker);
 	}
 };
 
