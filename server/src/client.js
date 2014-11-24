@@ -320,11 +320,12 @@ function Client(websocket, database, server) {
 
 			for(var i in server.cache.playersExtended) {
 				var player = server.cache.playersExtended[i];
+				counter++;
 				if(player.steamid == this.user.steamid) {
 					visiblePlayers.push(player);
+					decCounter();
 				}
 				else {
-					counter++;
 					database.getUserBySteamID(player.steamid, function(err, playerDB) {
 						if(!checkError(err, async)) {
 							if(playerDB == undefined) {
