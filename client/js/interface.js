@@ -72,9 +72,11 @@ UI.updatePlayers = function(players) {
 		var player = players[i];
 		var mapping;
 		if(!(mapping = UI.playerMapping[player.steamid])) {
-			UI.newPlayerMapping(player);
+			mapping = UI.newPlayerMapping(player);
 		}
-		UI.updatePlayer(mapping);
+		if(mapping) {
+			UI.updatePlayer(mapping);
+		}
 	}
 };
 

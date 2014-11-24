@@ -53,6 +53,7 @@ NET.refreshKnownPlayers = function() {
 NET.refreshPlayers = function() {
 	Websocket.send("getPlayers", undefined, function(obj) {
 		UI.updatePlayers(obj.players);
+		Map.updatePlayers(obj.players);
 	});
 };
 
@@ -98,6 +99,7 @@ NET.displayPlayerDisconnectedWarning = function(player) {
 
 NET.playerOffline = function(evt) {
 	UI.removePlayerMapping(evt.steamid);
+	Map.removePlayerMapping(evt.steamid);
 };
 
 $(function() {

@@ -10,7 +10,45 @@ var Map = {
 		}
 	},
 	markers : {},
+	playerMapping : {}
 };
+
+Map.newPlayerMapping = function(player) {
+	var icon = new L.userIcon({
+		number : UI.playerMapping[player.steamid].number,
+		rotation : player.rotation.y
+	});
+	var marker = L.marker([player.position.x, player.position.z], {
+		icon: icon,
+		zIndexOffset : 1000
+	});
+	marker.addTo(Map.map);
+	var mapping = {
+		playerObjec : player,
+		marker : marker,
+		icon : icon
+	};
+	Map.playerMapping[player.steamid] = mapping;
+	return mapping;
+};
+
+Map.updatePlayers = function(players) {
+	for(var i in players) {
+		var player = players[i];
+		var mapping;
+		if(!(mapping = Map.playerMapping[player.steamid])) {
+			mapping = Map.newPlayerMapping(player);
+		}
+		mapping.marker.setLatLng([player.position.x, player.position.z]);
+		mapping.icon.setRotation(player.rotation.y);
+	}
+};
+
+Map.removePlayerMapping = function(steamid) {
+	var mapping = Map.playerMapping[steamid];
+	Map.map.removeLayer(mapping.marker);
+	delete Map.playerMapping[steamid];
+}
 
 Map.init = function() {
 	$.getJSON("map/mapinfo.json", function(json) {
@@ -108,7 +146,7 @@ Map.ignoreMarker = function(marker, popup) {
 Map.displayMarker = function(marker) {
 	var icon = Map.getMarkerIcon(marker.icon, marker.visibility);
 	var popup;
-	//TODO: Change content of popup depended of marker ownerage
+	//TODO: Edit marker
 	var elem = $("<div></div>")
 	elem.append($("<h1>" + marker.name + "</h1><p>" + marker.description + "</p>"));
 	if(marker.author === Login.getUser().id) {
