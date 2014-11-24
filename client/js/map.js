@@ -9,7 +9,6 @@ var Map = {
 			return new L.LatLng(point.x * Math.pow(2,Map. nativeZoom) - 2, point.y * Math.pow(2, Map.nativeZoom) + 1);
 		}
 	},
-	markerIcons : {},
 	markers : {},
 };
 
@@ -42,7 +41,7 @@ Map.initLeaflet = function(param) {
 	});
 	Map.map = L.map('map', {
 		center : [0, 0],
-		zoomControl: true,
+		zoomControl: false,
 		zoom : Map.nativeZoom / 2,
 		crs : Map.crs,
 		minZoom: 1,
@@ -63,16 +62,25 @@ Map.initLeaflet = function(param) {
 	});
 };
 
-Map.getMarkerIcon = function(iconID) {
+Map.getMarkerIcon = function(iconID, visibility) {
 	var icon;
-	if(!(icon = Map.markerIcons[iconID])) {
-		icon = L.AwesomeMarkers.icon({
-			icon : iconID,
-			prefix: 'fa',
-			markerColor : "blue" //TODO: Change color depending on marker type (private, public, etc.) here
-		});
-		Map.markerIcons[iconID] = icon;
+	var color;
+	switch(visibility) {
+		case "private":
+			color = "red";
+			break;
+		case "public":
+			color = "green";
+			break;
+		case "friends":
+			color = "orange";
+			break;
 	}
+	icon = L.AwesomeMarkers.icon({
+		icon : iconID,
+		prefix: 'fa',
+		markerColor : color
+	});
 	return icon;
 };
 
@@ -97,7 +105,7 @@ Map.ignoreMarker = function(marker, popup) {
 };
 
 Map.displayMarker = function(marker) {
-	var icon = Map.getMarkerIcon(marker.icon);
+	var icon = Map.getMarkerIcon(marker.icon, marker.visibility);
 	var popup;
 	//TODO: Change content of popup depended of marker ownerage
 	var elem = $("<div></div>")
