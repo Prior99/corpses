@@ -32,7 +32,10 @@ NET.removeMarker = function(id, callback) {
 };
 
 NET.ignoreMarker = function(id, callback) {
-	//TODO
+	Websocket.send("ignoreMarker", id, function(obj) {
+		callback(obj.okay);
+		//TODO: Error management
+	});
 };
 
 NET.refreshInfo = function() {

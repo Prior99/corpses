@@ -101,6 +101,7 @@ Map.invokeRemoveMarker = function(marker, popup) {
 Map.ignoreMarker = function(marker, popup) {
 	NET.ignoreMarker(marker.id, function() {
 		Map.map.removeLayer(popup);
+		Map.removeMarker(marker.id);
 	});
 };
 
