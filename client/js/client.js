@@ -26,22 +26,35 @@ NET.onUpdate = function(what) {
 
 NET.addMarker = function(obj, callback) {
 	Websocket.send("addMarker", obj, function(answer) {
-		callback(answer.okay);
-		//TODO: Error management
+		if(answer.okay) {
+			callback(answer.okay);
+		}
+		else {
+			Errors.displayError(answer.reason);
+		}
 	});
 }
 
 NET.removeMarker = function(id, callback) {
 	Websocket.send("removeMarker", id, function(obj) {
-		callback(obj.okay);
-		//TODO: Error management
+		if(obj.okay) {
+			callback(obj.okay);
+		}
+		else {
+			Errors.displayError(obj.reason);
+		}
 	});
 };
 
 NET.ignoreMarker = function(id, callback) {
 	Websocket.send("ignoreMarker", id, function(obj) {
-		callback(obj.okay);
-		//TODO: Error management
+		if(obj.okay) {
+			callback(obj.okay);
+		}
+		else {
+			Errors.displayError(obj.reason);
+		}
+
 	});
 };
 
@@ -59,8 +72,13 @@ NET.refreshKnownPlayers = function() {
 
 NET.refreshPlayers = function() {
 	Websocket.send("getPlayers", undefined, function(obj) {
-		UI.updatePlayers(obj.players);
-		Map.updatePlayers(obj.players);
+		if(obj.okay) {
+			UI.updatePlayers(obj.players);
+			Map.updatePlayers(obj.players);
+		}
+		else {
+			Errors.displayError(obj.reason);
+		}
 	});
 };
 
@@ -72,21 +90,34 @@ NET.refreshTime = function() {
 
 NET.refreshUsers = function() {
 	Websocket.send("getUsers", undefined, function(obj) {
-		UI.updateUsers(obj.users);
+		if(obj.okay) {
+			UI.updateUsers(obj.users);
+		}
+		else {
+			Errors.displayError(obj.reason);
+		}
 	});
 };
 
 NET.toggleFriend = function(player) {
 	if(player.friend) {
 		Websocket.send("removeFriend", player.steamid, function(obj) {
-			//TODO: check error
-			NET.refreshUsers();
+			if(obj.okay) {
+				NET.refreshUsers();
+			}
+			else {
+				Errors.displayError(obj.reason);
+			}
 		});
 	}
 	else {
 		Websocket.send("addFriend", player.steamid, function(obj) {
-			//TODO: check error
-			NET.refreshUsers();
+			if(obj.okay) {
+				NET.refreshUsers();
+			}
+			else {
+				Errors.displayError(obj.reason);
+			}
 		});
 	}
 };
