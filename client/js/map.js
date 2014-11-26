@@ -48,19 +48,34 @@ Map.removePlayerMapping = function(steamid) {
 	var mapping = Map.playerMapping[steamid];
 	Map.map.removeLayer(mapping.marker);
 	delete Map.playerMapping[steamid];
-}
+};
+
+Map.reloadMarkers = function() {
+	Websocket.send("fetchMarkers", undefined, function(obj) {
+		if(obj.okay) {
+			Map.clearMarkers();
+			Map.displayMarkers(obj.markers);
+		}
+		else {
+			//TODO Error handling
+		}
+	});
+};
+
+Map.clearMarkers = function() {
+	var arr = [];
+	for(var id in Map.markers) {
+		arr.push(id);
+	}
+	for(var id in arr) {
+		Map.removeMarker(id);
+	}
+};
 
 Map.init = function() {
 	$.getJSON("map/mapinfo.json", function(json) {
 		Map.initLeaflet(json);
-		Websocket.send("fetchMarkers", {}, function(obj) {
-			if(obj.okay) {
-				Map.displayMarkers(obj.markers);
-			}
-			else {
-				//TODO Error handling
-			}
-		});
+		Map.reloadMarkers();
 	});
 	Websocket.addMessageListener("marker", function(obj) {
 		Map.displayMarker(obj);

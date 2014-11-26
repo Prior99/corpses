@@ -50,7 +50,11 @@ Server.prototype.symlinkMap = function() {
 			console.log("Map successfully linked. (" + config.mapDirectory + " -> " + config.clientDirectory + "/map");
 		}
 	});
-}
+};
+
+Server.prototype.notifyNewUser() = function() {
+	this.broadcast("updated", "users");
+};
 
 Server.prototype.startWebsocketServer = function() {
 	console.log("Starting Websocketserver...");

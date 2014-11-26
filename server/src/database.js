@@ -197,9 +197,9 @@ Database.prototype.fetchMarkers = function(id, callback) {
 							"WHERE author = ? OR (" +
 								"visibility = 'public' OR (" +
 									"visibility = 'friends' AND " +
-									"author IN (SELECT friend FROM friends WHERE user = ?)" +
+									"author IN (SELECT friend FROM Friends WHERE user = ?)" +
 								")" +
-							") AND NOT id IN (SELECT marker FROM markerIgnore WHERE user = ?)", [id, id, id], function(err, rows) {
+							") AND NOT id IN (SELECT marker FROM MarkerIgnore WHERE user = ?)", [id, id, id], function(err, rows) {
 			if(err) {
 				console.error("Unable to fetch Markers:");
 				console.error(err);
@@ -357,6 +357,27 @@ Database.prototype.getUserBySteamID = function(steamid, callback) {
 			}
 		}
 	});
+};
+
+Database.prototype.getUsers = function(userid, callback) {
+	this.pool.query("SELECT u.name AS name, " +
+							"u.steamid AS steamid, " +
+							"u.enabled AS enabled, " +
+							"u.id IN (SELECT friend FROM Friends WHERE user = ?) AS friendedBy, " +
+							"u.id IN (SELECT user FROM Friends WHERE friend = ?) AS friend, " +
+							"u.id IN (SELECT user FROM Admins) AS admin " +
+					"FROM Users u",
+		function(err, rows) {
+			if(err) {
+				console.error("Could not get users:");
+				console.error(err);
+				callback(err);
+			}
+			else {
+				callback(undefined, rows);
+			}
+		}
+	);
 };
 
 Database.prototype.ignoreMarker = function(user, marker, callback) {

@@ -42,6 +42,7 @@ function Client(websocket, database, server) {
 					async({
 						okay : true
 					});
+					server.notifyNewUser();
 				}
 			}.bind(this));
 		}
@@ -170,9 +171,9 @@ function Client(websocket, database, server) {
 	/*
 	 * Listener for Callback addFriend
 	 */
-	websocket.addListener("addFriend", function(username, async) {
+	websocket.addListener("addFriend", function(steamid, async) {
 		if(this.checkLoggedIn(async)) {
-			database.getUserByName(username, function(err, friend) {
+			database.getUserBySteamID(steamid, function(err, friend) {
 				if(!checkError(err, async)) {
 					if(friend !== undefined) {
 						database.addFriend(this.user.id, friend.id, function(err) {
@@ -197,9 +198,9 @@ function Client(websocket, database, server) {
 	/*
 	 * Listener for Callback removeFriend
 	 */
-	websocket.addListener("removeFriend", function(username, async) {
+	websocket.addListener("removeFriend", function(steamid, async) {
 		if(this.checkLoggedIn(async)) {
-			database.getUserByName(username, function(err, friend) {
+			database.getUserBySteamID(steamid, function(err, friend) {
 				if(!checkError(err, async)) {
 					if(friend !== undefined) {
 						database.removeFriend(this.user.id, friend.id, function(err) {
@@ -364,6 +365,21 @@ function Client(websocket, database, server) {
 				okay : true,
 				user : this.user
 			});
+		}
+	}.bind(this), true);
+	/*
+	 * Listener for getUsers
+	 */
+	websocket.addListener("getUsers", function(obj, async) {
+		if(this.checkLoggedIn(async)) {
+			this.database.getUsers(this.user.id, function(err, users) {
+				if(!checkError(err, async)) {
+					async({
+						okay : true,
+						users : users
+					});
+				}
+			}.bind(this));
 		}
 	}.bind(this), true);
 };

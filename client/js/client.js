@@ -14,6 +14,13 @@ NET.onUpdate = function(what) {
 		case "time":
 			NET.refreshTime();
 			break;
+		case "users":
+			NET.refreshUsers();
+			break;
+		case "friends":
+			NET.refreshPlayers();
+			NET.refreshUsers();
+			Map.reloadMarkers();
 	};
 };
 
@@ -63,11 +70,33 @@ NET.refreshTime = function() {
 	});
 };
 
+NET.refreshUsers = function() {
+	Websocket.send("getUsers", undefined, function(obj) {
+		UI.updateUsers(obj.users);
+	});
+};
+
+NET.toggleFriend = function(player) {
+	if(player.friend) {
+		Websocket.send("removeFriend", player.steamid, function(obj) {
+			//TODO: check error
+			NET.refreshUsers();
+		});
+	}
+	else {
+		Websocket.send("addFriend", player.steamid, function(obj) {
+			//TODO: check error
+			NET.refreshUsers();
+		});
+	}
+};
+
 NET.refreshAll = function() {
 	NET.refreshTime();
 	NET.refreshKnownPlayers();
 	NET.refreshPlayers();
 	NET.refreshInfo();
+	NET.refreshUsers();
 }
 
 NET.displayHordeWarning = function() {

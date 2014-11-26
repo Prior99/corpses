@@ -14,18 +14,30 @@ UI.updateInfo = function(obj) {
 	$("#items").html(obj.items);
 };
 
+UI.updateUsers = function(users) {
+	var div = $("#users");
+	div.html("<tr><td>Name</td><td>Enabled</td><td>Admin</td><td>Your Friend</td><td>Friend of yours</td></tr>");
+	for(var i in users) {
+		function(player) {
+			div.append($("<tr></tr>")
+				.append("<td>" + player.name + "</td>")
+				.append("<td>" + player.enabled + "</td>")
+				.append("<td>" + player.admin + "</td>")
+				.append("<td>" + player.friendedBy + "</td>")
+				.append($("<td style='cursor: pointer;'>" + player.friend + "</td>").click(function() {
+					NET.toggleFriend(player);
+				})
+			);
+		}(players[i]);
+	}
+};
 
 UI.updateTime = function(obj) {
 	$("#time").html("Day " + obj.day + ", " + obj.hour + ":" + obj.minute);
 };
 
 UI.updateKnownPlayers = function(players) {
-	var div = $("#knownPlayers");
-	div.html("");
-	for(var i in players) {
-		var player = players[i];
-		div.append("<p>" + player.name + "</p>");
-	}
+	//TODO: Stub
 };
 
 UI.generatePlayerNumber = function() {
