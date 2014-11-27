@@ -17,18 +17,21 @@ UI.updateInfo = function(obj) {
 UI.updateUsers = function(users) {
 	var div = $("#users");
 	div.html("<tr><td>Name</td><td>Enabled</td><td>Admin</td><td>Your Friend</td><td>Friend of yours</td></tr>");
+
+	function updateUserHTML(player) {
+		div.append($("<tr></tr>")
+			.append("<td>" + player.name + "</td>")
+			.append("<td>" + player.enabled + "</td>")
+			.append("<td>" + player.admin + "</td>")
+			.append("<td>" + player.friendedBy + "</td>")
+			.append($("<td style='cursor: pointer;'>" + player.friend + "</td>").click(function() {
+				NET.toggleFriend(player);
+			})
+		));
+	}
+
 	for(var i in users) {
-		function(player) {
-			div.append($("<tr></tr>")
-				.append("<td>" + player.name + "</td>")
-				.append("<td>" + player.enabled + "</td>")
-				.append("<td>" + player.admin + "</td>")
-				.append("<td>" + player.friendedBy + "</td>")
-				.append($("<td style='cursor: pointer;'>" + player.friend + "</td>").click(function() {
-					NET.toggleFriend(player);
-				})
-			);
-		}(players[i]);
+		updateUserHTML(players[i]);
 	}
 };
 
@@ -42,7 +45,7 @@ UI.updateKnownPlayers = function(players) {
 
 UI.generatePlayerNumber = function() {
 	for(var number = 0;;number ++) {
-		if(UI.playerNumbers.indexOf(number) == -1) {
+		if(UI.playerNumbers.indexOf(number) === -1) {
 			UI.playerNumbers.push(number);
 			return number;
 		}
@@ -58,7 +61,7 @@ UI.generatePlayerRow = function() {
 };
 
 UI.newPlayerMapping = function(player) {
-	if(UI.playerNumbers.length == 0) {
+	if(UI.playerNumbers.length === 0) {
 		$("#noplayers").hide();
 	}
 	var mapping = {
@@ -74,7 +77,7 @@ UI.removePlayerMapping = function(steamid) {
 	mapping.row.remove();
 	UI.freePlayerNumber(mapping.number);
 	delete UI.playerMapping[steamid];
-	if(UI.playerNumbers.length == 0) {
+	if(UI.playerNumbers.length === 0) {
 		$("#noplayers").show();
 	}
 };
@@ -126,4 +129,4 @@ UI.firePopup = function(obj) {
 	setTimeout(function() {
 		popup.close();
 	}, obj.timeout ? obj.timeout*1000 : 10000);
-}
+};

@@ -1,19 +1,19 @@
-var Map = {
+var MapSystem = {
 	size : 16,
 	nativeZoom : 4,
 	projection : {
 		project: function (latlng) {
-			return new L.Point((latlng.lat + 2) / Math.pow(2, Map.nativeZoom), (latlng.lng - 1) / Math.pow(2, Map.nativeZoom));
+			return new L.Point((latlng.lat + 2) / Math.pow(2, MapSystem.nativeZoom), (latlng.lng - 1) / Math.pow(2, MapSystem.nativeZoom));
 		},
 		unproject: function (point) {
-			return new L.LatLng(point.x * Math.pow(2,Map. nativeZoom) - 2, point.y * Math.pow(2, Map.nativeZoom) + 1);
+			return new L.LatLng(point.x * Math.pow(2,MapSystem.nativeZoom) - 2, point.y * Math.pow(2, MapSystem.nativeZoom) + 1);
 		}
 	},
 	markers : {},
 	playerMapping : {}
 };
 
-Map.newPlayerMapping = function(player) {
+MapSystem.newPlayerMapping = function(player) {
 	var icon = new L.userIcon({
 		number : UI.playerMapping[player.steamid].number,
 		rotation : player.rotation.y
@@ -22,39 +22,39 @@ Map.newPlayerMapping = function(player) {
 		icon: icon,
 		zIndexOffset : 1000
 	});
-	marker.addTo(Map.map);
+	marker.addTo(MapSystem.map);
 	var mapping = {
 		playerObjec : player,
 		marker : marker,
 		icon : icon
 	};
-	Map.playerMapping[player.steamid] = mapping;
+	MapSystem.playerMapping[player.steamid] = mapping;
 	return mapping;
 };
 
-Map.updatePlayers = function(players) {
+MapSystem.updatePlayers = function(players) {
 	for(var i in players) {
 		var player = players[i];
 		var mapping;
-		if(!(mapping = Map.playerMapping[player.steamid])) {
-			mapping = Map.newPlayerMapping(player);
+		if(!(mapping = MapSystem.playerMapping[player.steamid])) {
+			mapping = MapSystem.newPlayerMapping(player);
 		}
 		mapping.marker.setLatLng([player.position.x, player.position.z]);
 		mapping.icon.setRotation(player.rotation.y);
 	}
 };
 
-Map.removePlayerMapping = function(steamid) {
-	var mapping = Map.playerMapping[steamid];
-	Map.map.removeLayer(mapping.marker);
-	delete Map.playerMapping[steamid];
+MapSystem.removePlayerMapping = function(steamid) {
+	var mapping = MapSystem.playerMapping[steamid];
+	MapSystem.map.removeLayer(mapping.marker);
+	delete MapSystem.playerMapping[steamid];
 };
 
-Map.reloadMarkers = function() {
+MapSystem.reloadMarkers = function() {
 	Websocket.send("fetchMarkers", undefined, function(obj) {
 		if(obj.okay) {
-			Map.clearMarkers();
-			Map.displayMarkers(obj.markers);
+			MapSystem.clearMarkers();
+			MapSystem.displayMarkers(obj.markers);
 		}
 		else {
 			//TODO Error handling
@@ -62,41 +62,41 @@ Map.reloadMarkers = function() {
 	});
 };
 
-Map.clearMarkers = function() {
+MapSystem.clearMarkers = function() {
 	var arr = [];
-	for(var id in Map.markers) {
+	for(var id in MapSystem.markers) {
 		arr.push(id);
 	}
-	for(var id in arr) {
-		Map.removeMarker(id);
+	for(var i in arr) {
+		MapSystem.removeMarker(i);
 	}
 };
 
-Map.init = function() {
+MapSystem.init = function() {
 	$.getJSON("map/mapinfo.json", function(json) {
-		Map.initLeaflet(json);
-		Map.reloadMarkers();
+		MapSystem.initLeaflet(json);
+		MapSystem.reloadMarkers();
 	});
 	Websocket.addMessageListener("marker", function(obj) {
-		Map.displayMarker(obj);
+		MapSystem.displayMarker(obj);
 	});
 	Websocket.addMessageListener("removeMarker", function(id) {
-		Map.removeMarker(id);
+		MapSystem.removeMarker(id);
 	});
 };
 
-Map.initLeaflet = function(param) {
-	Map.crs = L.extend({}, L.CRS.Simple, {
-		projection: Map.projection,
+MapSystem.initLeaflet = function(param) {
+	MapSystem.crs = L.extend({}, L.CRS.Simple, {
+		projection: MapSystem.projection,
 		scale: function(zoom) {
 			return Math.pow(2, zoom);
 		}
 	});
-	Map.map = L.map('map', {
+	MapSystem.map = L.map('map', {
 		center : [0, 0],
 		zoomControl: false,
-		zoom : Map.nativeZoom / 2,
-		crs : Map.crs,
+		zoom : MapSystem.nativeZoom / 2,
+		crs : MapSystem.crs,
 		minZoom: 1,
 		maxZoom: param.maxZoom,
 		layers : [
@@ -110,12 +110,12 @@ Map.initLeaflet = function(param) {
 			})
 		]
 	});
-	Map.map.on("contextmenu", function(e) {
-		Map.displayCreateMarkerInterface(e.latlng);
+	MapSystem.map.on("contextmenu", function(e) {
+		MapSystem.displayCreateMarkerInterface(e.latlng);
 	});
 };
 
-Map.getMarkerIcon = function(iconID, visibility) {
+MapSystem.getMarkerIcon = function(iconID, visibility) {
 	var icon;
 	var color;
 	switch(visibility) {
@@ -137,63 +137,63 @@ Map.getMarkerIcon = function(iconID, visibility) {
 	return icon;
 };
 
-Map.removeMarker = function(id) {
-	var marker = Map.markers[id];
+MapSystem.removeMarker = function(id) {
+	var marker = MapSystem.markers[id];
 	if(marker) {
-		Map.map.removeLayer(marker.markerElement);
-		delete Map.markers[id];
+		MapSystem.map.removeLayer(marker.markerElement);
+		delete MapSystem.markers[id];
 	}
 };
 
-Map.invokeRemoveMarker = function(marker, popup) {
+MapSystem.invokeRemoveMarker = function(marker, popup) {
 	NET.removeMarker(marker.id, function() {
-		Map.map.removeLayer(popup);
+		MapSystem.map.removeLayer(popup);
 	});
 };
 
-Map.ignoreMarker = function(marker, popup) {
+MapSystem.ignoreMarker = function(marker, popup) {
 	NET.ignoreMarker(marker.id, function() {
-		Map.map.removeLayer(popup);
-		Map.removeMarker(marker.id);
+		MapSystem.map.removeLayer(popup);
+		MapSystem.removeMarker(marker.id);
 	});
 };
 
-Map.displayMarker = function(marker) {
-	var icon = Map.getMarkerIcon(marker.icon, marker.visibility);
+MapSystem.displayMarker = function(marker) {
+	var icon = MapSystem.getMarkerIcon(marker.icon, marker.visibility);
 	var popup;
 	//TODO: Edit marker
-	var elem = $("<div></div>")
+	var elem = $("<div></div>");
 	elem.append($("<h1>" + marker.name + "</h1><p>" + marker.description + "</p>"));
 	if(marker.author === Login.getUser().id) {
 		elem.append($("<a href='#'>Remove</a>").click(function() {
 			elem.html("<img src='img/loading.gif' />");
-			Map.invokeRemoveMarker(marker, popup);
+			MapSystem.invokeRemoveMarker(marker, popup);
 		}));
 	}
 	else {
 		elem.append($("<a href='#'>Ignore</a>").click(function() {
 			elem.html("<img src='img/loading.gif' />");
-			Map.ignoreMarker(marker, popup);
+			MapSystem.ignoreMarker(marker, popup);
 		}));
 	}
 	popup = L.popup().setContent(elem[0]);
 	var markerElement = L.marker([marker.lat, marker.lng], {
 		icon : icon
 	});
-	markerElement.bindPopup(popup)
-	markerElement.addTo(Map.map);
-	Map.markers[marker.id] = marker;
-	Map.markers[marker.id].markerElement = markerElement;
+	markerElement.bindPopup(popup);
+	markerElement.addTo(MapSystem.map);
+	MapSystem.markers[marker.id] = marker;
+	MapSystem.markers[marker.id].markerElement = markerElement;
 };
 
-Map.displayMarkers = function(markers) {
+MapSystem.displayMarkers = function(markers) {
 	for(var i in markers) {
 		var marker = markers[i];
-		Map.displayMarker(marker);
+		MapSystem.displayMarker(marker);
 	}
 };
 
-Map.displayCreateMarkerInterface = function(latlng) {
+MapSystem.displayCreateMarkerInterface = function(latlng) {
 	var popup;
 	var wrapper = $("<div></div>");
 	var loader = $("<img src='img/loading.gif' />").hide().appendTo(wrapper);
@@ -211,7 +211,7 @@ Map.displayCreateMarkerInterface = function(latlng) {
 			visibility : elem.find("#visibility").val()
 		}, function(okay) {
 			if(okay) {
-				Map.map.removeLayer(popup);
+				MapSystem.map.removeLayer(popup);
 			}
 			else {
 				loader.hide();
@@ -222,5 +222,5 @@ Map.displayCreateMarkerInterface = function(latlng) {
 	popup = L.popup()
 		.setLatLng(latlng)
 		.setContent(wrapper[0])
-		.openOn(Map.map);
+		.openOn(MapSystem.map);
 };

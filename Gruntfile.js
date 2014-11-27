@@ -57,8 +57,7 @@ module.exports = function(grunt) {
 					jQuery: true
 				}
 			},
-			beforeconcat: ['client/js/*.js'],
-			afterconcat: ['htdocs/<%= pkg.name %>.js']
+			beforeconcat: ['client/js/*.js']
 		}
 	});
 	grunt.loadNpmTasks('grunt-contrib-uglify');

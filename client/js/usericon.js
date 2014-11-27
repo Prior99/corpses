@@ -8,19 +8,19 @@ L.userIcon = L.Icon.extend({
 
 	createIcon: function () {
 		var div = $("<div class='usermarker'></div>");
-		var img = this._createImg(this.options["iconUrl"]);
+		var img = this._createImg(this.options.iconUrl);
 		var numdiv = $("<div></div>");
 		numdiv.addClass("number");
-		numdiv.html(this.options["number"]);
+		numdiv.html(this.options.number);
 		div.append(img);
 		div.append(numdiv);
 		this.imgElem = $(img);
 		this._setIconStyles(div[0], "icon");
-		this.setRotation(this.options["rotation"]);
+		this.setRotation(this.options.rotation);
 		return div[0];
 	},
 
 	setRotation : function(deg) {
-		this.imgElem.css({"transform" : "rotate(" + deg + "deg)"})
+		this.imgElem.css({"transform" : "rotate(" + deg + "deg)"});
 	}
 });

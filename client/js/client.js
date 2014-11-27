@@ -20,8 +20,8 @@ NET.onUpdate = function(what) {
 		case "friends":
 			NET.refreshPlayers();
 			NET.refreshUsers();
-			Map.reloadMarkers();
-	};
+			MapSystem.reloadMarkers();
+	}
 };
 
 NET.addMarker = function(obj, callback) {
@@ -33,7 +33,7 @@ NET.addMarker = function(obj, callback) {
 			Errors.displayError(answer.reason);
 		}
 	});
-}
+};
 
 NET.removeMarker = function(id, callback) {
 	Websocket.send("removeMarker", id, function(obj) {
@@ -74,7 +74,7 @@ NET.refreshPlayers = function() {
 	Websocket.send("getPlayers", undefined, function(obj) {
 		if(obj.okay) {
 			UI.updatePlayers(obj.players);
-			Map.updatePlayers(obj.players);
+			MapSystem.updatePlayers(obj.players);
 		}
 		else {
 			Errors.displayError(obj.reason);
@@ -128,7 +128,7 @@ NET.refreshAll = function() {
 	NET.refreshPlayers();
 	NET.refreshInfo();
 	NET.refreshUsers();
-}
+};
 
 NET.displayHordeWarning = function() {
 	UI.firePopup({
@@ -159,7 +159,7 @@ NET.displayPlayerDisconnectedWarning = function(player) {
 
 NET.playerOffline = function(evt) {
 	UI.removePlayerMapping(evt.steamid);
-	Map.removePlayerMapping(evt.steamid);
+	MapSystem.removePlayerMapping(evt.steamid);
 };
 
 $(function() {

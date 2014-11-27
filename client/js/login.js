@@ -5,11 +5,11 @@ Login.getUser = function() {
 };
 
 Login.restoreLoginData = function() {
-	if(localStorage["login"] !== undefined) {
-		Login.loginData = JSON.parse(localStorage["login"]);
+	if(localStorage.login !== undefined) {
+		Login.loginData = JSON.parse(localStorage.login);
 
-		if(localStorage["logged_in"] !== undefined) {
-			Login.loggedIn = JSON.parse(localStorage["logged_in"]);
+		if(localStorage.logged_in !== undefined) {
+			Login.loggedIn = JSON.parse(localStorage.logged_in);
 		}
 		else{
 			Login.loggedIn = false;
@@ -23,8 +23,8 @@ Login.storeLoginData = function(name, password, remember) {
 		password : password,
 		remember: remember
 	};
-	localStorage["login"] = JSON.stringify(Login.loginData);
-	localStorage["logged_in"] = true;
+	localStorage.login = JSON.stringify(Login.loginData);
+	localStorage.logged_in = true;
 };
 
 Login.retreiveLoginData = function() {
@@ -41,23 +41,23 @@ Login.isLoginDataAvailable = function() {
 	else {
 		return false;
 	}
-}
+};
 
 Login.logout = function(forever) {
-	if(forever || Login.loginData.remember == false){
+	if(forever || Login.loginData.remember === false){
 		Login.deleteStoredLoginData();
 	}
 	else{
-		localStorage["logged_in"] = false;
+		localStorage.logged_in = false;
 	}
 	window.location.href = "index.html";
 
-}
+};
 
 Login.deleteStoredLoginData = function() {
-	delete localStorage["login"];
-	delete localStorage["logged_in"];
-}
+	delete localStorage.login;
+	delete localStorage.logged_in;
+};
 
 Login.checkLogin = function(callback) {
 	if(!Login.isLoginDataAvailable()) {
@@ -66,7 +66,7 @@ Login.checkLogin = function(callback) {
 	if(!Login.isLoginDataAvailable()) {
 		callback(false);
 	}
-	else if(Login.loginData.remember == true || Login.loggedIn == true){
+	else if(Login.loginData.remember === true || Login.loggedIn === true){
 		Websocket.send("login", {
 				name: Login.loginData.name,
 				password: Login.loginData.password
@@ -101,7 +101,7 @@ Login.login = function(name, password, remember){
 			password: passwdEnc
 		},
 		function(obj){
-			if(obj.okay == true){
+			if(obj.okay === true){
 				Login.storeLoginData(name, passwdEnc, remember);
 				window.location.href = "map.html";
 			}
@@ -120,7 +120,7 @@ Login.register = function(name, password, steamID, remember, callback){
 			steamid: steamID
 		},
 		function(obj){
-			if(obj.okay == true){
+			if(obj.okay === true){
 				Login.storeLoginData(name, passwdEnc, remember);
 				window.location.href = "map.html";
 			}
