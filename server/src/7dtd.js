@@ -4,17 +4,29 @@ var Regexes = require("./regex.js");
 var Events = require('events');
 
 function Connection() {
-	this.client = new net.Socket();
+	try{
+		this.client = new net.Socket();
+	}
+	catch(error){
+		throw "Error connecting to 7 days to die server!";
+	}
+
 	this.client.on("close", function() {
+		// console.log("[Telnet] CLOSE!");
 		this.emit("close");
+		// console.log("[Telnet] close finished");
 	}.bind(this));
 	this.buffer = "";
 	this.client.on("data", function(data) {
+		// console.log("[Telnet] DATA!");
 		this.buffer += data.toString();
 		this.checkMessage();
+		// console.log("[Telnet] data finished");
 	}.bind(this));
 	this.client.connect(config.telnetPort, config.telnetHost, function() {
+		// console.log("[Telnet] CONNECT!");
 		this.emit("open");
+		// console.log("[Telnet] connect finished");
 	}.bind(this));
 };
 
@@ -22,7 +34,7 @@ Connection.prototype.__proto__ = Events.EventEmitter.prototype;
 
 Connection.prototype.checkMessage = function() {
 	var index;
-	var reg = /^\d+\.\d\d\d\s/gm;
+	var reg = /^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\s\d+\.\d\d\d\s/gm;
 	if((index = this.buffer.search(reg)) != -1) {
 		var msgs = this.buffer.split(reg);
 		for(var i = 0; i < msgs.length -1; i++) {
@@ -106,7 +118,7 @@ Connection.prototype.computeMessage = function(type, array) {
 					online : player[4] == "True",
 					ip : player[5],
 					playtime : player[6],
-					seen : player[7] 
+					seen : player[7]
 				});
 			}
 			this.emit("listKnownPlayers", results);
@@ -165,6 +177,18 @@ Connection.prototype.computeMessage = function(type, array) {
 			this.emit("playerDisconnected", {
 				name : array[1],
 				playTime : array[2]
+			});
+			break;
+		}
+		case "playerSetOnline": {
+			this.emit("playerSetOnline", {
+				steamid : array[1]
+			});
+			break;
+		}
+		case "playerSetOffline": {
+			this.emit("playerSetOffline", {
+				steamid : array[1]
 			});
 			break;
 		}

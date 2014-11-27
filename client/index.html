@@ -8,147 +8,23 @@
 		<script src="//cdnjs.cloudflare.com/ajax/libs/less.js/1.7.5/less.min.js"></script>
 		<script src="port.js"></script>
 		<script src="js/websocket_client.js"></script>
+		<script src="js/login.js"></script>
+		<script src="js/errors.js"></script>
 	</head>
 	<body>
-		<div class="header">
-			Welcome to the 7 days to die map for Land der toten Römmelbrömser
-		</div>
-		<div id="form">
-			<div id="loginDiv" class="form">
-				<span id="loginError" class="error"></span>
-				<table>
-					<tr>
-						<td>Username:</td>
-						<td><input type="text" id="loginName"></input></td>
-					</tr>
-					<tr>
-						<td>Password:</td>
-						<td><input type="text" id="loginPassword"></input></td>
-					</tr>
-				</table>
-				<input type="checkbox" id="loginRemember" value="bla"> Remember my login data</input><br/>
-				<button id="login">Login</button><br/>
-				
-				<a href="#" id="gotoRegister"> Not registered jet? </a>
-			</div>
-			
-			<div id="registerDiv" class="form">
-				<span id="registerError" class="error"></span>
-				Username: <input id="registerName"></input><br/>
-				Steam64 ID: <input id="registerSteamID"></input> <a id="registerSteamIDHelp" class="tipstrip"> ? </a><span id="registerSteamIDHelpText" class="help">tolle help</span><br/>
-				Password: <input id="registerPassword"></input> <a id="registerPasswordHelp" class="tipstrip"> ? </a><span id="registerPasswordHelpText" class="help">tolle help</span><br/>
-				Repeated password: <input id="registerPasswordRepeat"></input><br/>
-				<input type="checkbox" id="registerRemember"> Remember my login data</input><br/>
-				<button id="register">Register</button><br/>
-				<a href="#" id="gotoLogin"> I suddenly remembered my login! </a>
-			</div>
-			
-		</div>
-		
 		<script>
-			function showRegister(animationLength){
-				$(".help").hide();
-				
-				//gotoRegister").hide(animationLength);
-				//$("#gotoLogin").show(animationLength);
-				
-				$("#loginDiv").hide(animationLength);
-				$("#registerDiv").show(animationLength);
-			}
-			
-			function showLogin(animationLength){
-				$(".help").hide();
-				
-				//$("#gotoLogin").hide(animationLength);
-				//$("#gotoRegister").show(animationLength);
-				
-				$("#registerDiv").hide(animationLength);
-				$("#loginDiv").show(animationLength);
-			}
-			
-			function gotoMap(){
-				window.location.href = "map.html";
-			}
-			
-			function showHelp(markerID, show, animationLength){
-				var span = $("#" + markerID + "Text");
-				if(show){
-					span.show(animationLength);
-				}
-				else{
-					span.hide(animationLength);
-				}
-			}
-			
-			function storeLoginData(remember, name, password){
-				if(remember){
-					localStorage.setItem("name", name);
-					localStorage.setItem("password", password);
-				}
-			}
-			
-			function retreiveLoginData(){
-				if(localStorage["name"] !== undefined && localStorage["password"] !== undefined){
-					return {
-						name: localStorage["name"],
-						password: localStorage["password"]
-					};
-				}
-				else{
-					return undefined;
-				}
-			}
-			
-			$(function(){
-				showLogin(0);
-				
+			$(function() {
 				//Websocket.init();
-				
-				$(".tipstrip").hover(function(){ showHelp($(this).attr("id"), true, 100); }, function(){ showHelp($(this).attr("id"), false, 100); });
-				
-				$("#gotoRegister").click(function(){
-					showRegister(100);
-				});
-				$("#gotoLogin").click(function(){
-					showLogin(100);
-				});
-				
-				$("#register").click(function(){
-					Websocket.send("register", {
-							name: $("#registerName").val(),
-							steamid: $("#registerSteamID").val(),
-							password: $("#registerPassword").val()
-						},
-						function(obj){
-							if(obj.okay == true){
-								storeLoginData($("#registerRemember").is(":checked"), $("#registerName").val(), $("#registerPassword").val());
-								gotoMap();
-							}
-							else{
-								$("#registerError").html(obj.reason);
-							}
+				Websocket.addOpenListener(function() {
+					Login.checkLogin(function(loginOkay) {
+						if(loginOkay) {
+							window.location.href = "map.html";
 						}
-					);
-				});
-				
-				$("#login").click(function(){
-					Websocket.send("login", {
-							name: $("#loginName").val(),
-							password: $("#loginPassword").val()
-						},
-						function(obj){
-							if(obj.okay == true){
-								storeLoginData($("#loginRemember").is(":checked"), $("#registerName").val(), $("#registerPassword").val());
-								gotoMap();
-							}
-							else{
-								$("#loginError").html(obj.reason);
-							}
+						else {
+							window.location.href = "login.html";
 						}
-					);
+					});
 				});
-				
-				
 			});
 		</script>
 	</body>

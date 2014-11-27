@@ -12,62 +12,90 @@ function Database() {
 	        conn.release();
 	        console.log("Connecting to Database ... Done.");
 			process.stdout.write("Getting tables ready ... ");
-			function handleError(err) {
+			function checkError(err) {
 				if(err) {
 					console.error("An error occured when creating the tables:");
 					console.error(err);
+					return false;
+				}
+				else {
+					return true;
 				}
 			}
-			this.pool.query(
-				"CREATE TABLE IF NOT EXISTS Markers (" +
-					"id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT," +
-					"name			VARCHAR(128) NOT NULL," +
-					"description	TEXT," +
-					"lat			FLOAT NOT NULL," +
-					"lng			FLOAT NOT NULL," +
-					"visibility		ENUM('private', 'friends', 'public') NOT NULL DEFAULT(FALSE), " +
-					"author			INT NOT NULL, " +
-					"icon			VARCHAR(32) NOT NULL," +
-					"FOREIGN KEY(author) REFERENCES Users(id) ON DELETE CASCADE", handleError);
-			this.pool.query(
-				"CREATE TABLE IF NOT EXISTS Users (" +
-					"id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT," +
-					"name			VARCHAR(128) NOT NULL UNIQUE," +
-					"steamid		VARCHAR(128) NOT NULL UNIQUE," +
-					"enabled		BOOL," +
-					"password		VARCHAR(128) NOT NULL)", handleError);
-			this.pool.query(
-				"CREATE TABLE IF NOT EXISTS Friends (" +
-					"id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT," +
-					"user			INT NOT NULL," +
-					"friend			INT NOT NULL," +
-					"FOREIGN KEY(user) REFERENCES Users(id) ON DELETE CASCADE," +
-					"FOREIGN KEY(friend) REFERENCES Users(id) ON DELETE CASCADE)", handleError);
-			this.pool.query(
-				"CREATE TABLE IF NOT EXISTS MarkerIgnore (" +
-					"id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT," +
-					"user			INT NOT NULL," +
-					"marker			INT NOT NULL," +
-					"FOREIGN KEY(user) REFERENCES Users(id) ON DELETE CASCADE," +
-					"FOREIGN KEY(marker) REFERENCES Markers(id) ON DELETE CASCADE)", handleError);
-			this.pool.query(
-				"CREATE TABLE IF NOT EXISTS Admins (" +
-					"id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT," +
-					"user			INT NOT NULL UNIQUE," +
-					"FOREIGN KEY(user) REFERENCES Users(id) ON DELETE CASCADE)", handleError);
-	    }
+			var pool = this.pool;
+			createUsers();
+			function createUsers() {
+				pool.query(
+					"CREATE TABLE IF NOT EXISTS Users (" +
+						"id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT," +
+						"name			VARCHAR(128) NOT NULL UNIQUE," +
+						"steamid		VARCHAR(128) NOT NULL UNIQUE," +
+						"enabled		BOOL," +
+						"password		VARCHAR(128) NOT NULL)", function(err) {
+					if(checkError(err)) createFriends();
+				});
+			}
+			function createFriends() {
+				pool.query(
+					"CREATE TABLE IF NOT EXISTS Friends (" +
+						"id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT," +
+						"user			INT NOT NULL," +
+						"friend			INT NOT NULL," +
+						"FOREIGN KEY(user) REFERENCES Users(id) ON DELETE CASCADE," +
+						"FOREIGN KEY(friend) REFERENCES Users(id) ON DELETE CASCADE)", function(err) {
+					if(checkError(err)) createAdmins();
+				});
+			}
+			function createAdmins() {
+				pool.query(
+					"CREATE TABLE IF NOT EXISTS Admins (" +
+						"id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT," +
+						"user			INT NOT NULL UNIQUE," +
+						"FOREIGN KEY(user) REFERENCES Users(id) ON DELETE CASCADE)", function(err) {
+					if(checkError(err)) createMarkers();
+				});
+			}
+			function createMarkers() {
+				pool.query(
+					"CREATE TABLE IF NOT EXISTS Markers (" +
+						"id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT," +
+						"name			VARCHAR(128) NOT NULL," +
+						"description	TEXT," +
+						"lat			FLOAT NOT NULL," +
+						"lng			FLOAT NOT NULL," +
+						"visibility		ENUM('private', 'friends', 'public') NOT NULL DEFAULT 'public', " +
+						"author			INT NOT NULL, " +
+						"icon			VARCHAR(32) NOT NULL," +
+						"FOREIGN KEY(author) REFERENCES Users(id) ON DELETE CASCADE)", function(err) {
+					if(checkError(err)) createMarkerIgnore();
+				});
+			}
+			function createMarkerIgnore() {
+				pool.query(
+					"CREATE TABLE IF NOT EXISTS MarkerIgnore (" +
+						"id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT," +
+						"user			INT NOT NULL," +
+						"marker			INT NOT NULL," +
+						"FOREIGN KEY(user) REFERENCES Users(id) ON DELETE CASCADE," +
+						"FOREIGN KEY(marker) REFERENCES Markers(id) ON DELETE CASCADE)", function(err) {
+					if(checkError(err)) console.log("All tables okay.");
+				});
+	    	}
+		}
 	}.bind(this));
 };
 
-Database.prototype.addMarker = function(obj, callback) {
-	this.pool.query("INSERT INTO Markers (name, description, lat, lng, icon) VALUES(?, ?, ?, ?, ?)",
-		[obj.name, obj.description, obj.lat, obj.lng, obj.icon], function(err, result) {
+Database.prototype.addMarker = function(obj, author, callback) {
+	this.pool.query("INSERT INTO Markers (name, description, lat, lng, icon, visibility, author) VALUES(?, ?, ?, ?, ?, ?, ?)",
+		[obj.name, obj.description, obj.lat, obj.lng, obj.icon, obj.visibility, author], function(err, result) {
 		if(err) {
 			console.error("Unable to create Marker:");
 			console.error(err);
 			callback(err);
 		}
 		else {
+			obj.id = result.insertId;
+			obj.author = author;
 			callback(undefined, obj);
 		}
 	});
@@ -86,7 +114,7 @@ Database.prototype.removeMarker = function(id, userid, callback) {
 	});
 };
 
-Database.prototype.validateLogin = function(username, password, callback) {
+Database.prototype.validateUser = function(username, password, callback) {
 	if(username !== undefined && password !== undefined) {
 		this.pool.query("SELECT id FROM Users WHERE name = ? AND password = ?", [username, password], function(err, rows) {
 			if(err) {
@@ -100,9 +128,7 @@ Database.prototype.validateLogin = function(username, password, callback) {
 		});
 	}
 	else {
-		console.error("Unable to validate user:");
-		console.error("either username, password or both were not supplied.");
-		callback(err);
+		callback(undefined, false);
 	}
 };
 
@@ -115,6 +141,24 @@ Database.prototype.getFriendsOf = function(id, callback) {
 		}
 		else {
 			callback(undefined, rows);
+		}
+	});
+};
+
+Database.prototype.isFriendOf = function(me, friendOf, callback) {
+	this.pool.query("SELECT id FROM Friends WHERE user = ? AND friend = ?", [friendOf, me], function(err, rows) {
+		if(err) {
+			console.error("Unable to check, if someone is someones friend:");
+			console.error(err);
+			callback(err);
+		}
+		else {
+			if(rows == undefined || rows.length < 1) {
+				callback(undefined, false);
+			}
+			else {
+				callback(undefined, true);
+			}
 		}
 	});
 };
@@ -153,9 +197,9 @@ Database.prototype.fetchMarkers = function(id, callback) {
 							"WHERE author = ? OR (" +
 								"visibility = 'public' OR (" +
 									"visibility = 'friends' AND " +
-									"author IN (SELECT friend FROM friends WHERE user = ?)" +
+									"author IN (SELECT friend FROM Friends WHERE user = ?)" +
 								")" +
-							") AND NOT id IN (SELECT marker FROM markerIgnore WHERE user = ?)", [id, id, id], function(err, rows) {
+							") AND NOT id IN (SELECT marker FROM MarkerIgnore WHERE user = ?)", [id, id, id], function(err, rows) {
 			if(err) {
 				console.error("Unable to fetch Markers:");
 				console.error(err);
@@ -295,6 +339,45 @@ Database.prototype.getUserByName = function(username, callback) {
 			}
 		}
 	});
+};
+
+Database.prototype.getUserBySteamID = function(steamid, callback) {
+	this.pool.query("SELECT id, name, steamid, enabled, password FROM Users WHERE steamid = ?", [steamid], function(err, rows) {
+		if(err) {
+			console.error("Could not get user by steamid:");
+			console.error(err);
+			callback(err);
+		}
+		else {
+			if(rows == undefined || rows.length != 1) {
+				callback();
+			}
+			else {
+				callback(undefined, rows[0]);
+			}
+		}
+	});
+};
+
+Database.prototype.getUsers = function(userid, callback) {
+	this.pool.query("SELECT u.name AS name, " +
+							"u.steamid AS steamid, " +
+							"u.enabled AS enabled, " +
+							"u.id IN (SELECT friend FROM Friends WHERE user = ?) AS friendedBy, " +
+							"u.id IN (SELECT user FROM Friends WHERE friend = ?) AS friend, " +
+							"u.id IN (SELECT user FROM Admins) AS admin " +
+					"FROM Users u",
+		function(err, rows) {
+			if(err) {
+				console.error("Could not get users:");
+				console.error(err);
+				callback(err);
+			}
+			else {
+				callback(undefined, rows);
+			}
+		}
+	);
 };
 
 Database.prototype.ignoreMarker = function(user, marker, callback) {

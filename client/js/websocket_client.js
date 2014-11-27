@@ -36,13 +36,13 @@ var Websocket = {
 	onMessage: function(evt){
 		var self = this;
 		var obj = JSON.parse(evt.data);
-		//console.log("received: " + evt.data);
+		console.log("received: " + evt.data);
 		if(obj.type === undefined || obj.id === undefined){
 			console.error("received broken packet: " + evt.data + " - Required field missing");
 			return;
 		}
 
-		if(obj.type == "req" && obj.key !== undefined ){
+		if(obj.type === "req" && obj.key !== undefined ){
 			var listener = this.messageListener[obj.key];
 			if(listener !== undefined){
 				if(listener.async){
@@ -66,7 +66,7 @@ var Websocket = {
 				}
 			}
 		}
-		else if(obj.type == "res"){
+		else if(obj.type === "res"){
 			var handler = this.responses[obj.id];
 			if(handler !== undefined){
 				handler(obj.param);
@@ -80,19 +80,19 @@ var Websocket = {
 	},
 
 	onOpen: function(evt){
-		for(l in this.openListener){
+		for(var l in this.openListener){
 			this.openListener[l](evt);
 		}
 	},
 
 	onClose: function(evt){
-		for(l in this.closeListener){
+		for(var l in this.closeListener){
 			this.closeListener[l](evt);
 		}
 	},
 
 	onError: function(evt){
-		for(l in this.errorListener){
+		for(var l in this.errorListener){
 			this.errorListener[l](evt);
 		}
 	},
@@ -123,8 +123,12 @@ var Websocket = {
 			id: this.id
 		};
 		this.responses[this.id] = handler;
-		//console.log("send: " + JSON.stringify(meta));
+		console.log("send: " + JSON.stringify(meta));
 		this.socket.send(JSON.stringify(meta));
 		this.id++;
 	}
 };
+
+$(function(){
+	Websocket.init();
+});

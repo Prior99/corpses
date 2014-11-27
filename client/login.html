@@ -1,0 +1,144 @@
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+		<link rel="stylesheet"  type="text/less" href="style/style.less" />
+		<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/less.js/1.7.5/less.min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/jsSHA/1.5.0/sha256.js"></script>
+		<script src="port.js"></script>
+		<script src="js/websocket_client.js"></script>
+		<script src="js/login.js"></script>
+		<script src="js/errors.js"></script>
+
+	</head>
+	<body>
+		<div class="header">
+			7 Days To Die Interactive Map
+		</div>
+		<div id="form" class="form">
+			<div id="loginDiv">
+				<h1>Login</h1>
+				<table>
+					<tr>
+						<th colspan="2"><span id="loginError" class="error"></span></th>
+					</tr>
+					<tr>
+						<td>Username:</td>
+						<td><input type="text" id="loginName"></input><br/></td>
+					</tr>
+					<tr>
+						<td>Password:</td>
+						<td><input type="password" id="loginPassword"></input><br/></td>
+					</tr>
+					<tr>
+						<td>Remember me:</td>
+						<td><input type="checkbox" id="loginRemember"></input></td>
+					</tr>
+					<tr>
+						<th colspan="2"><button id="login">Login</button></th>
+					</tr>
+				</table>
+				<a href="#" id="gotoRegister">Not registered yet?</a>
+			</div>
+
+			<div id="registerDiv" >
+				<h1>Register</h1>
+				<table>
+					<tr>
+						<th colspan="2"><span id="registerError" class="error"></span></th>
+					</tr>
+					<tr>
+						<td>Username:</td>
+						<td><input type="text" id="registerName"></input></td>
+					</tr>
+					<tr>
+						<td>Steam64 ID:</td>
+						<td>
+							<input type="text" id="registerSteamID"></input>
+							<a id="registerSteamIDHelp" class="tipstrip">?</a>
+							<span id="registerSteamIDHelpText" class="help">
+								Please enter your Steam ID 64 here so the webinterface can identify
+								you ingame. If you don't know your Steam ID, you may look it up
+								on pages like <a href="http://steamidconverter.com/">http://steamidconverter.com/</a>.
+							</span>
+						</td>
+					</tr>
+					<tr>
+						<td>Password:</td>
+						<td>
+							<input type="password" id="registerPassword"></input>
+							<a id="registerPasswordHelp" class="tipstrip">?</a>
+							<span id="registerPasswordHelpText" class="help">
+								As we assume that you are grown up enough to choose a wise password.
+								There are no restrictions for passwords here. Please keep in mind,
+								that a stolen account may have negative impacts on you.
+							</span>
+						</td>
+					</tr>
+					<tr>
+						<td>Repeated password:</td>
+						<td><input type="password" id="registerPasswordRepeat"></input></td>
+					</tr>
+					<tr>
+						<td>Remember me:</td>
+						<td><input type="checkbox" id="registerRemember"></input></td>
+					</tr>
+					<tr>
+						<th colspan="2"><button id="register">Register</button></th>
+					</tr>
+				</table>
+				<a href="#" id="gotoLogin">I suddenly remembered my login!</a>
+			</div>
+		</div>
+		<script>
+			function showHelp(markerID, show, animationLength){
+				var span = $("#" + markerID + "Text");
+				if(show){
+					span.show(animationLength);
+				}
+				else{
+					span.hide(animationLength);
+				}
+			}
+
+			function showRegister(animationLength){
+				$(".help").hide();
+				$("#loginDiv").hide(animationLength);
+				$("#registerDiv").show(animationLength);
+			}
+
+			function showLogin(animationLength){
+				$(".help").hide();
+				$("#registerDiv").hide(animationLength);
+				$("#loginDiv").show(animationLength);
+			}
+
+			$(function(){
+				showLogin(0);
+
+				//Websocket.init();
+
+				Websocket.addOpenListener(function(){
+					$(".tipstrip").hover(function(){ showHelp($(this).attr("id"), true, 100); }, function(){ showHelp($(this).attr("id"), false, 100); });
+
+					$("#gotoRegister").click(function(){
+						showRegister(100);
+					});
+					$("#gotoLogin").click(function(){
+						showLogin(100);
+					});
+
+					$("#register").click(function(){
+						if($("#registerPassword").val() == $("#registerPasswordRepeat").val()){
+							Login.register($("#registerName").val(), $("#registerPassword").val(), $("#registerSteamID").val(), $("#registerRemember").is(":checked"));
+						}
+					});
+
+					$("#login").click(function(){
+						Login.login($("#loginName").val(), $("#loginPassword").val(), $("#loginRemember").is(":checked"));
+					});
+				});
+			});
+		</script>
+	</body>
+</html>
