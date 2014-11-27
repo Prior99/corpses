@@ -4,3 +4,4 @@ client/port.js
 server/config.json
 npm-debug.log
 htdocs
+bower_components/
