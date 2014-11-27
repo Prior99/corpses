@@ -52,7 +52,7 @@ Server.prototype.symlinkMap = function() {
 	});
 };
 
-Server.prototype.notifyNewUser() = function() {
+Server.prototype.notifyNewUser = function() {
 	this.broadcast("updated", "users");
 };
 
