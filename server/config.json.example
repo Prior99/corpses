@@ -2,7 +2,7 @@
   "websocketPort" : "4733",
   "telnetPort" : "8081",
   "telnetHost" : "localhost",
-  "clientDirectory" : "../client/",
+  "clientDirectory" : "htdocs/",
   "mapDirectory" : "/home/sdtd/instances/my_instance/Random Gen/my_map/map",
   "database" : {
     "host": "localhost",
