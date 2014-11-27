@@ -3,22 +3,24 @@ module.exports = function(grunt) {
 		pkg: grunt.file.readJSON('package.json'),
 		concat: {
 			options: {
-				separator: ';'
+				separator: ';',
+				sourceMap: true
 			},
 			dist: {
 				src: ['client/js/*.js'],
-				dest: 'htdocs/<%= pkg.name %>.js'
+				dest: 'tmp/<%= pkg.name %>.js'
 			}
 		},
 		uglify: {
 			options: {
 				banner: '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\n',
-				sourceMap: '<%= pkg.name %>.map'
+				sourceMap: '<%= pkg.name %>.map',
+				sourceMapIn : '<%= concat.dist.dest %>.map',
+				sourceMapIncludeSources : true
 			},
 			dist: {
-				files: {
-					'htdocs/<%= pkg.name %>.min.js': ['<%= concat.dist.dest %>']
-				}
+				src : 'tmp/<%= pkg.name %>.js',
+				dest : 'htdocs/<%= pkg.name %>.min.js'
 			}
 		},
 		less: {
@@ -43,7 +45,7 @@ module.exports = function(grunt) {
 		copy: {
 			images: {
 				files: [
-					{expand: true, src: ['client/img/*'], dest: 'htdocs/img/', filter: 'isFile'}
+					{expand: true, cwd: 'client', src: ['img/**'], dest: 'htdocs'}
 				]
 			}
 		},
@@ -58,6 +60,10 @@ module.exports = function(grunt) {
 				}
 			},
 			beforeconcat: ['client/js/*.js']
+		},
+		clean : {
+			build: ["tmp"],
+			release : ["htdocs/"]
 		}
 	});
 	grunt.loadNpmTasks('grunt-contrib-uglify');
@@ -65,5 +71,6 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-less');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
-	grunt.registerTask('default', ['jshint', 'concat', 'uglify', 'less', 'copy']);
+	grunt.loadNpmTasks('grunt-contrib-clean');
+	grunt.registerTask('default', ['clean:release', 'jshint', 'concat', 'uglify', 'less', 'copy', 'clean:build']);
 };
