@@ -12,15 +12,19 @@ module.exports = function(grunt) {
 			}
 		},
 		uglify: {
-			options: {
-				banner: '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\n',
-				sourceMap: '<%= pkg.name %>.map',
-				sourceMapIn : '<%= concat.dist.dest %>.map',
-				sourceMapIncludeSources : true
-			},
-			dist: {
+			local : {
+				options: {
+					banner: '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\n',
+					sourceMap: '<%= pkg.name %>.map',
+					sourceMapIncludeSources : true,
+					sourceMapIn : '<%= concat.dist.dest %>.map'
+				},
 				src : 'tmp/<%= pkg.name %>.js',
 				dest : 'htdocs/<%= pkg.name %>.min.js'
+			},
+			bower : {
+				src : '<%= bower_concat.all.dest %>',
+				dest : 'htdocs/bower.min.js'
 			}
 		},
 		less: {
@@ -47,6 +51,11 @@ module.exports = function(grunt) {
 				files: [
 					{expand: true, cwd: 'client', src: ['img/**'], dest: 'htdocs'}
 				]
+			},
+			html: {
+				files: [
+					{expand: true, cwd: 'client', src: ['*.html'], dest: 'htdocs'}
+				]
 			}
 		},
 		jshint: {
@@ -64,6 +73,14 @@ module.exports = function(grunt) {
 		clean : {
 			build: ["tmp"],
 			release : ["htdocs/"]
+		},
+		bower_concat: {
+			all: {
+				dest: 'tmp/bower.js',
+				dependencies: {
+					'Leaflet.awesome-markers': 'leaflet'
+				},
+			}
 		}
 	});
 	grunt.loadNpmTasks('grunt-contrib-uglify');
@@ -72,5 +89,6 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-clean');
-	grunt.registerTask('default', ['clean:release', 'jshint', 'concat', 'uglify', 'less', 'copy', 'clean:build']);
+	grunt.loadNpmTasks('grunt-bower-concat');
+	grunt.registerTask('default', ['clean:release', 'jshint', 'concat', 'bower_concat', 'uglify', 'less', 'copy', 'clean:build']);
 };
