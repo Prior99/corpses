@@ -22,6 +22,10 @@ Errors = {
 	"username_or_password_wrong" : {
 		name : "Username and password don't match",
 		description : "The username and password you provided did not match any user in the database. Please check, that both are correct."
+	},
+	"no_admin" : {
+		name : "Not an admin",
+		description : "You tried to invoke a command that is for admins only."
 	}
 };
 

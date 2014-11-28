@@ -227,9 +227,9 @@ function Client(websocket, database, server) {
 	/*
 	 * Listener for enabeling an user
 	 */
-	websocket.addListener("enableUser", function(username, async) {
-		this.checkAdmin(function(admin) {
-			database.getUserByName(username, function(err, toEnable) {
+	websocket.addListener("enableUser", function(steamid, async) {
+		this.checkAdmin(function() {
+			database.getUserBySteamID(steamid, function(err, toEnable) {
 				if(!checkError(err, async)) {
 					if(toEnable !== undefined) {
 						database.enableUser(toEnable.id, function(err) {
@@ -253,9 +253,9 @@ function Client(websocket, database, server) {
 	/*
 	 * Listener for disabeling users
 	 */
-	websocket.addListener("disableUser", function(username, async) {
-		this.checkAdmin(function(admin) {
-			database.getUserByName(username, function(err, toEnable) {
+	websocket.addListener("disableUser", function(steamid, async) {
+		this.checkAdmin(function() {
+			database.getUserBySteamID(steamid, function(err, toEnable) {
 				if(!checkError(err, async)) {
 					if(toEnable !== undefined) {
 						database.disableUser(toEnable.id, function(err) {
@@ -382,12 +382,72 @@ function Client(websocket, database, server) {
 			}.bind(this));
 		}
 	}.bind(this), true);
+	/*
+	 * Listener for addAdmin
+	 */
+	websocket.addListener("addAdmin", function(steamid, async) {
+		this.checkAdmin(function() {
+			database.getUserBySteamID(steamid, function(err, toBeAdmin) {
+				if(!checkError(err, async)) {
+					if(toBeAdmin !== undefined) {
+						database.addAdmin(toBeAdmin.id, function(err) {
+							if(!checkError(err, async)) {
+								async({
+									okay : true
+								});
+							}
+						});
+					}
+					else {
+						async({
+							okay : false,
+							reason : "user_unknown"
+						});
+					}
+				}
+			});
+		}.bind(this), async);
+	}.bind(this), true);
+	/*
+	 * Listener for removeAdmin
+	 */
+	websocket.addListener("removeAdmin", function(steamid, async) {
+		this.checkAdmin(function() {
+			database.getUserBySteamID(steamid, function(err, toBeNoAdmin) {
+				if(!checkError(err, async)) {
+					if(toBeNoAdmin !== undefined) {
+						database.removeAdmin(toBeNoAdmin.id, function(err) {
+							if(!checkError(err, async)) {
+								async({
+									okay : true
+								});
+							}
+						});
+					}
+					else {
+						async({
+							okay : false,
+							reason : "user_unknown"
+						});
+					}
+				}
+			});
+		}.bind(this), async);
+	}.bind(this), true);
 };
 
 Client.prototype.checkAdmin = function(callback, async) {
 	this.database.validateAdmin(this.user.id, function(err, admin) {
 		if(!checkError(err, async)) {
-			callback(admin);
+			if(admin) {
+				callback(admin);
+			}
+			else {
+				async({
+					okay : false,
+					reason : "no_admin"
+				});
+			}
 		}
 	});
 };

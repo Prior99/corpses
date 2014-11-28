@@ -324,7 +324,7 @@ Database.prototype.validateAdmin = function(id, callback) {
 };
 
 Database.prototype.getUserByName = function(username, callback) {
-	this.pool.query("SELECT id, name, steamid, enabled, password FROM Users WHERE name = ?", [username], function(err, rows) {
+	this.pool.query("SELECT id, name, steamid, enabled, password, id IN (SELECT user FROM Admins) AS admin FROM Users WHERE name = ?", [username], function(err, rows) {
 		if(err) {
 			console.error("Could not get user by username:");
 			console.error(err);
@@ -342,7 +342,7 @@ Database.prototype.getUserByName = function(username, callback) {
 };
 
 Database.prototype.getUserBySteamID = function(steamid, callback) {
-	this.pool.query("SELECT id, name, steamid, enabled, password FROM Users WHERE steamid = ?", [steamid], function(err, rows) {
+	this.pool.query("SELECT id, name, steamid, enabled, password, id IN (SELECT user FROM Admins) AS admin FROM Users WHERE steamid = ?", [steamid], function(err, rows) {
 		if(err) {
 			console.error("Could not get user by steamid:");
 			console.error(err);

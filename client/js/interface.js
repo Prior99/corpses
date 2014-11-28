@@ -18,15 +18,32 @@ UI.updateUsers = function(users) {
 	var div = $("#users");
 	div.html("<tr><td>Name</td><td>Enabled</td><td>Admin</td><td>Your Friend</td><td>Friend of yours</td></tr>");
 
+	var adminRow = $("<td>" + player.admin + "</td>");
+	var friendRow = $("<td>" + player.friend + "</td>")
+		.click(function() {
+			NET.toggleFriend(player);
+		})
+		.css({"cursor" : "pointer"});
+	var enabledRow = $("<td>" + player.enabled + "</td>");
+	if(Login.getUser().admin) {
+		adminRow
+			.click(function() {
+				NET.toggleAdmin(player);
+			})
+			.css({"cursor" : "pointer"});
+		enabledRow
+			.click(function() {
+				NET.toggleEnabled(player);
+			})
+			.css({"cursor" : "pointer"});
+	}
 	function updateUserHTML(player) {
 		div.append($("<tr></tr>")
 			.append("<td>" + player.name + "</td>")
-			.append("<td>" + player.enabled + "</td>")
-			.append("<td>" + player.admin + "</td>")
+			.append(enabledRow)
+			.append(adminRow)
 			.append("<td>" + player.friendedBy + "</td>")
-			.append($("<td style='cursor: pointer;'>" + player.friend + "</td>").click(function() {
-				NET.toggleFriend(player);
-			})
+			.append(friendRow)
 		));
 	}
 

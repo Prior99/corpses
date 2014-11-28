@@ -99,6 +99,52 @@ NET.refreshUsers = function() {
 	});
 };
 
+NET.toggleEnabled = function(play) {
+	if(player.enabled) {
+		Websocket.send("disableUser", player.steamid, function(obj) {
+			if(obj.okay) {
+				NET.refreshUsers();
+			}
+			else {
+				Errors.displayError(obj.reason);
+			}
+		});
+	}
+	else {
+		Websocket.send("enableUser", player.steamid, function(obj) {
+			if(obj.okay) {
+				NET.refreshUsers();
+			}
+			else {
+				Errors.displayError(obj.reason);
+			}
+		});
+	}
+};
+
+NET.toggleAdmin = function(play) {
+	if(player.admin) {
+		Websocket.send("removeAdmin", player.steamid, function(obj) {
+			if(obj.okay) {
+				NET.refreshUsers();
+			}
+			else {
+				Errors.displayError(obj.reason);
+			}
+		});
+	}
+	else {
+		Websocket.send("addAdmin", player.steamid, function(obj) {
+			if(obj.okay) {
+				NET.refreshUsers();
+			}
+			else {
+				Errors.displayError(obj.reason);
+			}
+		});
+	}
+};
+
 NET.toggleFriend = function(player) {
 	if(player.friend) {
 		Websocket.send("removeFriend", player.steamid, function(obj) {
