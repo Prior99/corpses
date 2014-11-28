@@ -208,7 +208,7 @@ NET.playerOffline = function(evt) {
 	MapSystem.removePlayerMapping(evt.steamid);
 };
 
-$(function() {
+NET.init = function() {
 	Websocket.addMessageListener("spawningWanderingHorde", NET.displayHordeWarning);
 	Websocket.addMessageListener("playerConnected", NET.displayPlayerJoinedWarning);
 	Websocket.addMessageListener("playerDisconnected", NET.displayPlayerDisconnectedWarning);
@@ -216,10 +216,8 @@ $(function() {
 	//Websocket.addMessageListener("markers", ); //TODO
 	//Websocket.addMessageListener("removeMarker", removeMarker); //TODO
 	Websocket.addMessageListener("updated", NET.onUpdate);
-	Websocket.addOpenListener(function() {
-		NET.refreshAll();
-	});
 	Websocket.addMessageListener("reload", function() {
 		window.location.href = window.location.href;
 	});
-});
+	NET.refreshAll();
+};
