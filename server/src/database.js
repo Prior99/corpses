@@ -116,7 +116,7 @@ Database.prototype.removeMarker = function(id, userid, callback) {
 
 Database.prototype.validateUser = function(username, password, callback) {
 	if(username !== undefined && password !== undefined) {
-		this.pool.query("SELECT id FROM Users WHERE name = ? AND password = ?", [username, password], function(err, rows) {
+		this.pool.query("SELECT id FROM Users WHERE name = ? AND password = ? AND enabled = true", [username, password], function(err, rows) {
 			if(err) {
 				console.error("Unable to validate user:");
 				console.error(err);
