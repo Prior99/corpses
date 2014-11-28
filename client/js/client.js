@@ -219,4 +219,7 @@ $(function() {
 	Websocket.addOpenListener(function() {
 		NET.refreshAll();
 	});
+	Websocket.addMessageListener("reload", function() {
+		window.location.href = window.location.href;
+	});
 });

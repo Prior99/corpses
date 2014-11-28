@@ -181,6 +181,7 @@ function Client(websocket, database, server) {
 								async({
 									okay : true
 								});
+								server.broadcastToUser(steamid, "updated", "friends");
 							}
 						});
 					}
@@ -208,6 +209,7 @@ function Client(websocket, database, server) {
 								async({
 									okay : true
 								});
+								server.broadcastToUser(steamid, "updated", "friends");
 							}
 						});
 					}
@@ -395,6 +397,7 @@ function Client(websocket, database, server) {
 								async({
 									okay : true
 								});
+								server.broadcastToUser(steamid, "reload", undefined);
 							}
 						});
 					}
@@ -421,6 +424,7 @@ function Client(websocket, database, server) {
 								async({
 									okay : true
 								});
+								server.broadcastToUser(steamid, "reload", undefined);
 							}
 						});
 					}
@@ -434,6 +438,10 @@ function Client(websocket, database, server) {
 			});
 		}.bind(this), async);
 	}.bind(this), true);
+};
+
+Client.prototype.isUser = function(steamid) {
+	return this.isLoggedIn() && this.user.steamid == steamid;
 };
 
 Client.prototype.checkAdmin = function(callback, async) {

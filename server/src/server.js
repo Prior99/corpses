@@ -97,6 +97,15 @@ Server.prototype.broadcast = function(name, obj) {
 	}
 };
 
+Server.prototype.broadcastToUser = function(steamid, name, obj) {
+	for(var i in this.clients) {
+		var client = this.clients[i];
+		if(client.isUser(steamid)) {
+			client.sendEvent(name, obj);
+		}
+	}
+};
+
 Server.prototype.initTelnetClient = function() {
 	console.log("Initializing Telnetclient...");
 	var me = this;
