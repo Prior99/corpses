@@ -85,12 +85,22 @@ module.exports = function(grunt) {
 					directory : "htdocs/bower_components"
 				}
 			}
-		}
+		},
+		watch: {
+			scripts: {
+				files: ['client/**'],
+				tasks: ['default'],
+				options: {
+					spawn: false,
+				},
+			},
+		},
 	});
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-less');
 	grunt.loadNpmTasks('grunt-contrib-copy');
+	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-wiredep');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-clean');
