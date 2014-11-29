@@ -16,39 +16,52 @@ UI.updateInfo = function(obj) {
 
 UI.updateUsers = function(users) {
 	var div = $("#users");
-	div.html("<tr><td>Name</td><td>Enabled</td><td>Admin</td><td>Your Friend</td><td>Friend of yours</td></tr>");
-
-	var adminRow = $("<td>" + player.admin + "</td>");
-	var friendRow = $("<td>" + player.friend + "</td>")
+	div.html("<tr>" +
+		"<td><i class='fa fa-user'></i></td>" +
+		"<td><i class='fa fa-check-circle'></td>" +
+		"<td><i class='fa fa-gavel'></i></td>" +
+		"<td><i class='fa fa-heart'></i></td>" +
+		"<td><i class='fa fa-heart'></i></td>" +
+	"</tr>");
+	function boolToSymbol(bool) {
+		if(bool) {
+			return "<i class='fa fa-check'></i>";
+		}
+		else {
+			return "<i class='fa fa-times'></i>";
+		}
+	}
+	function updateUserHTML(user) {
+		var adminRow = $("<td>" + boolToSymbol(user.admin) + "</td>");
+		var friendRow = $("<td>" + boolToSymbol(user.friend) + "</td>")
 		.click(function() {
-			NET.toggleFriend(player);
+			NET.toggleFriend(user);
 		})
 		.css({"cursor" : "pointer"});
-	var enabledRow = $("<td>" + player.enabled + "</td>");
-	if(Login.getUser().admin) {
-		adminRow
+		var enabledRow = $("<td>" + boolToSymbol(user.enabled) + "</td>");
+		if(Login.getUser().admin) {
+			adminRow
 			.click(function() {
-				NET.toggleAdmin(player);
+				NET.toggleAdmin(user);
 			})
 			.css({"cursor" : "pointer"});
-		enabledRow
+			enabledRow
 			.click(function() {
-				NET.toggleEnabled(player);
+				NET.toggleEnabled(user);
 			})
 			.css({"cursor" : "pointer"});
-	}
-	function updateUserHTML(player) {
+		}
 		div.append($("<tr></tr>")
-			.append("<td>" + player.name + "</td>")
+			.append("<td>" + user.name + "</td>")
 			.append(enabledRow)
 			.append(adminRow)
-			.append("<td>" + player.friendedBy + "</td>")
+			.append("<td>" + boolToSymbol(user.friendedBy) + "</td>")
 			.append(friendRow)
-		));
+		);
 	}
 
 	for(var i in users) {
-		updateUserHTML(players[i]);
+		updateUserHTML(users[i]);
 	}
 };
 

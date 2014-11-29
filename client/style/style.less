@@ -114,9 +114,9 @@ div#noplayers {
 	bottom: 0px;
 	padding-top: 30px;
 	padding-bottom: 24px;
-	padding-left: 10px;
 	padding-right: 10px;
 	transition: left 0.2s linear;
+	overflow: hidden;
 	h1 {
 		font-size: 20pt;
 		color: grey;
@@ -132,5 +132,21 @@ div#noplayers {
 		width: 5px;
 		color: grey;
 		top: 50%;
+	}
+	table {
+		font-size: 16pt;
+		color: black;
+		border: none;
+		tr {
+			td {
+				border: none;
+				i.fa-check {
+					color: #84d378;
+				}
+				i.fa-times {
+					color: #b87474;
+				}
+			}
+		}
 	}
 }
