@@ -14,6 +14,7 @@ module.exports = function(grunt) {
 		uglify: {
 			local : {
 				options: {
+					mangle : false,
 					banner: '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\n',
 					sourceMap: '<%= pkg.name %>.map',
 					sourceMapIncludeSources : true,
@@ -21,10 +22,6 @@ module.exports = function(grunt) {
 				},
 				src : 'tmp/<%= pkg.name %>.js',
 				dest : 'htdocs/<%= pkg.name %>.min.js'
-			},
-			bower : {
-				src : '<%= bower_concat.all.dest %>',
-				dest : 'htdocs/bower.min.js'
 			}
 		},
 		less: {
@@ -56,6 +53,11 @@ module.exports = function(grunt) {
 				files: [
 					{expand: true, cwd: 'client', src: ['*.html'], dest: 'htdocs'}
 				]
+			},
+			bower: {
+				files : [
+					{expand: true, cwd: '.', src: ['bower_components/**'], dest: 'htdocs'}
+				]
 			}
 		},
 		jshint: {
@@ -74,12 +76,14 @@ module.exports = function(grunt) {
 			build: ["tmp"],
 			release : ["htdocs/"]
 		},
-		bower_concat: {
-			all: {
-				dest: 'tmp/bower.js',
-				dependencies: {
-					'Leaflet.awesome-markers': 'leaflet'
-				},
+		wiredep: {
+			task: {
+				src: [
+					'htdocs/*.html'
+				],
+				options: {
+					directory : "htdocs/bower_components"
+				}
 			}
 		}
 	});
@@ -87,8 +91,8 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-less');
 	grunt.loadNpmTasks('grunt-contrib-copy');
+	grunt.loadNpmTasks('grunt-wiredep');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-clean');
-	grunt.loadNpmTasks('grunt-bower-concat');
-	grunt.registerTask('default', ['clean:release', 'jshint', 'concat', 'bower_concat', 'uglify', 'less', 'copy', 'clean:build']);
+	grunt.registerTask('default', ['jshint', 'concat', 'uglify', 'less', 'copy', 'wiredep']);
 };
