@@ -2,6 +2,7 @@ var net = require("net");
 var config = require("../config.json");
 var Regexes = require("./regex.js");
 var Events = require('events');
+var Util = require("util");
 
 function Connection() {
 	process.stdout.write("Initializing Telnetclient... ");
@@ -29,7 +30,7 @@ function Connection() {
 	}.bind(this));
 }
 
-Connection.prototype = Events.EventEmitter.prototype;
+Util.inherits(Connection, Events.EventEmitter);
 
 Connection.prototype.checkMessage = function() {
 	var index;
@@ -66,7 +67,7 @@ Connection.prototype.parseMessage = function(string) {
 	//console.log("RECEIVED MSG: \"" + string + "\"");
 	for(var type in Regexes) {
 		var regex = Regexes[type];
-		if((result = regex.exec(string)) !== undefined) {
+		if((result = regex.exec(string)) !== null) {
 			//console.log("DETECTED:" + type + ":" + result);
 			if(type === "listPlayersExtended" || type === "listKnownPlayers") {
 				var array = [];
