@@ -19,7 +19,7 @@ UI.updateUsers = function(users) {
 	div.click(function(e) {
 		e.stopPropagation();
 		e.preventDefault();
-		return false; 
+		return false;
 	});
 	div.html("<tr>" +
 		"<td><i class='fa fa-user'></i></td>" +
@@ -156,7 +156,6 @@ UI.updatePlayer = function(mapping) {
 		"<td>" + player.health + "</td>" +
 		"<td>" + player.zombieKills + "/" + player.playerKills + "</td>" +
 		"<td>" + player.score + "</td>" +
-		"<td>" + player.playtime + "min</td>" +
 		"<td>" + player.ping + "ms</td>"
 	);
 };
