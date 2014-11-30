@@ -5,6 +5,84 @@ function Database() {
 	this.pool = MySQL.createPool(config.database);
 	process.stdout.write("Connecting to Database... ");
 	this.pool.getConnection(function(err, conn) {
+		function checkError(err) {
+			if(err) {
+				console.error("An error occured when creating the tables:");
+				console.error(err);
+				return false;
+			}
+			else {
+				return true;
+			}
+		}
+		function createUsers() {
+			pool.query(
+				"CREATE TABLE IF NOT EXISTS Users (" +
+				"id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT," +
+				"name			VARCHAR(128) NOT NULL UNIQUE," +
+				"steamid		VARCHAR(128) NOT NULL UNIQUE," +
+				"enabled		BOOL," +
+				"password		VARCHAR(128) NOT NULL)", function(err) {
+					if(checkError(err)) {
+						createFriends();
+					}
+				});
+			}
+			function createFriends() {
+				pool.query(
+					"CREATE TABLE IF NOT EXISTS Friends (" +
+					"id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT," +
+					"user			INT NOT NULL," +
+					"friend			INT NOT NULL," +
+					"FOREIGN KEY(user) REFERENCES Users(id) ON DELETE CASCADE," +
+					"FOREIGN KEY(friend) REFERENCES Users(id) ON DELETE CASCADE)", function(err) {
+						if(checkError(err)) {
+							createAdmins();
+						}
+				});
+			}
+			function createAdmins() {
+				pool.query(
+					"CREATE TABLE IF NOT EXISTS Admins (" +
+					"id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT," +
+					"user			INT NOT NULL UNIQUE," +
+					"FOREIGN KEY(user) REFERENCES Users(id) ON DELETE CASCADE)", function(err) {
+						if(checkError(err)) {
+							createMarkers();
+						}
+				});
+			}
+			function createMarkers() {
+				pool.query(
+					"CREATE TABLE IF NOT EXISTS Markers (" +
+					"id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT," +
+					"name			VARCHAR(128) NOT NULL," +
+					"description	TEXT," +
+					"lat			FLOAT NOT NULL," +
+					"lng			FLOAT NOT NULL," +
+					"visibility		ENUM('private', 'friends', 'public') NOT NULL DEFAULT 'public', " +
+					"author			INT NOT NULL, " +
+					"icon			VARCHAR(32) NOT NULL," +
+					"FOREIGN KEY(author) REFERENCES Users(id) ON DELETE CASCADE)", function(err) {
+						if(checkError(err)) {
+							createMarkerIgnore();
+						}
+				});
+			}
+			function createMarkerIgnore() {
+				pool.query(
+					"CREATE TABLE IF NOT EXISTS MarkerIgnore (" +
+					"id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT," +
+					"user			INT NOT NULL," +
+					"marker			INT NOT NULL," +
+					"FOREIGN KEY(user) REFERENCES Users(id) ON DELETE CASCADE," +
+					"FOREIGN KEY(marker) REFERENCES Markers(id) ON DELETE CASCADE)", function(err) {
+						if(checkError(err)) {
+							console.log("All tables okay.");
+						}
+				});
+			}
+
 	    if(err) {
 			console.log("Connecting to Database failed.");
 	    }
@@ -12,78 +90,11 @@ function Database() {
 	        conn.release();
 	        console.log("Connecting to Database done.");
 			process.stdout.write("Getting tables ready ... ");
-			function checkError(err) {
-				if(err) {
-					console.error("An error occured when creating the tables:");
-					console.error(err);
-					return false;
-				}
-				else {
-					return true;
-				}
-			}
 			var pool = this.pool;
 			createUsers();
-			function createUsers() {
-				pool.query(
-					"CREATE TABLE IF NOT EXISTS Users (" +
-						"id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT," +
-						"name			VARCHAR(128) NOT NULL UNIQUE," +
-						"steamid		VARCHAR(128) NOT NULL UNIQUE," +
-						"enabled		BOOL," +
-						"password		VARCHAR(128) NOT NULL)", function(err) {
-					if(checkError(err)) createFriends();
-				});
-			}
-			function createFriends() {
-				pool.query(
-					"CREATE TABLE IF NOT EXISTS Friends (" +
-						"id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT," +
-						"user			INT NOT NULL," +
-						"friend			INT NOT NULL," +
-						"FOREIGN KEY(user) REFERENCES Users(id) ON DELETE CASCADE," +
-						"FOREIGN KEY(friend) REFERENCES Users(id) ON DELETE CASCADE)", function(err) {
-					if(checkError(err)) createAdmins();
-				});
-			}
-			function createAdmins() {
-				pool.query(
-					"CREATE TABLE IF NOT EXISTS Admins (" +
-						"id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT," +
-						"user			INT NOT NULL UNIQUE," +
-						"FOREIGN KEY(user) REFERENCES Users(id) ON DELETE CASCADE)", function(err) {
-					if(checkError(err)) createMarkers();
-				});
-			}
-			function createMarkers() {
-				pool.query(
-					"CREATE TABLE IF NOT EXISTS Markers (" +
-						"id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT," +
-						"name			VARCHAR(128) NOT NULL," +
-						"description	TEXT," +
-						"lat			FLOAT NOT NULL," +
-						"lng			FLOAT NOT NULL," +
-						"visibility		ENUM('private', 'friends', 'public') NOT NULL DEFAULT 'public', " +
-						"author			INT NOT NULL, " +
-						"icon			VARCHAR(32) NOT NULL," +
-						"FOREIGN KEY(author) REFERENCES Users(id) ON DELETE CASCADE)", function(err) {
-					if(checkError(err)) createMarkerIgnore();
-				});
-			}
-			function createMarkerIgnore() {
-				pool.query(
-					"CREATE TABLE IF NOT EXISTS MarkerIgnore (" +
-						"id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT," +
-						"user			INT NOT NULL," +
-						"marker			INT NOT NULL," +
-						"FOREIGN KEY(user) REFERENCES Users(id) ON DELETE CASCADE," +
-						"FOREIGN KEY(marker) REFERENCES Markers(id) ON DELETE CASCADE)", function(err) {
-					if(checkError(err)) console.log("All tables okay.");
-				});
-	    	}
 		}
 	}.bind(this));
-};
+}
 
 Database.prototype.addMarker = function(obj, author, callback) {
 	this.pool.query("INSERT INTO Markers (name, description, lat, lng, icon, visibility, author) VALUES(?, ?, ?, ?, ?, ?, ?)",
@@ -123,7 +134,7 @@ Database.prototype.validateUser = function(username, password, callback) {
 				callback(err);
 			}
 			else {
-				callback(undefined, rows !== undefined && rows.length == 1);
+				callback(undefined, rows !== undefined && rows.length === 1);
 			}
 		});
 	}
@@ -153,7 +164,7 @@ Database.prototype.isFriendOf = function(me, friendOf, callback) {
 			callback(err);
 		}
 		else {
-			if(rows == undefined || rows.length < 1) {
+			if(rows === undefined || rows.length < 1) {
 				callback(undefined, false);
 			}
 			else {
@@ -312,7 +323,7 @@ Database.prototype.validateAdmin = function(id, callback) {
 				callback(err);
 			}
 			else {
-				callback(undefined, rows !== undefined && rows.length == 1);
+				callback(undefined, rows !== undefined && rows.length === 1);
 			}
 		});
 	}
@@ -331,7 +342,7 @@ Database.prototype.getUserByName = function(username, callback) {
 			callback(err);
 		}
 		else {
-			if(rows == undefined || rows.length != 1) {
+			if(rows === undefined || rows.length !== 1) {
 				callback();
 			}
 			else {
@@ -349,7 +360,7 @@ Database.prototype.getUserBySteamID = function(steamid, callback) {
 			callback(err);
 		}
 		else {
-			if(rows == undefined || rows.length != 1) {
+			if(rows === undefined || rows.length !== 1) {
 				callback();
 			}
 			else {

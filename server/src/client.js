@@ -97,7 +97,7 @@ function Client(websocket, database, server) {
 							okay : true
 						});
 					}
-				}.bind(this))
+				}.bind(this));
 			}
 		}
 	}.bind(this), true);
@@ -301,60 +301,61 @@ function Client(websocket, database, server) {
 	 *	Listener for getPlayers
 	 */
 	websocket.addListener("getPlayers", function(obj, async) {
+		function done() {
+			async({
+				okay : true,
+				players : visiblePlayers
+			});
+		}
+
+		function decCounter() {
+			counter--;
+			if(counter === 0) {
+				done();
+			}
+			if(counter < 0) {
+				console.error("Error: Counter lower than 0");
+			}
+		}
+
+		function handlePlayer(err, playerDB) {
+			if(!checkError(err, async)) {
+				if(playerDB === undefined) {
+					decCounter();
+					console.error("Unknown player on the server");
+					async({
+						okay : false,
+						reason : "internal_error"
+					});
+				}
+				else {
+					database.isFriendOf(this.user.id, playerDB.id, function(err, f) {
+						if(!checkError(err)) {
+							if(f) {
+								visiblePlayers.push(player);
+							}
+						}
+						decCounter();
+					});
+				}
+			}
+			else {
+				decCounter();
+			}
+		}
+
 		if(this.checkLoggedIn(async)) {
 			var visiblePlayers = [];
 			var counter = 0;
-
-			function done() {
-				async({
-					okay : true,
-					players : visiblePlayers
-				});
-			}
-
-			function decCounter() {
-				counter--;
-				if(counter == 0) {
-					done();
-				}
-				if(counter < 0) {
-					console.error("Error: Counter lower than 0");
-				}
-			}
-
 			for(var i in server.cache.playersExtended) {
 				var player = server.cache.playersExtended[i];
 				counter++;
-				if(player.steamid == this.user.steamid) {
+				if(player.steamid === this.user.steamid) {
 					visiblePlayers.push(player);
 					decCounter();
 				}
 				else {
-					database.getUserBySteamID(player.steamid, function(err, playerDB) {
-						if(!checkError(err, async)) {
-							if(playerDB == undefined) {
-								decCounter();
-								console.error("Unknown player on the server");
-								async({
-									okay : false,
-									reason : "internal_error"
-								});
-							}
-							else {
-								database.isFriendOf(this.user.id, playerDB.id, function(err, f) {
-									if(!checkError(err)) {
-										if(f) {
-											visiblePlayers.push(player);
-										}
-									}
-									decCounter();
-								})
-							}
-						}
-						else {
-							decCounter();
-						}
-					});
+					database.getUserBySteamID(player.steamid, handlePlayer);
 				}
 			}
 		}
@@ -439,10 +440,10 @@ function Client(websocket, database, server) {
 			});
 		}.bind(this), async);
 	}.bind(this), true);
-};
+}
 
 Client.prototype.isUser = function(steamid) {
-	return this.isLoggedIn() && this.user.steamid == steamid;
+	return this.isLoggedIn() && this.user.steamid === steamid;
 };
 
 Client.prototype.checkAdmin = function(callback, async) {
@@ -472,7 +473,7 @@ function checkError(err, async) {
 		});
 		return err;
 	}
-};
+}
 
 Client.prototype.isLoggedIn = function() {
 	return this.user !== undefined;
@@ -511,17 +512,17 @@ Client.prototype.sendMarker = function(marker) {
 	var me = this;
 	function send() {
 		me.websocket.send("marker", marker);
-	};
-	if(marker.visibility == "public") {
+	}
+	if(marker.visibility === "public") {
 		send();
 	}
-	else if(marker.visibility == "friends") {
+	else if(marker.visibility === "friends") {
 		this.database.isFriendOf(this.user.id, marker.author, function(err, okay) {
 			send();
 		});
 	}
-	else if(marker.visibility == "private") {
-		if(marker.author == this.user.id) {
+	else if(marker.visibility === "private") {
+		if(marker.author === this.user.id) {
 			send();
 		}
 	}

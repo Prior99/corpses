@@ -27,14 +27,14 @@ function Connection() {
 		this.emit("open");
 		// console.log("[Telnet] connect finished");
 	}.bind(this));
-};
+}
 
-Connection.prototype.__proto__ = Events.EventEmitter.prototype;
+Connection.prototype = Events.EventEmitter.prototype;
 
 Connection.prototype.checkMessage = function() {
 	var index;
 	var reg = /^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\s\d+\.\d\d\d\s/gm;
-	if((index = this.buffer.search(reg)) != -1) {
+	if((index = this.buffer.search(reg)) !== -1) {
 		var msgs = this.buffer.split(reg);
 		for(var i = 0; i < msgs.length -1; i++) {
 			//console.log("CHUNK: +++" + msgs[i] + "+++");
@@ -66,12 +66,12 @@ Connection.prototype.parseMessage = function(string) {
 	//console.log("RECEIVED MSG: \"" + string + "\"");
 	for(var type in Regexes) {
 		var regex = Regexes[type];
-		if(result = regex.exec(string)) {
+		if((result = regex.exec(string)) !== undefined) {
 			//console.log("DETECTED:" + type + ":" + result);
-			if(type == "listPlayersExtended" || type == "listKnownPlayers") {
+			if(type === "listPlayersExtended" || type === "listKnownPlayers") {
 				var array = [];
 				array.push(result);
-				while(result = regex.exec(string)) {
+				while((result = regex.exec(string)) !== undefined) {
 					array.push(result);
 				}
 				this.computeMessage(type, array);
@@ -114,7 +114,7 @@ Connection.prototype.computeMessage = function(type, array) {
 					name : player[1],
 					id : player[2],
 					steamid : player[3],
-					online : player[4] == "True",
+					online : player[4] === "True",
 					ip : player[5],
 					playtime : player[6],
 					seen : player[7]
@@ -132,34 +132,34 @@ Connection.prototype.computeMessage = function(type, array) {
 			break;
 		}
 		case "listPlayersExtended": {
-			var results = [];
-			for(var i in array) {
-				var player = array[i];
-				results.push({
-					id : player[1],
-					name : player[2],
+			var players = [];
+			for(var j in array) {
+				var p = array[j];
+				players.push({
+					id : p[1],
+					name : p[2],
 					position : {
-						x : player[3],
-						y : player[4],
-						z : player[5],
+						x : p[3],
+						y : p[4],
+						z : p[5],
 					},
 					rotation : {
-						x : player[6],
-						y : player[7],
-						z : player[8],
+						x : p[6],
+						y : p[7],
+						z : p[8],
 					},
-					remote : player[9] == "True",
-					health : player[10],
-					deaths : player[11],
-					zombieKills : player[12],
-					playerKills : player[13],
-					score : player[14],
-					steamid : player[15],
-					ip : player[16],
-					ping : player[17],
+					remote : p[9] === "True",
+					health : p[10],
+					deaths : p[11],
+					zombieKills : p[12],
+					playerKills : p[13],
+					score : p[14],
+					steamid : p[15],
+					ip : p[16],
+					ping : p[17],
 				});
 			}
-			this.emit("listPlayersExtended", results);
+			this.emit("listPlayersExtended", players);
 			break;
 		}
 		case "playerConnected": {
@@ -192,6 +192,6 @@ Connection.prototype.computeMessage = function(type, array) {
 			break;
 		}
 	}
-}
+};
 
 module.exports = Connection;

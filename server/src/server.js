@@ -1,6 +1,6 @@
 var TelnetClient = require("./7dtd.js");
 var WS = require("ws");
-var WebSocket = require("./websocket_server.js");
+var Websocket = require("./websocket_server.js");
 var config = require("../config.json");
 var FS = require("fs");
 var Database = require("./database.js");
@@ -67,23 +67,25 @@ Server.prototype.startWebsocketServer = function() {
 					var client = new Client(wsc, me.database, me);
 					me.clients.push(client);
 					console.log("New client connected. Currently " + me.clients.length + " clients connected.");
-				})(new WebSocket(ws));
+				})(new Websocket(ws));
+			})
+			.on("error", function() {
+				console.error("The websocketserver could not be started. Is the port maybe in use?");
 			});
-			console.log("Websocketserver Started up!");
 		}
 	});
-}
+};
 
 Server.prototype.removeClient = function(client) {
 	var index;
-	if((index = this.clients.indexOf(client)) != -1) {
+	if((index = this.clients.indexOf(client)) !== -1) {
 		this.clients.splice(index, 1);
 		console.log("Client disconnected. Currently " + this.clients.length + " clients connected.");
 	}
 	else {
 		console.error("Tried to remove client from clients that was not known.");
 	}
-}
+};
 
 Server.prototype.broadcast = function(name, obj) {
 	for(var i in this.clients) {
@@ -139,6 +141,6 @@ Server.prototype.initTelnetClient = function() {
 	this.telnetClient.on("listPlayersExtended", function(evt) {
 		me.broadcast("updated", "playersExtended");
 	});
-}
+};
 
 module.exports = Server;

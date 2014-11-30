@@ -36,8 +36,9 @@ Connection.prototype = {
 			id: this.id
 		};
 		this.responses[this.id] = handler;
-		if(!this.dead)
-		this.socket.send(JSON.stringify(meta));
+		if(!this.dead) {
+			this.socket.send(JSON.stringify(meta));
+		}
 		this.id++;
 	},
 
@@ -49,7 +50,7 @@ Connection.prototype = {
 			return;
 		}
 
-		if(obj.type == "req" && obj.key !== undefined ){
+		if(obj.type === "req" && obj.key !== undefined ){
 			var listener = this.listeners[obj.key];
 			if(listener !== undefined){
 				if(listener.async){
@@ -59,8 +60,9 @@ Connection.prototype = {
 							type: "res",
 							param: ans
 						};
-						if(!self.dead)
-						self.socket.send(JSON.stringify(answer));
+						if(!self.dead) {
+							self.socket.send(JSON.stringify(answer));
+						}
 					});
 				}
 				else{
@@ -70,12 +72,13 @@ Connection.prototype = {
 						type: "res",
 						param: ans
 					};
-					if(!self.dead)
-					this.socket.send(JSON.stringify(answer));
+					if(!self.dead) {
+						this.socket.send(JSON.stringify(answer));
+					}
 				}
 			}
 		}
-		else if(obj.type == "res"){
+		else if(obj.type === "res"){
 			var handler = this.responses[obj.id];
 			if(handler !== undefined){
 				handler(obj.param);

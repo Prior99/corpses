@@ -70,7 +70,8 @@ module.exports = function(grunt) {
 					jQuery: true
 				}
 			},
-			beforeconcat: ['client/js/*.js']
+			client: ['client/js/*.js'],
+			server: ['server/src/*.js']
 		},
 		clean : {
 			build: ["tmp"],
@@ -104,5 +105,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-wiredep');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-clean');
-	grunt.registerTask('default', ['jshint', 'concat', 'uglify', 'less', 'copy', 'wiredep']);
+	grunt.registerTask('client', ['jshint:client', 'concat', 'uglify', 'less', 'copy', 'wiredep']);
+	grunt.registerTask('server', ['jshint:server']);
+	grunt.registerTask('default', ['server', 'client']);
 };
