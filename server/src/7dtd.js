@@ -72,7 +72,7 @@ Connection.prototype.parseMessage = function(string) {
 			if(type === "listPlayersExtended" || type === "listKnownPlayers") {
 				var array = [];
 				array.push(result);
-				while((result = regex.exec(string)) !== undefined) {
+				while((result = regex.exec(string)) !== null) {
 					array.push(result);
 				}
 				this.computeMessage(type, array);
