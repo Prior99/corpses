@@ -58,7 +58,7 @@ Connection.prototype.triggerListKnownPlayers = function() {
 };
 
 Connection.prototype.triggerListPlayersExtended = function() {
-	this.client.write("listplayersextended\n");
+	this.client.write("listplayers\n");
 };
 
 Connection.prototype.parseMessage = function(string) {
