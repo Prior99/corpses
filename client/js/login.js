@@ -94,7 +94,7 @@ Login.encrypt = function(key, msg){
 	return encrypter.getHMAC(key, "TEXT", "SHA-256", "HEX");
 };
 
-Login.login = function(name, password, remember){
+Login.login = function(name, password, remember, onErr){
 	var passwdEnc = Login.encrypt(name, password);
 	Websocket.send("login", {
 			name: name,
@@ -106,13 +106,18 @@ Login.login = function(name, password, remember){
 				window.location.href = "map.html";
 			}
 			else{
-				window.location.href = "index.html";
+				if(onErr) {
+					onErr(obj.reason);
+				}
+				else {
+					window.location.href = "index.html";
+				}
 			}
 		}
 	);
 };
 
-Login.register = function(name, password, steamID, remember, callback){
+Login.register = function(name, password, steamID, remember, onErr){
 	var passwdEnc = Login.encrypt(name, password);
 	Websocket.send("register", {
 			name: name,
@@ -125,7 +130,12 @@ Login.register = function(name, password, steamID, remember, callback){
 				window.location.href = "map.html";
 			}
 			else{
-				window.location.href = "index.html";
+				if(onErr) {
+					onErr(obj.reason);
+				}
+				else {
+					window.location.href = "index.html";
+				}
 			}
 		}
 	);

@@ -18,7 +18,7 @@
 				<h1>Login</h1>
 				<table>
 					<tr>
-						<th colspan="2"><span id="loginError" class="error"></span></th>
+						<th colspan="2" id="loginError" class="error"></th>
 					</tr>
 					<tr>
 						<td>Username:</td>
@@ -43,7 +43,7 @@
 				<h1>Register</h1>
 				<table>
 					<tr>
-						<th colspan="2"><span id="registerError" class="error"></span></th>
+						<th colspan="2" id="registerError" class="error"></th>
 					</tr>
 					<tr>
 						<td>Username:</td>
@@ -115,7 +115,10 @@
 				showLogin(0);
 
 				//Websocket.init();
-
+				function displayLoginError(div, err) {
+					var error = Errors[err];
+					div.html("<h1>" + error.name + "</h1><p>" + error.description + "</p>");
+				}
 				Websocket.addOpenListener(function(){
 					$(".tipstrip").hover(function(){ showHelp($(this).attr("id"), true, 100); }, function(){ showHelp($(this).attr("id"), false, 100); });
 
@@ -128,12 +131,16 @@
 
 					$("#register").click(function(){
 						if($("#registerPassword").val() == $("#registerPasswordRepeat").val()){
-							Login.register($("#registerName").val(), $("#registerPassword").val(), $("#registerSteamID").val(), $("#registerRemember").is(":checked"));
+							Login.register($("#registerName").val(), $("#registerPassword").val(), $("#registerSteamID").val(), $("#registerRemember").is(":checked"), function(err) {
+								displayLoginError($("#registerError"), err);
+							});
 						}
 					});
 
 					$("#login").click(function(){
-						Login.login($("#loginName").val(), $("#loginPassword").val(), $("#loginRemember").is(":checked"));
+						Login.login($("#loginName").val(), $("#loginPassword").val(), $("#loginRemember").is(":checked"), function(err) {
+							displayLoginError($("#loginError"), err);
+						});
 					});
 				});
 			});
