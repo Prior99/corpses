@@ -6,6 +6,7 @@ var FS = require("fs");
 var Database = require("./database.js");
 var Client = require("./client.js");
 var Cache = require("./cache.js");
+var ConfigUtils = require("./configutils.js");
 
 function Server() {
 	this.wsServer = null;
@@ -115,7 +116,16 @@ Server.prototype.initTelnetClient = function() {
 		}
 	});
 	this.telnetClient.on("playerConnected", function(evt) {
-		me.broadcast("playerConnected", evt);
+		if(config.kickUnregistered !== undefined && config.kickUnregistered === true){
+			me.database.getUserBySteamID(evt.steamid, function(err, result){
+				if(err === undefined && result === undefined){
+					me.telnetClient.triggerKickPlayer(evt.name, "You must have an enabled account on " + (config.website === undefined ? "our website": config.website) + " to play on this server");
+				}
+				else{
+					me.broadcast("playerConnected", evt);
+				}
+			});
+		}
 	});
 	this.telnetClient.on("playerDisconnected", function(evt) {
 		me.broadcast("playerDisconnected", evt);
