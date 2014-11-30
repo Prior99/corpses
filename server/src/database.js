@@ -3,14 +3,14 @@ var config = require('../config.json');
 
 function Database() {
 	this.pool = MySQL.createPool(config.database);
+	process.stdout.write("Connecting to Database... ");
 	this.pool.getConnection(function(err, conn) {
 	    if(err) {
-	        console.log("Connecting to Database ... Failed.");
-	        conn.release();
+			console.log("Connecting to Database failed.");
 	    }
 	    else {
 	        conn.release();
-	        console.log("Connecting to Database ... Done.");
+	        console.log("Connecting to Database done.");
 			process.stdout.write("Getting tables ready ... ");
 			function checkError(err) {
 				if(err) {
@@ -366,7 +366,7 @@ Database.prototype.getUsers = function(userid, callback) {
 							"u.id IN (SELECT friend FROM Friends WHERE user = ?) AS friendedBy, " +
 							"u.id IN (SELECT user FROM Friends WHERE friend = ?) AS friend, " +
 							"u.id IN (SELECT user FROM Admins) AS admin " +
-					"FROM Users u",
+					"FROM Users u", [userid, userid],
 		function(err, rows) {
 			if(err) {
 				console.error("Could not get users:");

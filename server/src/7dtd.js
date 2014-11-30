@@ -4,13 +4,11 @@ var Regexes = require("./regex.js");
 var Events = require('events');
 
 function Connection() {
-	try{
-		this.client = new net.Socket();
-	}
-	catch(error){
-		throw "Error connecting to 7 days to die server!";
-	}
-
+	process.stdout.write("Initializing Telnetclient... ");
+	this.client = new net.Socket();
+	this.client.on("error", function() {
+		console.log("Initializing Telnetclient failed. Is the server running and reachable?");
+	});
 	this.client.on("close", function() {
 		// console.log("[Telnet] CLOSE!");
 		this.emit("close");
@@ -25,6 +23,7 @@ function Connection() {
 	}.bind(this));
 	this.client.connect(config.telnetPort, config.telnetHost, function() {
 		// console.log("[Telnet] CONNECT!");
+		console.log("Initializing Telnetclient okay.");
 		this.emit("open");
 		// console.log("[Telnet] connect finished");
 	}.bind(this));

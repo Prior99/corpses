@@ -194,7 +194,7 @@ function Client(websocket, database, server) {
 				}
 			}.bind(this));
 		}
-	}.bind(this));
+	}.bind(this), true);
 
 	/*
 	 * Listener for Callback removeFriend
@@ -222,7 +222,7 @@ function Client(websocket, database, server) {
 				}
 			}.bind(this));
 		}
-	}.bind(this));
+	}.bind(this), true);
 	websocket.addCloseListener(function() {
 		server.removeClient(this);
 	}.bind(this));

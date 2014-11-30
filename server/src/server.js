@@ -13,14 +13,8 @@ function Server() {
 	this.telnetClient = new TelnetClient();
 	this.telnetClient.on("open", function(){
 		console.log("Connection to 7DTD established.");
-		try{
-			this.telnetClient.triggerListKnownPlayers();
-			this.cache.connectionEstablished(this.telnetClient);
-		}
-		catch(error){
-			console.error("Error opening TelnetClient: " + error);
-		}
-
+		this.telnetClient.triggerListKnownPlayers();
+		this.cache.connectionEstablished(this.telnetClient);
 		this.database = new Database();
 		this.clients = [];
 		this.startWebsocketServer();
