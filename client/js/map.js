@@ -92,6 +92,14 @@ MapSystem.initLeaflet = function(param) {
 			return Math.pow(2, zoom);
 		}
 	});
+	MapSystem.mapLayer = L.tileLayer('map/{z}/{x}/{y}.png', {
+		tileSize: param.blockSize,
+		minZoom: 1,
+		maxZoom: param.maxZoom,
+		noWrap: true,
+		tms: true,
+		continuousWorld : true
+	});
 	MapSystem.map = L.map('map', {
 		center : [0, 0],
 		zoomControl: false,
@@ -100,14 +108,7 @@ MapSystem.initLeaflet = function(param) {
 		minZoom: 1,
 		maxZoom: param.maxZoom,
 		layers : [
-			L.tileLayer('map/{z}/{x}/{y}.png', {
-				tileSize: param.blockSize,
-				minZoom: 1,
-				maxZoom: param.maxZoom,
-				noWrap: true,
-				tms: true,
-				continuousWorld : true,
-			})
+			MapSystem.mapLayer
 		]
 	});
 	MapSystem.map.on("contextmenu", function(e) {

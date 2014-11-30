@@ -318,6 +318,8 @@ function Client(websocket, database, server) {
 			}
 		}
 
+		var thisClient = this;
+
 		function handlePlayer(err, playerDB) {
 			if(!checkError(err, async)) {
 				if(playerDB === undefined) {
@@ -329,7 +331,7 @@ function Client(websocket, database, server) {
 					});
 				}
 				else {
-					database.isFriendOf(this.user.id, playerDB.id, function(err, f) {
+					database.isFriendOf(thisClient.user.id, playerDB.id, function(err, f) {
 						if(!checkError(err)) {
 							if(f) {
 								visiblePlayers.push(player);
