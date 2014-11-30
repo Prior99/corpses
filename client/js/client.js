@@ -18,6 +18,7 @@ NET.onUpdate = function(what) {
 			NET.refreshUsers();
 			break;
 		case "friends":
+			UI.clearPlayers();
 			NET.refreshPlayers();
 			NET.refreshUsers();
 			MapSystem.reloadMarkers();

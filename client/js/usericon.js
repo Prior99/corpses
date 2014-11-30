@@ -12,8 +12,8 @@ L.userIcon = L.Icon.extend({
 		var numdiv = $("<div></div>");
 		numdiv.addClass("number");
 		numdiv.html(this.options.number);
-		div.append(img);
 		div.append(numdiv);
+		div.append(img);
 		this.imgElem = $(img);
 		this._setIconStyles(div[0], "icon");
 		this.setRotation(this.options.rotation);

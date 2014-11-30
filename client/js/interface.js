@@ -121,6 +121,16 @@ UI.newPlayerMapping = function(player) {
 	UI.playerMapping[player.steamid] = mapping;
 };
 
+UI.clearPlayers = function() {
+	var arr = [];
+	for(var i in UI.playerMappings) {
+		arr.push(i);
+	}
+	for(var j in arr) {
+		UI.removePlayerMapping(j);
+	}
+};
+
 UI.removePlayerMapping = function(steamid) {
 	var mapping = UI.playerMapping[steamid];
 	mapping.row.remove();
