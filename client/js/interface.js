@@ -123,7 +123,7 @@ UI.newPlayerMapping = function(player) {
 
 UI.clearPlayers = function() {
 	var arr = [];
-	for(var i in playerMappings) {
+	for(var i in UI.playerMappings) {
 		arr.push(i);
 	}
 	for(var j in arr) {
