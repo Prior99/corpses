@@ -265,6 +265,7 @@ function Client(websocket, database, server) {
 								async({
 									okay : true
 								});
+								server.broadcastToUser(steamid, "reload");
 							}
 						});
 					}

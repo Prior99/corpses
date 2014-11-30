@@ -21,7 +21,6 @@ UI.updateUsers = function(users) {
 		"<td><i class='fa fa-check-circle'></td>" +
 		"<td><i class='fa fa-gavel'></i></td>" +
 		"<td><i class='fa fa-heart'></i></td>" +
-		"<td><i class='fa fa-heart'></i></td>" +
 	"</tr>");
 	function boolToSymbol(bool) {
 		if(bool) {
@@ -31,9 +30,25 @@ UI.updateUsers = function(users) {
 			return "<i class='fa fa-times'></i>";
 		}
 	}
+
+	function friendSymbol(send, recv) {
+		if(send && recv) {
+			return "<i class='fa fa-check'></i>";
+		}
+		else if(!send && !recv){
+			return "<i class='fa fa-times'></i>";
+		}
+		else if(send && !recv){
+			return "<i class='fa fa-exclamation'></i>";
+		}
+		else if(!send && recv){
+			return "<i class='fa fa-question'></i>";
+		}
+	}
+
 	function updateUserHTML(user) {
 		var adminRow = $("<td>" + boolToSymbol(user.admin) + "</td>");
-		var friendRow = $("<td>" + boolToSymbol(user.friend) + "</td>")
+		var friendRow = $("<td>" + friendSymbol(user.friend, user.friendedBy) + "</td>")
 		.click(function() {
 			NET.toggleFriend(user);
 		})
@@ -55,7 +70,6 @@ UI.updateUsers = function(users) {
 			.append("<td>" + user.name + "</td>")
 			.append(enabledRow)
 			.append(adminRow)
-			.append("<td>" + boolToSymbol(user.friendedBy) + "</td>")
 			.append(friendRow)
 		);
 	}

@@ -99,7 +99,7 @@ NET.refreshUsers = function() {
 	});
 };
 
-NET.toggleEnabled = function(play) {
+NET.toggleEnabled = function(player) {
 	if(player.enabled) {
 		Websocket.send("disableUser", player.steamid, function(obj) {
 			if(obj.okay) {
@@ -122,7 +122,7 @@ NET.toggleEnabled = function(play) {
 	}
 };
 
-NET.toggleAdmin = function(play) {
+NET.toggleAdmin = function(player) {
 	if(player.admin) {
 		Websocket.send("removeAdmin", player.steamid, function(obj) {
 			if(obj.okay) {

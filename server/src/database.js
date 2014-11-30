@@ -304,7 +304,7 @@ Database.prototype.disableUser = function(id, callback) {
 };
 
 Database.prototype.validateAdmin = function(id, callback) {
-	if(username !== undefined && password !== undefined) {
+	if(id !== undefined) {
 		this.pool.query("SELECT id FROM Admins WHERE user = ?", [id], function(err, rows) {
 			if(err) {
 				console.error("Could not validate admin:");
@@ -363,8 +363,8 @@ Database.prototype.getUsers = function(userid, callback) {
 	this.pool.query("SELECT u.name AS name, " +
 							"u.steamid AS steamid, " +
 							"u.enabled AS enabled, " +
-							"u.id IN (SELECT friend FROM Friends WHERE user = ?) AS friendedBy, " +
-							"u.id IN (SELECT user FROM Friends WHERE friend = ?) AS friend, " +
+							"u.id IN (SELECT friend FROM Friends WHERE user = ?) AS friend, " +
+							"u.id IN (SELECT user FROM Friends WHERE friend = ?) AS friendedBy, " +
 							"u.id IN (SELECT user FROM Admins) AS admin " +
 					"FROM Users u", [userid, userid],
 		function(err, rows) {
