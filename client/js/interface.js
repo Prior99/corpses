@@ -16,6 +16,11 @@ UI.updateInfo = function(obj) {
 
 UI.updateUsers = function(users) {
 	var div = $("#users");
+	div.click(function(e) {
+		e.stopPropagation();
+		e.preventDefault();
+		return false; 
+	});
 	div.html("<tr>" +
 		"<td><i class='fa fa-user'></i></td>" +
 		"<td><i class='fa fa-check-circle'></td>" +
