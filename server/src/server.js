@@ -38,7 +38,9 @@ Server.prototype.broadcastMarker = function(marker) {
 Server.prototype.symlinkMap = function() {
 	FS.symlink(config.mapDirectory, config.clientDirectory + "/map", function(err) {
 		if(err) {
-			console.error("Unable to create symlink for map.\nPlease create it manually by executing the following command:\n\nln -s " + config.mapDirectory + " " + config.clientDirectory + "/map");
+			if(err.errno !== 47) {
+				console.error("Unable to create symlink for map.\nPlease create it manually by executing the following command:\n\nln -s " + config.mapDirectory + " " + config.clientDirectory + "/map");
+			}
 		}
 		else {
 			console.log("Map successfully linked. (" + config.mapDirectory + " -> " + config.clientDirectory + "/map");
@@ -103,7 +105,6 @@ Server.prototype.broadcastToUser = function(steamid, name, obj) {
 };
 
 Server.prototype.initTelnetClient = function() {
-	console.log("Initializing Telnetclient...");
 	var me = this;
 	this.telnetClient.on("close", function() {
 		console.log("Connection to 7DTD closed. Restarting it!");
