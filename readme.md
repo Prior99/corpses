@@ -1,10 +1,25 @@
+CORPSES
+=======
+CORPSES stands for **Comprehensive Online (Route) Planning-, Social- and Explorationsystem**.
+
+This is most of all a webbased map for the popular game *7 Days To Die* from *The Fun Pimps*.
+
+This software requires an own server that interops with the telnet interface of the 7DTD server itself, utilizes a database and listens for incoming websocketconnections to run commands executed by the webinterface published via http using your systems default webserver.
+
+Requirements
+============
+This software should run on every plattform that supports [NodeJS](http://nodejs.org/) and allows hosting a webpage (Allmost every operatingsystem does this), but only Linux (Debian, Ubuntu and Arch) and Windows were tested). You will need access to a database on a MySQL server as well as a 7DTD server itself.
+
+What could also be necessary is a decent cup of hot chocolate for the duration of the installationprocess.
+
+
 Installation
 ============
-This software utilizes [node](http://nodejs.org/) as serversoftware. All relevant packages are installed via nodes packagemanager **npm**.
-The whole buildsystem is written in [grunt](http://gruntjs.com/), clientside scripts are installed using [bower](http://bower.io/).
+This software utilizes [NodeJS](http://nodejs.org/) as serversoftware. All relevant packages are installed via nodes packagemanager **npm**.
+The whole buildsystem is written in [Grunt](http://gruntjs.com/), clientside scripts are installed using [Bower](http://bower.io/).
 
-0. Cloning this repository
---------------------------
+Preparing
+-----------
 Clone this repository somewhere to your system. Either do this by invoking:
 
 	git clone <URL to where you found this repository>
@@ -24,7 +39,7 @@ There should also be a tag named ```stable``` which should always point to the l
 
 1. Installing node
 ------------------
-Make sure **node** is installed on your system. On a Debian or Ubuntu based machine you can install it using aptitude:
+Make sure **NodeJS** is installed on your system. On a Debian or Ubuntu based machine you can install it using aptitude:
 
 	apt-get install nodejs
 
@@ -71,7 +86,7 @@ And was abled to reach the webinterface via example.org/7dtd afterwards. Please 
 
 6. Setting up a database
 ------------------------
-This webinterface is currently using **mysql** as it's database. If you do not have **mysql** installed, you might want to do this. Part of  installing and managing a **mysql**-server is not part of this readme.
+This webinterface is currently using **MySQL** as it's database. If you do not have **MySQL** installed, you might want to do this. Installing and managing a MySQL server is not part of this readme.
 Create a new database and a new user, grant the user all privileges for the database and give it a decent password.
 
 7. Configuring the server
@@ -97,9 +112,9 @@ The contents should look like this:
 
 Set the ```websocketPort``` to some free port on your system. The server will automatically configure the webui to use this port.
 
-If you did not change the port of the *telnet interface* in the 7 days to die server, you do neither need to edit ```telnetPort``` nor ```telnetHost```.
+If you did not change the port of the *telnet interface* in the 7 days to die server and it is running on the same machine as this server, you do neither need to edit ```telnetPort``` nor ```telnetHost```.
 
-The setting ```clientDirectory``` needs to point to the ```htdocs``` directory the webui is hosted in. If you linked it and did not move it, you do not need to change this. If you did move it, please point it to the correct directory.
+The setting ```clientDirectory``` needs to point to the ```htdocs/``` directory the webui is hosted in. If you linked it and did not move it, you do not need to change this. If you did move it, please point it to the correct directory.
 
 The next one is a bit tricky: We need the path to where the 7 days to die server drops the rendered map. The server will try to link this into the webuis directory so it has access to the map and your users can see the map at all.
 Please point ```mapDirectory``` to the corresponding directory. If you are using Allocs scripts, this should be: ```/home/sdtd/instances/<Name of your instance>/Random Gen/<Name of your map>/map```.
@@ -112,13 +127,26 @@ At last you need to set ```website``` to your the url to where your webui is pub
 
 *Whew*. You are now done configuring the server.
 
-8. Starting the server
+8. Preparing the 7 days to die server
+-------------------------------------
+
+You need to have [Allocs fixes](http://7dtd.illy.bz) installed to interopt with the server.
+Please install them following their instructions. If you are using Allocs scripts to manage the server (e.g. in linux), then they are already installed.
+
+You need to make the server render the map. Use a telnet client (I recommend putty when using windows) and connect to ```localhost``` on port ```8081``` if you did not change the port in the configuration of the 7 days to die server.
+Run the commands
+
+	enablerendering
+
+to enable live rendering as well as
+
+	rendermap
+
+to render the part of the map that was already discovered.
+
+9. Starting the server
 ----------------------
 You can start the server using:
-
-	./start.sh
-
-Or on windows (or if you prefer not to use the script):
 
 	node server/src/startup.js
 
@@ -132,4 +160,21 @@ If everything went right, this should produce an output similiar to this:
 
 The order can be different as the server is heavily eventbased.
 
-I recommend running the server in a **screen** session for the time being, an init-script as well as more scripts will be available in a later release.
+I recommend running the server in a **screen** session for the time being, an init script as well as more management and configuration scripts will be available in a later release.
+
+Contributors
+============
+This software was mainly written by:
+
+  * Soana (Andra Ruebsteck)
+  * Prior (Frederick Gnodtke)
+
+If you would like to contribute to this project we of course would be happy. Just fork this project and send us a pull-request.
+
+Thanks to
+=========
+**Alloc** for his server fixes as without them there would be neither maprendering nor a decent telnetinterface.
+
+Every contributor of every dependency we are using.
+
+The Fun Pimps for creating this game.
