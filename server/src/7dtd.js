@@ -78,6 +78,10 @@ Connection.prototype.triggerListPlayersExtended = function() {
 	this.client.write("listplayers\n");
 };
 
+Connection.prototype.triggerKickPlayer = function(name, reason){
+	this.client.write("kick " + name + (reason === undefined ? "": " " + reason));
+};
+
 Connection.prototype.parseMessage = function(string) {
 	var result;
 	Events.EventEmitter.call(this);
