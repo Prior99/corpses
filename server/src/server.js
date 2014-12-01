@@ -6,7 +6,6 @@ var FS = require("fs");
 var Database = require("./database.js");
 var Client = require("./client.js");
 var Cache = require("./cache.js");
-var ConfigUtils = require("./configutils.js");
 
 function Server() {
 	this.wsServer = null;
