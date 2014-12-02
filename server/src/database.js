@@ -207,7 +207,7 @@ Database.prototype.getFriendsBy = function(id, callback) {
 Database.prototype.fetchMarkers = function(id, callback) {
 	if(id === undefined) {
 		this.pool.query("SELECT id, name, description, lat, lng, visibility, author, icon " +
-						"FROM markers " +
+						"FROM Markers " +
 						"WHERE visibility = 'public'", function(err, rows) {
 			if(err) {
 				console.error("Unable to fetch Markers:");
@@ -221,13 +221,14 @@ Database.prototype.fetchMarkers = function(id, callback) {
 	}
 	else {
 		this.pool.query("SELECT id, name, description, lat, lng, visibility, author, icon " +
-							"FROM markers " +
+							"FROM Markers " +
 							"WHERE author = ? OR (" +
 								"visibility = 'public' OR (" +
 									"visibility = 'friends' AND " +
-									"author IN (SELECT friend FROM Friends WHERE user = ?)" +
+									"author IN (SELECT friend FROM Friends WHERE user = ?) AND " +
+									"author IN (SELECT user FROM Friends WHERE friend = ?)" +
 								")" +
-							") AND NOT id IN (SELECT marker FROM MarkerIgnore WHERE user = ?)", [id, id, id], function(err, rows) {
+							") AND NOT id IN (SELECT marker FROM MarkerIgnore WHERE user = ?)", [id, id, id, id], function(err, rows) {
 			if(err) {
 				console.error("Unable to fetch Markers:");
 				console.error(err);

@@ -35,11 +35,15 @@ NET.onUpdate = function(what) {
 			NET.refreshUsers();
 			break;
 		case "friends":
-			UI.clearPlayers();
-			NET.refreshPlayers();
-			NET.refreshUsers();
-			MapSystem.reloadMarkers();
+			NET.refreshFriends();
 	}
+};
+
+NET.refreshFriends = function() {
+	UI.clearPlayers();
+	NET.refreshPlayers();
+	NET.refreshUsers();
+	MapSystem.reloadMarkers();
 };
 
 NET.addMarker = function(obj, callback) {
@@ -167,7 +171,7 @@ NET.toggleFriend = function(player) {
 	if(player.friend) {
 		Websocket.send("removeFriend", player.steamid, function(obj) {
 			if(obj.okay) {
-				NET.refreshUsers();
+				NET.refreshFriends();
 			}
 			else {
 				Errors.displayError(obj.reason);
@@ -177,7 +181,7 @@ NET.toggleFriend = function(player) {
 	else {
 		Websocket.send("addFriend", player.steamid, function(obj) {
 			if(obj.okay) {
-				NET.refreshUsers();
+				NET.refreshFriends();
 			}
 			else {
 				Errors.displayError(obj.reason);

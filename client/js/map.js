@@ -68,13 +68,13 @@ MapSystem.removePlayerMapping = function(steamid) {
 };
 
 MapSystem.reloadMarkers = function() {
+	MapSystem.clearMarkers();
 	Websocket.send("fetchMarkers", undefined, function(obj) {
 		if(obj.okay) {
-			MapSystem.clearMarkers();
 			MapSystem.displayMarkers(obj.markers);
 		}
 		else {
-			//TODO Error handling
+			Errors.displayError(obj.reason);
 		}
 	});
 };
@@ -85,7 +85,7 @@ MapSystem.clearMarkers = function() {
 		arr.push(id);
 	}
 	for(var i in arr) {
-		MapSystem.removeMarker(i);
+		MapSystem.removeMarker(arr[i]);
 	}
 };
 

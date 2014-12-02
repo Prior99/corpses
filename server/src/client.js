@@ -85,7 +85,7 @@ function Client(websocket, database, server) {
 			else {
 				database.addMarker(obj, this.user.id, function(err, result) {
 					if(!checkError(err, async)) {
-						this.server.broadcastMarker(result);
+						this.server.broadcastMarker(result); //TODO: FIX! THIS IS SO WRONG!
 						async({
 							okay : true
 						});
@@ -108,7 +108,7 @@ function Client(websocket, database, server) {
 			}
 			else {
 				database.removeMarker(id, this.user.id, function(err, result) {
-					this.server.broadcastRemoveMarker(id);
+					this.server.broadcastRemoveMarker(id); //TODO: FIX! THIS IS SO WRONG!
 					if(!checkError(err, async)) {
 						async({
 							okay : true
