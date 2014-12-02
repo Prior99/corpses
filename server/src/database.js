@@ -173,6 +173,30 @@ Database.prototype.getFriendsOf = function(id, callback) {
 	});
 };
 
+Database.prototype.areFriends = function(user1, user2, callback) {
+	this.pool.query("SELECT " +
+						"(" +
+							"EXISTS(SELECT id FROM Friends WHERE user = ? AND friend = ?) AND " +
+							"EXISTS(SELECT id FROM Friends WHERE friend = ? AND user = ?)" +
+						") AS friends ", [user1, user2, user1, user2],
+		function(err, rows) {
+			if(err) {
+				console.error("Unable to check, two people are friends:");
+				console.error(err);
+				callback(err);
+			}
+			else {
+				if(rows !== undefined && rows[0].friends) {
+					callback(undefined, true);
+				}
+				else {
+					callback(undefined, false);
+				}
+			}
+		}
+	);
+};
+
 Database.prototype.isFriendOf = function(me, friendOf, callback) {
 	this.pool.query("SELECT id FROM Friends WHERE user = ? AND friend = ?", [friendOf, me], function(err, rows) {
 		if(err) {

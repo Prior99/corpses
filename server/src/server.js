@@ -40,18 +40,6 @@ function Server() {
 	}.bind(this));
 }
 
-Server.prototype.broadcastRemoveMarker = function(id) {
-	for(var i in this.clients) {
-		this.clients[i].sendRemoveMarker(id);
-	}
-};
-
-Server.prototype.broadcastMarker = function(marker) {
-	for(var i in this.clients) {
-		this.clients[i].sendMarker(marker);
-	}
-};
-
 Server.prototype.symlinkMap = function() {
 	FS.symlink(config.mapDirectory, config.clientDirectory + "/map", function(err) {
 		if(err) {

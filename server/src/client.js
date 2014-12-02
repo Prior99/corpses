@@ -85,7 +85,12 @@ function Client(websocket, database, server) {
 			else {
 				database.addMarker(obj, this.user.id, function(err, result) {
 					if(!checkError(err, async)) {
-						this.server.broadcastMarker(result); //TODO: FIX! THIS IS SO WRONG!
+						if(result.visibility === 'friends') {
+							this.broadcastMarker(result, true);
+						}
+						else if(result.visibility === 'public') {
+							this.broadcastMarker(result, false);
+						}
 						async({
 							okay : true
 						});
@@ -108,7 +113,13 @@ function Client(websocket, database, server) {
 			}
 			else {
 				database.removeMarker(id, this.user.id, function(err, result) {
-					this.server.broadcastRemoveMarker(id); //TODO: FIX! THIS IS SO WRONG!
+					this.server.broadcastRemoveMarker(id);
+					if(result.visbility === 'friends') {
+						this.broadcastRemoveMarker(result, true);
+					}
+					else if(result.visibility === 'public') {
+						this.broadcastRemoveMarker(result, false);
+					}
 					if(!checkError(err, async)) {
 						async({
 							okay : true
@@ -460,6 +471,51 @@ function Client(websocket, database, server) {
 		}.bind(this), async);
 	}.bind(this), true);
 }
+
+
+Client.prototype.broadcastRemoveMarker = function(id, friendsOnly) {
+	var self = this;
+	function sendMarker(client) {
+		if(friendsOnly && client.user.id !== self.user.id) {
+			self.database.areFriends(client.user.id, self.user.id, function(err, okay) {
+				if(!err && okay) {
+					client.sendRemoveMarker(marker);
+				}
+			});
+		}
+		else {
+			client.sendRemoveMarker(marker);
+		}
+	}
+	for(var i in this.clients) {
+		var client = this.server.clients[i];
+		if(client.isLoggedIn()) {
+			sendMarker(client);
+		}
+	}
+};
+
+Client.prototype.broadcastMarker = function(marker, friendsOnly) {
+	var self = this;
+	function sendMarker(client) {
+		if(friendsOnly && client.user.id !== self.user.id) {
+			self.database.areFriends(client.user.id, self.user.id, function(err, okay) {
+				if(!err && okay) {
+					client.sendMarker(marker);
+				}
+			});
+		}
+		else {
+			client.sendMarker(marker);
+		}
+	}
+	for(var i in this.server.clients) {
+		var client = this.server.clients[i];
+		if(client.isLoggedIn()) {
+			sendMarker(client);
+		}
+	}
+};
 
 Client.prototype.isUser = function(steamid) {
 	return this.isLoggedIn() && this.user.steamid === steamid;
