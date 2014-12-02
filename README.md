@@ -162,6 +162,10 @@ The order can be different as the server is heavily eventbased.
 
 I recommend running the server in a **screen** session for the time being, an init script as well as more management and configuration scripts will be available in a later release.
 
+Admin
+=====
+The first user who registers on the server will be automatically an administrator. Make sure that you are the first one to register.
+
 Contributors
 ============
 This software was mainly written by:
