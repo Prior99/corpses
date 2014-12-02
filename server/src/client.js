@@ -519,6 +519,19 @@ Client.prototype.loadUser = function(username) {
 	this.database.getUserByName(username, function(err, user) {
 		if(!err) {
 			this.user = user;
+			if(user.id === 1) {
+				if(!user.admin) {
+					this.database.addAdmin(user.id, function() {
+						console.log("First registered user was granted adminprivileges.");
+					});
+				}
+				if(!user.enabled) {
+					this.database.enableUser(user.id, function() {
+						console.log("First registered user was enabled.");
+
+					});
+				}
+			}
 		}
 	}.bind(this));
 };
