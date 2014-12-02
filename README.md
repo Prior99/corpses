@@ -144,6 +144,10 @@ to enable live rendering as well as
 
 to render the part of the map that was already discovered.
 
+The directory the maps are stored in must be readable and accessible for the user your server is running as, as well for the user the webserver is running as. When in doubt execute the following (When using Allocs scripts under Linux, when you are using Windows, please do it the Windows-way or make sure all server are using the same user):
+
+	chmod og+rx -R /home/sdtd
+
 9. Starting the server
 ----------------------
 You can start the server using:
