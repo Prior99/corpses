@@ -1,0 +1,9 @@
+{
+  "database" : {
+      "host" : "localhost",
+      "user" : "corpsestest",
+      "password" : "HufuLSAAnuSmdCeD",
+      "database" : "corpsestest",
+      "multipleStatements" : "true"
+  }
+}
