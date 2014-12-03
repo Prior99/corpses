@@ -35,13 +35,13 @@ Cache.prototype.connectionEstablished = function(telnetClient) {
 	var me = this;
 	this.intervals.timeInterval = setInterval(function() {
 		me.telnetClient.triggerGetTime();
-	}, 7000);
+	}, 3000);
 	this.intervals.knownPlayersInterval = setInterval(function() {
 		me.telnetClient.triggerListKnownPlayers();
-	}, 10000);
+	}, 5000);
 	this.intervals.playersExtendedInterval = setInterval(function() {
 		me.telnetClient.triggerListPlayersExtended();
-	}, 3000);
+	}, 1000);
 	telnetClient.on("info", function(evt) {
 		me.info = evt;
 		//console.log("Got info", evt);
