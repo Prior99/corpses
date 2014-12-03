@@ -56,10 +56,10 @@ function Client(websocket, database, server) {
 				}
 				else {
 					this.loadUser(obj.name);
+					server.notifyNewUser();
 					async({
 						okay : true
 					});
-					server.notifyNewUser();
 				}
 			}.bind(this));
 		}
