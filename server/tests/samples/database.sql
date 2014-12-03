@@ -56,6 +56,13 @@ CREATE TABLE IF NOT EXISTS `Friends` (
   KEY `friend` (`friend`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
+--
+-- Daten für Tabelle `Friends`
+--
+
+INSERT INTO `Friends` (`id`, `user`, `friend`) VALUES
+(7, 1, 2), (8, 2, 1);
+
 -- --------------------------------------------------------
 
 --
