@@ -44,19 +44,19 @@ Cache.prototype.connectionEstablished = function(telnetClient) {
 	}, 3000);
 	telnetClient.on("info", function(evt) {
 		me.info = evt;
-		console.log("Got info", evt);
+		//console.log("Got info", evt);
 	});
 	telnetClient.on("listKnownPlayers", function(evt) {
 		me.knownPlayers = evt;
-		console.log("Got known players", evt);
+		//console.log("Got known players", evt);
 	});
 	telnetClient.on("getTime", function(evt) {
 		me.time = evt;
-		console.log("Got time", evt);
+		//console.log("Got time", evt);
 	});
 	telnetClient.on("listPlayersExtended", function(evt) {
 		me.playersExtended = evt;
-		console.log("Got lpe", evt);
+		//console.log("Got lpe", evt);
 	});
 };
 
