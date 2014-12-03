@@ -26,7 +26,7 @@ var Cache = require("./cache.js");
 
 function Server() {
 	this.wsServer = null;
-	this.cache = new Cache();
+	this.cache = new Cache({time : 5000, knownPlayers : 10000, playersExtended : 1000});
 	this.telnetClient = new TelnetClient();
 	this.telnetClient.on("open", function(){
 		console.log("Connection to 7DTD established.");

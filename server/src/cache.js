@@ -15,7 +15,8 @@
  *  along with CORPSES. If not, see <http://www.gnu.org/licenses/>.
  */
 
-function Cache(server) {
+function Cache(times) {
+	this.times = times;
 	this.time = undefined;
 	this.knownPlayers = undefined;
 	this.playersExtended = undefined;
@@ -35,13 +36,13 @@ Cache.prototype.connectionEstablished = function(telnetClient) {
 	var me = this;
 	this.intervals.timeInterval = setInterval(function() {
 		me.telnetClient.triggerGetTime();
-	}, 3000);
+	}, this.times.time);
 	this.intervals.knownPlayersInterval = setInterval(function() {
 		me.telnetClient.triggerListKnownPlayers();
-	}, 5000);
+	}, this.times.knownPlayers);
 	this.intervals.playersExtendedInterval = setInterval(function() {
 		me.telnetClient.triggerListPlayersExtended();
-	}, 1000);
+	}, this.times.playersExtended);
 	telnetClient.on("info", function(evt) {
 		me.info = evt;
 		//console.log("Got info", evt);
