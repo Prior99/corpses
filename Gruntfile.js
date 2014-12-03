@@ -97,10 +97,13 @@ module.exports = function(grunt) {
 			},
 		},
 		mochacov: {
+			options : {
+				timeout : 20000,
+				require: ['should']
+			},
 			server_html: {
 				options: {
 					reporter: 'html-cov',
-					require: ['should'],
 					output: 'coverage/server.html'
 				},
 				src:['server/tests/*.js']
@@ -108,15 +111,13 @@ module.exports = function(grunt) {
 			server_json: {
 				options: {
 					reporter: 'json-cov',
-					require: ['should'],
 					output: 'coverage/server.json'
 				},
 				src:['server/tests/*.js']
 			},
 			server_spec: {
 				options: {
-					reporter: 'spec',
-					require: ['should']
+					reporter: 'spec'
 				},
 				src:['server/tests/*.js']
 			}
@@ -126,7 +127,7 @@ module.exports = function(grunt) {
 			client: ['jshint:client', 'concat', 'uglify', 'less', 'copy', 'wiredep']
 		},
 		test: {
-			server: ['mochacov:server_html', 'mochacov:server_json', 'mochacov:server_spec'],
+			server: ['mochacov:server_spec', 'mochacov:server_html', 'mochacov:server_json'],
 			client: []
 		}
 	});
