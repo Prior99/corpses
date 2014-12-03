@@ -14,7 +14,7 @@ What could also be necessary is a decent cup of hot chocolate for the duration o
 
 Installation
 ============
-Please refer to the [https://git.cronosx.de/prior/corpses/wikis/installation](official wiki page).
+Please refer to the [official wiki page](https://git.cronosx.de/prior/corpses/wikis/installation).
 
 
 Admin
