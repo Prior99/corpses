@@ -29,13 +29,13 @@ describe('The cache holding the information from the 7DTD server', function() {
 	setTimeout(function() {
 		handlerMap["info"](sample.info);
 	}, 80);
-	it("should register four handlers", function() {
+	it("registers four handlers", function() {
 		handlers.indexOf("getTime").should.not.equal(-1);
 		handlers.indexOf("listKnownPlayers").should.not.equal(-1);
 		handlers.indexOf("listPlayersExtended").should.not.equal(-1);
 		handlers.indexOf("info").should.not.equal(-1);
 	});
-	it("should have triggered three events after one second", function(done) {
+	it("has triggered three events after one second", function(done) {
 		setTimeout(function() {
 			triggerGetTime.should.be.true;
 			triggerListKnownPlayers.should.be.true;
@@ -43,7 +43,7 @@ describe('The cache holding the information from the 7DTD server', function() {
 			done();
 		}, 100);
 	});
-	it("should save the output of all four events consistently", function(done) {
+	it("saves the output of all four events consistently", function(done) {
 		setTimeout(function() {
 			cache.time.should.eql(sample.time);
 			cache.knownPlayers.should.eql(sample.knownPlayers);
@@ -52,7 +52,7 @@ describe('The cache holding the information from the 7DTD server', function() {
 			done();
 		}, 100);
 	});
-	it("should have no longer triggered something after disconnect", function(done) {
+	it("has no longer triggered something after disconnect", function(done) {
 		setTimeout(function() {
 			cache.connectionLost();
 			triggerGetTime = false;
