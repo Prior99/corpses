@@ -16,9 +16,8 @@
  */
 
 var MySQL = require('mysql');
-var config = require('../config.json');
 
-function Database() {
+function Database(config) {
 	this.pool = MySQL.createPool(config.database);
 	process.stdout.write("Connecting to Database... ");
 	this.pool.getConnection(function(err, conn) {

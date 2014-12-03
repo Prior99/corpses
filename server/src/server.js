@@ -32,7 +32,7 @@ function Server() {
 		console.log("Connection to 7DTD established.");
 		this.telnetClient.triggerListKnownPlayers();
 		this.cache.connectionEstablished(this.telnetClient);
-		this.database = new Database();
+		this.database = new Database(config);
 		this.clients = [];
 		this.startWebsocketServer();
 		this.initTelnetClient();
