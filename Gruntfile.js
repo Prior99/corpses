@@ -96,6 +96,39 @@ module.exports = function(grunt) {
 				},
 			},
 		},
+		mochacov: {
+			server_html: {
+				options: {
+					reporter: 'html-cov',
+					require: ['should'],
+					output: 'coverage/server.html'
+				},
+				src:['server/tests/*.js']
+			},
+			server_json: {
+				options: {
+					reporter: 'json-cov',
+					require: ['should'],
+					output: 'coverage/server.json'
+				},
+				src:['server/tests/*.js']
+			},
+			server_spec: {
+				options: {
+					reporter: 'spec',
+					require: ['should']
+				},
+				src:['server/tests/*.js']
+			}
+		},
+		build: {
+			server: ['jshint:server'],
+			client: ['jshint:client', 'concat', 'uglify', 'less', 'copy', 'wiredep']
+		},
+		test: {
+			server: ['mochacov:server_html', 'mochacov:server_json', 'mochacov:server_spec'],
+			client: []
+		}
 	});
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-concat');
@@ -105,7 +138,18 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-wiredep');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-clean');
-	grunt.registerTask('client', ['jshint:client', 'concat', 'uglify', 'less', 'copy', 'wiredep']);
-	grunt.registerTask('server', ['jshint:server']);
-	grunt.registerTask('default', ['server', 'client']);
+	grunt.loadNpmTasks('grunt-mocha-cov');
+	grunt.registerMultiTask('test', 'Run tests and code coverage for server and client.', function() {
+		grunt.task.run(this.data);
+	});
+	grunt.registerMultiTask('build', 'Build server and client.', function() {
+		grunt.task.run(this.data);
+	});
+	grunt.registerTask('printcoverage', 'Print the overall coverage the the commandline.', function() {
+		var json = require('./coverage/server.json');
+		console.log("Coverage: " + json.coverage + "%");
+	});
+	grunt.registerTask('client', 'Test and build the client.', ['test:client', 'build:client']);
+	grunt.registerTask('server', 'Test and build the server.', ['test:server', 'build:server', 'printcoverage']);
+	grunt.registerTask('default', 'Test and build both client and server.', ['server', 'client']);
 };
