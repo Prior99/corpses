@@ -1,182 +1,38 @@
 var Database = require("../src/database.js");
 var Client = require("../src/client.js");
 var dbConfig = require("./config.json");
-var MySQL = require('mysql');
-var FS = require("fs");
 
-describe("The interface to the client", function(done) {
+describe("The interface to the client", function() {
 	it("can setup the connection to the testdatabase", function(done) {
-		var sql = FS.readFileSync("server/tests/samples/database.sql", {encoding : "utf8"});
-		var connection = MySQL.createConnection(dbConfig.database);
-		connection.connect(function(err) { if(err) throw err; });
-		connection.query(sql, function(err, rows, fields) { if(err) throw err; });
-		connection.end(function(err) {
-			if(err) throw err;
-			done();
-		});
+		require("./util/resetdb.js")(done);
 	});
 	var requiredListeners = ["login", "register", "addMarker", "removeMarker", "fetchMarkers",
 		"getFriendsOf", "getFriendsBy", "ignoreMarker", "addFriend", "removeFriend", "enableUser",
 		"disableUser", "getTime", "getKnownPlayers", "getInfo", "getPlayers", "getUserData", "getUsers",
 		"addAdmin", "removeAdmin"];
-	var listeners = [];
-	var listenerMap = {};
-	function callMockedListener(name, data, callback) {
-		var l = listenerMap[name];
-		if(l.async) {
-			l.callback(data, callback);
-		}
-		else {
-			callback(l.callback(data));
-		}
-	}
-	var mockWebsocket = {
-		addListener : function(key, callback, async) {
-			listeners.push(key);
-			listenerMap[key] = {
-				callback : callback,
-				async : async
-			};
-		},
-		send : function(key, data, callback) {
-
-		},
-		addOpenListener : function(callback) {
-
-		},
-		addCloseListener : function(callback) {
-
-		}
-	};
-
+	var MockWebsocket = require("./util/mockedwebsocket.js");
 	var database = new Database(dbConfig);
-	var mockServer = {
-		newUser : false,
-		sentMarker : false,
-		notifyNewUser : function() {
-			mockServer.newUser = true;
-		},
-		clients : [{
-			sendMarker : function(marker) {
-				mockServer.sentMarker = true;
-			},
-			isLoggedIn : function() {
-				return true;
-			},
-			user : {id : 2}
-		}]
-	};
-	var client = new Client(mockWebsocket, database, mockServer);
+	var mockServer = require("./util/mockedserver.js");
+
+	var mockSock1 = new MockWebsocket();
+	var mockSock2 = new MockWebsocket();
+
+	var client1 = new Client(mockSock1, database, mockServer);
+	var client2 = new Client(mockSock2, database, mockServer);
+
+	mockServer.clients.push(client1);
+	mockServer.clients.push(client2);
+
 	describe("The general system", function() {
 		it("registers all listeners", function() {
 			for(var i in requiredListeners) {
 				var r = requiredListeners[i];
-				listeners.indexOf(r).should.not.equal(-1);
+				mockSock1.listeners.indexOf(r).should.not.equal(-1);
 			}
 		});
 	});
-	describe("Register", function() {
-		it("can register a non-existing account", function(done) {
-			callMockedListener("register", {name : "Test5", steamid : "56789", password : "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3"}, function(answer) {
-				answer.okay.should.be.true;
-				mockServer.newUser.should.be.true;
-				database.getUserByName("Test5", function(err, user) {
-					user.name.should.equal("Test5");
-					user.steamid.should.equal("56789");
-					user.password.should.equal("a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3");
-					user.enabled.should.eql(0);
-					done();
-				});
-			});
-		});
-		it("can't register an existing account", function(done) {
-			callMockedListener("register", {name : "Test5", steamid : "56789", password : "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3"}, function(answer) {
-				answer.okay.should.be.false;
-				done();
-			});
-		});
-		it("can't register an account with a name shorter than 3 characters", function(done) {
-			callMockedListener("register", {name : "Ah", steamid : "56789", password : "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3"}, function(answer) {
-				answer.okay.should.be.false;
-				done();
-			});
-		});
-	});
-	describe("Login", function() {
-		it("can login to an existing account", function(done) {
-			callMockedListener("login", {name : "Test1", password : "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3"}, function(answer) {
-				answer.okay.should.be.true;
-				done();
-			});
-		});
-		it("can not login to an non-existing account", function(done) {
-			callMockedListener("login", {name : "Foo", password : "123"}, function(answer) {
-				answer.okay.should.be.false;
-				done();
-			});
-		});
-		it("can not login with wrong password", function(done) {
-			callMockedListener("login", {name : "Test1", password : "5920422f9d417e48f1fa07e998e86f7a6667efdc4fb8a04a1f3ff5a4f7a27ae3"}, function(answer) {
-				answer.okay.should.be.false;
-				done();
-			});
-		});
-		it("can not login to an disabled account", function(done) {
-			callMockedListener("login", {name : "Test2", password : "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3"}, function(answer) {
-				answer.okay.should.be.false;
-				done();
-			});
-		});
-		it("is logged in as Test1 afterwards", function() {
-			client.user.name.should.equal("Test1");
-			client.user.id.should.equal(1);
-		});
-	});
-	describe("Adding Markers", function() {
-		it("can add a public marker", function(done) {
-			callMockedListener("addMarker", {
-				name : "Testmarker",
-				lat : 10.3,
-				lng : -9.4,
-				description : "This is a testmarker",
-				icon : "fa-trash",
-				visibility : 'public'}, function(answer) {
-					answer.okay.should.be.true;
-					mockServer.sentMarker.should.be.true;
-					mockServer.sentMarker = false;
-					done();
-				}
-			);
-		});
-		it("can add a private marker", function(done) {
-			callMockedListener("addMarker", {
-				name : "Testmarker",
-				lat : 10.3,
-				lng : -9.4,
-				description : "This is a testmarker",
-				icon : "fa-trash",
-				visibility : 'private'}, function(answer) {
-					answer.okay.should.be.true;
-					mockServer.sentMarker.should.be.false;
-					mockServer.sentMarker = false;
-					done();
-				}
-			);
-		});
-		it("can add a friends-only marker", function(done) {
-			callMockedListener("addMarker", {
-				name : "Testmarker",
-				lat : 10.3,
-				lng : -9.4,
-				description : "This is a testmarker",
-				icon : "fa-trash",
-				visibility : 'friends'}, function(answer) {
-					answer.okay.should.be.true;
-					mockServer.sentMarker.should.be.true;
-					mockServer.sentMarker = false;
-					done();
-				}
-			);
-		});
-	});
+	require("./client/register.js")(client1, database, mockServer, mockSock1);
+	require("./client/login.js")(client1, database, mockServer, mockSock1);
+	require("./client/friends.js")(client1, client2, database, mockServer, mockSock1, mockSock2);
+	require("./client/markers.js")(client1, client2, database, mockServer, mockSock1, mockSock2);
 });
