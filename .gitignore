@@ -7,3 +7,4 @@ htdocs
 bower_components/
 tmp
 coverage/
+*.log
