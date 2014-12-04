@@ -27,9 +27,10 @@ function Client(websocket, database, server) {
 		database.validateUser(obj.name, obj.password, function(err, okay) {
 			if(!checkError(err, async)) {
 				if(okay) {
-					this.loadUser(obj.name);
-					async({
-						okay : true
+					this.loadUser(obj.name, function() {
+						async({
+							okay : true
+						});
 					});
 				}
 				else {
@@ -55,10 +56,11 @@ function Client(websocket, database, server) {
 					});
 				}
 				else {
-					this.loadUser(obj.name);
-					server.notifyNewUser();
-					async({
-						okay : true
+					this.loadUser(obj.name, function() {
+						server.notifyNewUser();
+						async({
+							okay : true
+						});
 					});
 				}
 			}.bind(this));
@@ -206,10 +208,10 @@ function Client(websocket, database, server) {
 					if(friend !== undefined) {
 						database.addFriend(this.user.id, friend.id, function(err) {
 							if(!checkError(err, async)) {
+								server.broadcastToUser(steamid, "updated", "friends");
 								async({
 									okay : true
 								});
-								server.broadcastToUser(steamid, "updated", "friends");
 							}
 						});
 					}
@@ -571,7 +573,7 @@ Client.prototype.sendEvent = function(action, obj) {
 	this.websocket.send(action, obj);
 };
 
-Client.prototype.loadUser = function(username) {
+Client.prototype.loadUser = function(username, callback) {
 	this.database.getUserByName(username, function(err, user) {
 		if(!err) {
 			this.user = user;
@@ -579,16 +581,23 @@ Client.prototype.loadUser = function(username) {
 				if(!user.admin) {
 					this.database.addAdmin(user.id, function() {
 						console.log("First registered user was granted adminprivileges.");
+						callback();
 					});
 				}
-				if(!user.enabled) {
+				else if(!user.enabled) {
 					this.database.enableUser(user.id, function() {
 						console.log("First registered user was enabled.");
-
+						callback();
 					});
 				}
+				else {
+					callback();
+				}
 			}
-		}
+			else {
+				callback();
+			}
+		} //TODO: Errorhandlers
 	}.bind(this));
 };
 
