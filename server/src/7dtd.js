@@ -15,6 +15,7 @@
  *  along with CORPSES. If not, see <http://www.gnu.org/licenses/>.
  */
 
+var Winston = require('winston');
 var net = require("net");
 var config = require("../config.json");
 var Regexes = require("./regex.js");
@@ -25,25 +26,25 @@ function Connection() {
 	process.stdout.write("Initializing Telnetclient... ");
 	this.client = new net.Socket();
 	this.client.on("error", function() {
-		console.log("Initializing Telnetclient failed. Is the server running and reachable?");
+		Winston.info("Initializing Telnetclient failed. Is the server running and reachable?");
 	});
 	this.client.on("close", function() {
-		// console.log("[Telnet] CLOSE!");
+		// Winston.info("[Telnet] CLOSE!");
 		this.emit("close");
-		// console.log("[Telnet] close finished");
+		// Winston.info("[Telnet] close finished");
 	}.bind(this));
 	this.buffer = "";
 	this.client.on("data", function(data) {
-		// console.log("[Telnet] DATA!");
+		// Winston.info("[Telnet] DATA!");
 		this.buffer += data.toString();
 		this.checkMessage();
-		// console.log("[Telnet] data finished");
+		// Winston.info("[Telnet] data finished");
 	}.bind(this));
 	this.client.connect(config.telnetPort, config.telnetHost, function() {
-		// console.log("[Telnet] CONNECT!");
-		console.log("Initializing Telnetclient okay.");
+		// Winston.info("[Telnet] CONNECT!");
+		Winston.info("Initializing Telnetclient okay.");
 		this.emit("open");
-		// console.log("[Telnet] connect finished");
+		// Winston.info("[Telnet] connect finished");
 	}.bind(this));
 }
 
@@ -55,7 +56,7 @@ Connection.prototype.checkMessage = function() {
 	if((index = this.buffer.search(reg)) !== -1) {
 		var msgs = this.buffer.split(reg);
 		for(var i = 0; i < msgs.length -1; i++) {
-			//console.log("CHUNK: +++" + msgs[i] + "+++");
+			//Winston.info("CHUNK: +++" + msgs[i] + "+++");
 			this.parseMessage(msgs[i]);
 		}
 		this.buffer = msgs[msgs.length - 1];
@@ -85,11 +86,11 @@ Connection.prototype.triggerKickPlayer = function(name, reason){
 Connection.prototype.parseMessage = function(string) {
 	var result;
 	Events.EventEmitter.call(this);
-	//console.log("RECEIVED MSG: \"" + string + "\"");
+	//Winston.info("RECEIVED MSG: \"" + string + "\"");
 	for(var type in Regexes) {
 		var regex = Regexes[type];
 		if((result = regex.exec(string)) !== null) {
-			//console.log("DETECTED:" + type + ":" + result);
+			//Winston.info("DETECTED:" + type + ":" + result);
 			if(type === "listPlayersExtended" || type === "listKnownPlayers") {
 				var array = [];
 				array.push(result);

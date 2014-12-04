@@ -14,6 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with CORPSES. If not, see <http://www.gnu.org/licenses/>.
  */
+var Winston = require('winston');
 
 function Cache(times) {
 	this.times = times;
@@ -45,19 +46,19 @@ Cache.prototype.connectionEstablished = function(telnetClient) {
 	}, this.times.playersExtended);
 	telnetClient.on("info", function(evt) {
 		me.info = evt;
-		//console.log("Got info", evt);
+		//Winston.info("Got info", evt);
 	});
 	telnetClient.on("listKnownPlayers", function(evt) {
 		me.knownPlayers = evt;
-		//console.log("Got known players", evt);
+		//Winston.info("Got known players", evt);
 	});
 	telnetClient.on("getTime", function(evt) {
 		me.time = evt;
-		//console.log("Got time", evt);
+		//Winston.info("Got time", evt);
 	});
 	telnetClient.on("listPlayersExtended", function(evt) {
 		me.playersExtended = evt;
-		//console.log("Got lpe", evt);
+		//Winston.info("Got lpe", evt);
 	});
 };
 

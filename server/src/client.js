@@ -14,6 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with CORPSES. If not, see <http://www.gnu.org/licenses/>.
  */
+var Winston = require('winston');
 
 function Client(websocket, database, server) {
 	this.websocket = websocket;
@@ -344,7 +345,7 @@ function Client(websocket, database, server) {
 				done();
 			}
 			if(counter < 0) {
-				console.error("Error: Counter lower than 0");
+				Winston.error("Error: Counter lower than 0");
 			}
 		}
 
@@ -354,7 +355,7 @@ function Client(websocket, database, server) {
 			if(!checkError(err, async)) {
 				if(playerDB === undefined) {
 					decCounter();
-					console.error("Unknown player on the server");
+					Winston.error("Unknown player on the server");
 					async({
 						okay : false,
 						reason : "internal_error"
@@ -580,13 +581,13 @@ Client.prototype.loadUser = function(username, callback) {
 			if(user.id === 1) {
 				if(!user.admin) {
 					this.database.addAdmin(user.id, function() {
-						console.log("First registered user was granted adminprivileges.");
+						Winston.info("First registered user was granted adminprivileges.");
 						callback();
 					});
 				}
 				else if(!user.enabled) {
 					this.database.enableUser(user.id, function() {
-						console.log("First registered user was enabled.");
+						Winston.info("First registered user was enabled.");
 						callback();
 					});
 				}
@@ -624,7 +625,7 @@ Client.prototype.sendMarker = function(marker) {
 		}
 	}
 	else {
-		console.error("Assert failed: invalid visibility of marker");
+		Winston.error("Assert failed: invalid visibility of marker");
 	}
 };
 
