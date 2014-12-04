@@ -7,7 +7,7 @@ describe("The interface to the client", function() {
 		require("./util/resetdb.js")(done);
 	});
 	var requiredListeners = ["login", "register", "addMarker", "removeMarker", "fetchMarkers",
-		"getFriendsOf", "getFriendsBy", "ignoreMarker", "addFriend", "removeFriend", "enableUser",
+		"ignoreMarker", "addFriend", "removeFriend", "enableUser",
 		"disableUser", "getTime", "getKnownPlayers", "getInfo", "getPlayers", "getUserData", "getUsers",
 		"addAdmin", "removeAdmin"];
 	var MockWebsocket = require("./util/mockedwebsocket.js");

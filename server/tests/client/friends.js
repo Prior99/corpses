@@ -77,5 +77,61 @@ module.exports = function(client1, client2, database, server, mockSock1, mockSoc
 				done();
 			});
 		});
+		it("client1 can remove client2 as a friend", function(done) {
+			mockSock1.callMockedListener("removeFriend", client2.user.steamid, function(answer) {
+				answer.okay.should.be.true;
+				var users = answer.users;
+				for(var u in users) {
+					var user = users[u];
+					if(user.name == "Test1") {
+						user.friend.should.equal(0);
+						user.friendedBy.should.equal(1);
+					}
+				}
+				done();
+			});
+		});
+		it("client2 can remove client1 as a friend", function(done) {
+			mockSock2.callMockedListener("removeFriend", client1.user.steamid, function(answer) {
+				answer.okay.should.be.true;
+				var users = answer.users;
+				for(var u in users) {
+					var user = users[u];
+					if(user.name == "Test3") {
+						user.friend.should.equal(0);
+						user.friendedBy.should.equal(0);
+					}
+				}
+				done();
+			});
+		});
+		it("they are both not friends anymore from client1's perspective", function(done) {
+			mockSock1.callMockedListener("getUsers", null, function(answer) {
+				answer.okay.should.be.true;
+				var users = answer.users;
+				for(var u in users) {
+					var user = users[u];
+					if(user.name == "Test3") {
+						user.friend.should.equal(0);
+						user.friendedBy.should.equal(0);
+					}
+				}
+				done();
+			});
+		});
+		it("they are both not friends anymore from client2's perspective", function(done) {
+			mockSock2.callMockedListener("getUsers", null, function(answer) {
+				answer.okay.should.be.true;
+				var users = answer.users;
+				for(var u in users) {
+					var user = users[u];
+					if(user.name == "Test1") {
+						user.friend.should.equal(0);
+						user.friendedBy.should.equal(0);
+					}
+				}
+				done();
+			});
+		});
 	});
 };

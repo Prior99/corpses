@@ -39,7 +39,8 @@ module.exports = function(client1, client2, database, server, mockSock1, mockSoc
 				}
 			);
 		});
-		it("can add a friends-only marker", function(done) {
+		it("can add a friends-only marker and not-friends can not see it", function(done) {
+			delete mockSock2.lastMsg;
 			mockSock1.callMockedListener("addMarker", {
 				name : "Testmarker",
 				lat : 10.3,
@@ -49,11 +50,38 @@ module.exports = function(client1, client2, database, server, mockSock1, mockSoc
 				visibility : 'friends'}, function(answer) {
 					answer.okay.should.be.true;
 					var msg = mockSock2.lastMsg;
-					should.not.equal(msg, undefined);
-					msg.key.should.eql("marker");
+					console.log(msg);
+					should(mockSock2.lastMsg).not.be.ok;
 					done();
 				}
 			);
 		});
+		it("can add a friend", function(done) {
+			mockSock1.callMockedListener("addFriend", client2.user.steamid, function() {
+				mockSock2.callMockedListener("addFriend", client1.user.steamid, function() {
+					done();
+				});
+			});
+		});
+		it("can add a friends-only marker and friends can see it", function() {
+			mockSock2.lastMsg = null;
+			var marker = {
+				name : "Testmarker",
+				lat : 10.3,
+				lng : -9.4,
+				description : "This is a testmarker",
+				icon : "fa-trash",
+				visibility : 'friends'
+			};
+			mockSock1.callMockedListener("addMarker", marker, function(answer) {
+					answer.okay.should.be.true;
+					var msg = mockSock2.lastMsg;
+					should.not.equal(msg, null);
+					msg.key.should.equal("marker");
+					msg.data.should.eql(marker);
+					done();
+				}
+			);
+		})
 	});
 };
