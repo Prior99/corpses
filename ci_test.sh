@@ -7,7 +7,7 @@ echo "n" | bower install --silent | iconv -tascii -c &> bower.log
 echo "Done."
 cp server/config.json.example server/config.json
 echo "Now building/testing ... "
-grunt | tee grunt.log
+grunt | iconv -tascii | tee grunt.log
 grep --quiet "failing" grunt.log
 RESULT=$?
 if [ "$RESULT" = "1" ]; then
