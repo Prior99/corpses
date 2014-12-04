@@ -12,6 +12,8 @@ grep --quiet "Done, without errors." grunt.log
 RESULT=$?
 if [ "$RESULT" = "0" ]; then
 	echo "The build was successfull."
+	echo "Sharing codecoverage overview"
+	share coverage/server.html
 	exit 0
 else
 	echo "Some tests were detected to have failed."
