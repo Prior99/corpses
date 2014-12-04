@@ -145,36 +145,6 @@ function Client(websocket, database, server) {
 			}
 		});
 	}.bind(this), true);
-	/*
-	 * Listener for Callback getFriendsOf
-	 */
-	websocket.addListener("getFriendsOf", function(obj, async) {
-		if(this.checkLoggedIn(async)) {
-			database.getFriendsOf(this.user.id, function(err, friends) {
-				if(!checkError(err, async)) {
-					async({
-						okay : true,
-						friends : friends
-					});
-				}
-			});
-		}
-	}.bind(this), true);
-	/*
-	 * Listener for Callback getFriendsBy
-	 */
-	websocket.addListener("getFriendsBy", function(obj, async) {
-		if(this.checkLoggedIn(async)) {
-			database.getFriendsBy(this.user.id, function(err, friends) {
-				if(!checkError(err, async)) {
-					async({
-						okay : true,
-						friends : friends
-					});
-				}
-			});
-		}
-	}.bind(this), true);
 
 	/*
 	 * Listener for Callback ignoreMarker

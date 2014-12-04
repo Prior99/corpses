@@ -159,19 +159,6 @@ Database.prototype.validateUser = function(username, password, callback) {
 	}
 };
 
-Database.prototype.getFriendsOf = function(id, callback) {
-	this.pool.query("SELECT u.id AS id, u.name AS name FROM Friends f LEFT JOIN Users u ON f.user = u.id WHERE u.id = ?", [id], function(err, rows) {
-		if(err) {
-			Winston.error("Unable to get friends of:");
-			Winston.error(err);
-			callback(err);
-		}
-		else {
-			callback(undefined, rows);
-		}
-	});
-};
-
 Database.prototype.areFriends = function(user1, user2, callback) {
 	this.pool.query("SELECT " +
 						"(" +
@@ -210,19 +197,6 @@ Database.prototype.isFriendOf = function(me, friendOf, callback) {
 			else {
 				callback(undefined, true);
 			}
-		}
-	});
-};
-
-Database.prototype.getFriendsBy = function(id, callback) {
-	this.pool.query("SELECT u.id AS id, u.name AS name FROM Friends f LEFT JOIN Users u ON f.friend = u.id WHERE u.id = ?", [id], function(err, rows) {
-		if(err) {
-			Winston.error("Unable to get friends by:");
-			Winston.error(err);
-			callback(err);
-		}
-		else {
-			callback(undefined, rows);
 		}
 	});
 };
