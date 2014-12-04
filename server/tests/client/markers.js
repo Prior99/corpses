@@ -50,8 +50,7 @@ module.exports = function(client1, client2, database, server, mockSock1, mockSoc
 				visibility : 'friends'}, function(answer) {
 					answer.okay.should.be.true;
 					var msg = mockSock2.lastMsg;
-					console.log(msg);
-					should(mockSock2.lastMsg).not.be.ok;
+					(typeof msg).should.be.undefined;
 					done();
 				}
 			);
