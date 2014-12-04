@@ -10,15 +10,15 @@ module.exports = function(client1, client2, database, server, mockSock1, mockSoc
 		});
 		it("can add a public marker", function(done) {
 			mockSock1.callMockedListener("addMarker", {
-				name : "Testmarker",
-				lat : 10.3,
-				lng : -9.4,
+				name : "Testmarker 1",
+				lat : 14.3,
+				lng : -3.4,
 				description : "This is a testmarker",
 				icon : "fa-trash",
 				visibility : 'public'}, function(answer) {
 					answer.okay.should.be.true;
 					var msg = mockSock2.lastMsg;
-					should.not.equal(msg, undefined);
+					(typeof msg).should.not.be.undefined;
 					msg.key.should.eql("marker");
 					done();
 				}
@@ -26,9 +26,9 @@ module.exports = function(client1, client2, database, server, mockSock1, mockSoc
 		});
 		it("can add a private marker", function(done) {
 			mockSock1.callMockedListener("addMarker", {
-				name : "Testmarker",
+				name : "Testmarker 2",
 				lat : 10.3,
-				lng : -9.4,
+				lng : -9.47,
 				description : "This is a testmarker",
 				icon : "fa-trash",
 				visibility : 'private'}, function(answer) {
@@ -42,9 +42,9 @@ module.exports = function(client1, client2, database, server, mockSock1, mockSoc
 		it("can add a friends-only marker and not-friends can not see it", function(done) {
 			delete mockSock2.lastMsg;
 			mockSock1.callMockedListener("addMarker", {
-				name : "Testmarker",
+				name : "Testmarker 3",
 				lat : 10.3,
-				lng : -9.4,
+				lng : -90.4,
 				description : "This is a testmarker",
 				icon : "fa-trash",
 				visibility : 'friends'}, function(answer) {
@@ -62,11 +62,11 @@ module.exports = function(client1, client2, database, server, mockSock1, mockSoc
 				});
 			});
 		});
-		it("can add a friends-only marker and friends can see it", function() {
-			mockSock2.lastMsg = null;
+		it("can add a friends-only marker and friends can see it", function(done) {
+			mockSock2.lastMsg = undefined;
 			var marker = {
-				name : "Testmarker",
-				lat : 10.3,
+				name : "Testmarker 4",
+				lat : 11.3,
 				lng : -9.4,
 				description : "This is a testmarker",
 				icon : "fa-trash",
@@ -75,12 +75,18 @@ module.exports = function(client1, client2, database, server, mockSock1, mockSoc
 			mockSock1.callMockedListener("addMarker", marker, function(answer) {
 					answer.okay.should.be.true;
 					var msg = mockSock2.lastMsg;
-					should.not.equal(msg, null);
-					msg.key.should.equal("marker");
-					msg.data.should.eql(marker);
+					assert(msg !== undefined);
+					(typeof msg).should.not.be.undefined;
 					done();
 				}
 			);
-		})
+		});
+		it("can fetch markers and see it's own markers", function(done) {
+			mockSock1.callMockedListener("fetchMarkers", null, function(answer) {
+				answer.okay.should.be.ok;
+				answer.markers.length.should.equal(4);
+				done();
+			});
+		});
 	});
 };

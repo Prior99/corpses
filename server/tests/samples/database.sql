@@ -101,11 +101,6 @@ CREATE TABLE IF NOT EXISTS `Markers` (
 -- Daten für Tabelle `Markers`
 --
 
-INSERT INTO `Markers` (`id`, `name`, `description`, `lat`, `lng`, `visibility`, `author`, `icon`) VALUES
-(1, 'Andras Base', '', -550, 663, 'private', 1, 'heart'),
-(2, 'Andras Base', '', -551, 663, 'private', 1, 'heart'),
-(4, 'Andras Base', '', -547, 666, 'public', 1, 'binoculars'),
-(5, 'Priors Base', '', -858, 1335, 'friends', 1, 'heart');
 
 -- --------------------------------------------------------
 

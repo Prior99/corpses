@@ -1,6 +1,7 @@
 var Database = require("../src/database.js");
 var Client = require("../src/client.js");
 var dbConfig = require("./config.json");
+var assert = require("assert");
 
 describe("The interface to the client", function() {
 	it("can setup the connection to the testdatabase", function(done) {
@@ -27,7 +28,7 @@ describe("The interface to the client", function() {
 		it("registers all listeners", function() {
 			for(var i in requiredListeners) {
 				var r = requiredListeners[i];
-				mockSock1.listeners.indexOf(r).should.not.equal(-1);
+				assert(mockSock1.listeners.indexOf(r) !== -1);
 			}
 		});
 	});
