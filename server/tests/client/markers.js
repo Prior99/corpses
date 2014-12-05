@@ -97,6 +97,15 @@ module.exports = function(client1, client2, database, server, mockSock1, mockSoc
 				done();
 			});
 		});
+		var markerIgnoreID;
+		it("can fetch markers and see public and friend- markers", function(done) {
+			mockSock2.callMockedListener("fetchMarkers", null, function(answer) {
+				assert(answer.okay);
+				assert(answer.markers.length === 3);
+				markerIgnoreID = answer.markers[1].id;
+				done();
+			});
+		});
 		it("can remove it's own markers", function(done) {
 			mockSock1.callMockedListener("removeMarker", markerID, function(answer) {
 				assert(answer.okay);
@@ -105,6 +114,23 @@ module.exports = function(client1, client2, database, server, mockSock1, mockSoc
 					done();
 				});
 			});
-		})
+		});
+		it("can no longer see deleted markers", function(done) {
+			mockSock2.callMockedListener("fetchMarkers", null, function(answer) {
+				assert(answer.okay);
+				assert(answer.markers.length === 2)
+				done();
+			});
+		});
+		it("can ignore markers and does not see them afterwards", function(done) {
+			mockSock2.callMockedListener("ignoreMarker", markerIgnoreID, function(answer) {
+				assert(answer.okay);
+				mockSock2.callMockedListener("fetchMarkers", null, function(answer) {
+					assert(answer.okay);
+					assert(answer.markers.length === 1)
+					done();
+				});
+			});
+		});
 	});
 };
