@@ -120,19 +120,25 @@ function Client(websocket, database, server) {
 				});
 			}
 			else {
-				database.removeMarker(id, this.user.id, function(err, result) {
-					this.server.broadcastRemoveMarker(id);
-					if(result.visbility === 'friends') {
-						this.broadcastRemoveMarker(result, true);
-					}
-					else if(result.visibility === 'public') {
-						this.broadcastRemoveMarker(result, false);
-					}
-					if(!checkError(err, async)) {
-						async({
-							okay : true
-						});
-					}
+				database.getMarker(id, function(err, result) {
+					database.removeMarker(id, this.user.id, function(err) {
+						function done() {
+							async({
+								okay : true
+							});
+						}
+						if(!checkError(err, async)) {
+							if(result.visbility === 'friends') {
+								this.broadcastRemoveMarker(id, true, done);
+							}
+							else if(result.visibility === 'public') {
+								this.broadcastRemoveMarker(id, false, done);
+							}
+							else {
+								done();
+							}
+						}
+					}.bind(this));
 				}.bind(this));
 			}
 		}
@@ -451,24 +457,36 @@ function Client(websocket, database, server) {
 }
 
 
-Client.prototype.broadcastRemoveMarker = function(id, friendsOnly) {
+Client.prototype.broadcastRemoveMarker = function(id, friendsOnly, callback) {
 	var self = this;
+	var j = this.server.clients.length;
+	function decrease() {
+		j--;
+		if(j === 0) {
+			callback();
+		}
+	}
 	function sendMarker(client) {
 		if(friendsOnly && client.user.id !== self.user.id) {
 			self.database.areFriends(client.user.id, self.user.id, function(err, okay) {
 				if(!err && okay) {
-					client.sendRemoveMarker(marker);
+					client.sendRemoveMarker(id);
 				}
+				decrease();
 			});
 		}
 		else {
-			client.sendRemoveMarker(marker);
+			client.sendRemoveMarker(id);
+			decrease();
 		}
 	}
-	for(var i in this.clients) {
+	for(var i in this.server.clients) {
 		var client = this.server.clients[i];
 		if(client.isLoggedIn()) {
 			sendMarker(client);
+		}
+		else {
+			decrease();
 		}
 	}
 };

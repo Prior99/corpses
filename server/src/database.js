@@ -116,7 +116,7 @@ Database.prototype.addMarker = function(obj, author, callback) {
 	this.pool.query("INSERT INTO Markers (name, description, lat, lng, icon, visibility, author) VALUES(?, ?, ?, ?, ?, ?, ?)",
 		[obj.name, obj.description, obj.lat, obj.lng, obj.icon, obj.visibility, author], function(err, result) {
 		if(err) {
-			Winston.error("Unable to create Marker:");
+			Winston.error("Unable to create marker:");
 			Winston.error(err);
 			callback(err);
 		}
@@ -126,6 +126,26 @@ Database.prototype.addMarker = function(obj, author, callback) {
 			callback(undefined, obj);
 		}
 	});
+};
+
+Database.prototype.getMarker = function(id, callback) {
+	this.pool.query("SELECT id, name, description, lat, lng, icon, visibility, author FROM Markers WHERE id = ?", [id],
+		function(err, rows) {
+			if(err) {
+				Winston.error("Unable to get marker:");
+				Winston.error(err);
+				callback(err);
+			}
+			else {
+				if(rows.length > 0) {
+					callback(undefined, rows[0]);
+				}
+				else {
+					callback();
+				}
+			}
+		}
+	);
 };
 
 Database.prototype.removeMarker = function(id, userid, callback) {
