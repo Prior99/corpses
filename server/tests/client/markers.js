@@ -88,12 +88,23 @@ module.exports = function(client1, client2, database, server, mockSock1, mockSoc
 				}
 			);
 		});
+		var markerID;
 		it("can fetch markers and see it's own markers", function(done) {
 			mockSock1.callMockedListener("fetchMarkers", null, function(answer) {
 				assert(answer.okay);
 				assert(answer.markers.length === 4);
+				markerID = answer.markers[0].id;
 				done();
 			});
 		});
+		it("can remove it's own markers", function(done) {
+			mockSock1.callMockedListener("removeMarker", markerID, function(answer) {
+				assert(answer.okay);
+				mockSock1.callMockedListener("fetchMarkers", null, function(answer) {
+					assert(answer.markers.length === 3);
+					done();
+				});
+			});
+		})
 	});
 };
