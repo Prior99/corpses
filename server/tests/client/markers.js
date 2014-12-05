@@ -64,6 +64,12 @@ module.exports = function(client1, client2, database, server, mockSock1, mockSoc
 				});
 			});
 		});
+		it("are friends afterwards", function(done) {
+			database.areFriends(client1.user.id, client2.user.id, function(err, okay) {
+				assert(okay && !err);
+				done();
+			});
+		})
 		it("can add a friends-only marker and friends can see it", function(done) {
 			mockSock2.lastMsg = undefined;
 			var marker = {
