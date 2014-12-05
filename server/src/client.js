@@ -87,16 +87,21 @@ function Client(websocket, database, server) {
 			}
 			else {
 				database.addMarker(obj, this.user.id, function(err, result) {
-					if(!checkError(err, async)) {
-						if(result.visibility === 'friends') {
-							this.broadcastMarker(result, true);
-						}
-						else if(result.visibility === 'public') {
-							this.broadcastMarker(result, false);
-						}
+					function done() {
 						async({
 							okay : true
 						});
+					}
+					if(!checkError(err, async)) {
+						if(result.visibility === 'friends') {
+							this.broadcastMarker(result, true, done);
+						}
+						else if(result.visibility === 'public') {
+							this.broadcastMarker(result, false, done);
+						}
+						else {
+							done();
+						}
 					}
 				}.bind(this));
 			}
@@ -468,24 +473,36 @@ Client.prototype.broadcastRemoveMarker = function(id, friendsOnly) {
 	}
 };
 
-Client.prototype.broadcastMarker = function(marker, friendsOnly) {
+Client.prototype.broadcastMarker = function(marker, friendsOnly, callback) {
 	var self = this;
+	var j = this.server.clients.length;
+	function decrease() {
+		j--;
+		if(j === 0) {
+			callback();
+		}
+	}
 	function sendMarker(client) {
 		if(friendsOnly && client.user.id !== self.user.id) {
 			self.database.areFriends(client.user.id, self.user.id, function(err, okay) {
 				if(!err && okay) {
 					client.sendMarker(marker);
 				}
+				decrease();
 			});
 		}
 		else {
 			client.sendMarker(marker);
+			decrease();
 		}
 	}
 	for(var i in this.server.clients) {
 		var client = this.server.clients[i];
 		if(client.isLoggedIn()) {
 			sendMarker(client);
+		}
+		else {
+			decrease();
 		}
 	}
 };
@@ -577,26 +594,7 @@ Client.prototype.sendRemoveMarker = function(id) {
 };
 
 Client.prototype.sendMarker = function(marker) {
-	var me = this;
-	function send() {
-		me.websocket.send("marker", marker);
-	}
-	if(marker.visibility === "public") {
-		send();
-	}
-	else if(marker.visibility === "friends") {
-		this.database.isFriendOf(this.user.id, marker.author, function(err, okay) {
-			send();
-		});
-	}
-	else if(marker.visibility === "private") {
-		if(marker.author === this.user.id) {
-			send();
-		}
-	}
-	else {
-		Winston.error("Assert failed: invalid visibility of marker");
-	}
+	this.websocket.send("marker", marker);
 };
 
 module.exports = Client;
