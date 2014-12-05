@@ -46,18 +46,33 @@ module.exports = {
 	listPlayersExtended : [
 		{
 			id: '1302',
-		    name: 'Mörrrlin',
-		    position: { x: '-2000.9', y: '21.1', z: '-541.5' },
-		    rotation: { x: '-15.6', y: '85.8', z: '0.0' },
-		    remote: true,
-		    health: '50',
-		    deaths: '10',
-		    zombieKills: '238',
-		    playerKills: '0',
-		    score: '188',
-		    steamid: '76561198044544566',
-		    ip: '31.150.96.148',
-		    ping: '17'
-		}
+			name: 'Test1',
+			position: { x: '-2000.9', y: '21.1', z: '-541.5' },
+			rotation: { x: '-15.6', y: '85.8', z: '0.0' },
+			remote: true,
+			health: '50',
+			deaths: '10',
+			zombieKills: '238',
+			playerKills: '0',
+			score: '188',
+			steamid: '345',
+			ip: '31.150.96.148',
+			ping: '17'
+		},
+		{
+			id: '1374',
+			name: 'Test3',
+			position: { x: '-4000.9', y: '61.1', z: '-741.5' },
+			rotation: { x: '-25.6', y: '35.8', z: '0.0' },
+			remote: true,
+			health: '34',
+			deaths: '8',
+			zombieKills: '1788',
+			playerKills: '5',
+			score: '388',
+			steamid: '123',
+			ip: '78.65.78.91',
+			ping: '90'
+		},
 	]
 };

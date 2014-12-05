@@ -41,6 +41,19 @@ module.exports = function(client1, client2, database, server, mockSock1, mockSoc
 				}
 			);
 		});
+		it("can remove a friend", function(done) {
+			mockSock1.callMockedListener("removeFriend", client2.user.steamid, function() {
+				mockSock2.callMockedListener("removeFriend", client1.user.steamid, function() {
+					done();
+				});
+			});
+		});
+		it("are not friends afterwards", function(done) {
+			database.areFriends(client1.user.id, client2.user.id, function(err, okay) {
+				assert(!okay && !err);
+				done();
+			});
+		});
 		it("can add a friends-only marker and not-friends can not see it", function(done) {
 			delete mockSock2.lastMsg;
 			mockSock1.callMockedListener("addMarker", {
@@ -69,7 +82,7 @@ module.exports = function(client1, client2, database, server, mockSock1, mockSoc
 				assert(okay && !err);
 				done();
 			});
-		})
+		});
 		it("can add a friends-only marker and friends can see it", function(done) {
 			mockSock2.lastMsg = undefined;
 			var marker = {
