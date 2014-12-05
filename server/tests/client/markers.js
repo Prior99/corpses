@@ -1,9 +1,11 @@
+var assert = require("assert");
+
 module.exports = function(client1, client2, database, server, mockSock1, mockSock2) {
 	describe("Adding Markers", function() {
 		it("can login a second user at the same time", function(done) {
 			mockSock2.callMockedListener("login", {name : "Test3", password : "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3"},
 				function(answer) {
-					answer.okay.should.be.true;
+					assert(answer.okay);
 					done();
 				}
 			);
@@ -16,10 +18,10 @@ module.exports = function(client1, client2, database, server, mockSock1, mockSoc
 				description : "This is a testmarker",
 				icon : "fa-trash",
 				visibility : 'public'}, function(answer) {
-					answer.okay.should.be.true;
+					assert(answer.okay);
 					var msg = mockSock2.lastMsg;
-					(typeof msg).should.not.be.undefined;
-					msg.key.should.eql("marker");
+					assert(msg !== undefined);
+					assert(msg.key === "marker");
 					done();
 				}
 			);
@@ -32,8 +34,8 @@ module.exports = function(client1, client2, database, server, mockSock1, mockSoc
 				description : "This is a testmarker",
 				icon : "fa-trash",
 				visibility : 'private'}, function(answer) {
-					answer.okay.should.be.true;
-					server.sentMarker.should.be.false;
+					assert(answer.okay);
+					assert(!server.sentMarker);
 					server.sentMarker = false;
 					done();
 				}
@@ -48,9 +50,9 @@ module.exports = function(client1, client2, database, server, mockSock1, mockSoc
 				description : "This is a testmarker",
 				icon : "fa-trash",
 				visibility : 'friends'}, function(answer) {
-					answer.okay.should.be.true;
+					assert(answer.okay);
 					var msg = mockSock2.lastMsg;
-					(typeof msg).should.be.undefined;
+					assert(msg === undefined);
 					done();
 				}
 			);
@@ -73,18 +75,17 @@ module.exports = function(client1, client2, database, server, mockSock1, mockSoc
 				visibility : 'friends'
 			};
 			mockSock1.callMockedListener("addMarker", marker, function(answer) {
-					answer.okay.should.be.true;
+					assert(answer.okay);
 					var msg = mockSock2.lastMsg;
 					assert(msg !== undefined);
-					(typeof msg).should.not.be.undefined;
 					done();
 				}
 			);
 		});
 		it("can fetch markers and see it's own markers", function(done) {
 			mockSock1.callMockedListener("fetchMarkers", null, function(answer) {
-				answer.okay.should.be.ok;
-				answer.markers.length.should.equal(4);
+				assert(answer.okay);
+				assert(answer.markers.length === 4);
 				done();
 			});
 		});

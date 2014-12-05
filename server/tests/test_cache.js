@@ -1,3 +1,5 @@
+var assert = require("assert");
+
 describe('The cache holding the information from the 7DTD server', function() {
 	var sample = require("./samples/telnet_sampledata1.js");
 	var handlers = [];
@@ -30,25 +32,25 @@ describe('The cache holding the information from the 7DTD server', function() {
 		handlerMap["info"](sample.info);
 	}, 80);
 	it("registers four handlers", function() {
-		handlers.indexOf("getTime").should.not.equal(-1);
-		handlers.indexOf("listKnownPlayers").should.not.equal(-1);
-		handlers.indexOf("listPlayersExtended").should.not.equal(-1);
-		handlers.indexOf("info").should.not.equal(-1);
+		assert(handlers.indexOf("getTime") !== -1);
+		assert(handlers.indexOf("listKnownPlayers") !== -1);
+		assert(handlers.indexOf("listPlayersExtended") !== -1);
+		assert(handlers.indexOf("info") !== -1);
 	});
 	it("has triggered three events after one second", function(done) {
 		setTimeout(function() {
-			triggerGetTime.should.be.true;
-			triggerListKnownPlayers.should.be.true;
-			triggerListPlayersExtended.should.be.true;
+			assert(triggerGetTime);
+			assert(triggerListKnownPlayers);
+			assert(triggerListPlayersExtended);
 			done();
 		}, 100);
 	});
 	it("saves the output of all four events consistently", function(done) {
 		setTimeout(function() {
-			cache.time.should.eql(sample.time);
-			cache.knownPlayers.should.eql(sample.knownPlayers);
-			cache.playersExtended.should.eql(sample.listPlayersExtended);
-			cache.info.should.eql(sample.info);
+			assert(cache.time === sample.time);
+			assert(cache.knownPlayers === sample.knownPlayers);
+			assert(cache.playersExtended === sample.listPlayersExtended);
+			assert(cache.info === sample.info);
 			done();
 		}, 100);
 	});
@@ -59,9 +61,9 @@ describe('The cache holding the information from the 7DTD server', function() {
 			triggerListKnownPlayers = false;
 			triggerListPlayersExtended = false;
 			setTimeout(function() {
-				triggerGetTime.should.be.false;
-				triggerListKnownPlayers.should.be.false;
-				triggerListPlayersExtended.should.be.false;
+				assert(triggerGetTime === false);
+				assert(triggerListKnownPlayers === false);
+				assert(triggerListPlayersExtended === false);
 				done();
 			}, 200);
 		}, 150);
