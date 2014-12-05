@@ -325,9 +325,6 @@ function Client(websocket, database, server) {
 			if(counter === 0) {
 				done();
 			}
-			if(counter < 0) {
-				Winston.error("Error: Counter lower than 0");
-			}
 		}
 
 		var thisClient = this;
@@ -343,7 +340,7 @@ function Client(websocket, database, server) {
 					});
 				}
 				else {
-					database.isFriendOf(thisClient.user.id, playerDB.id, function(err, f) {
+					database.areFriends(thisClient.user.id, playerDB.id, function(err, f) {
 						if(!checkError(err)) {
 							if(f) {
 								visiblePlayers.push(player);
@@ -360,10 +357,10 @@ function Client(websocket, database, server) {
 
 		if(this.checkLoggedIn(async)) {
 			var visiblePlayers = [];
-			var counter = 0;
-			for(var i in server.cache.playersExtended) {
-				var player = server.cache.playersExtended[i];
-				counter++;
+			var plEx =  server.cache.playersExtended;
+			var counter = plEx.length;
+			for(var i in plEx) {
+				var player = plEx[i];
 				if(player.steamid === this.user.steamid) {
 					visiblePlayers.push(player);
 					decCounter();
