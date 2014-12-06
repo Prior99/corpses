@@ -37,4 +37,5 @@ describe("The interface to the client", function() {
 	require("./client/friends.js")(client1, client2, database, mockServer, mockSock1, mockSock2);
 	require("./client/gamequeries.js")(client1, client2, database, mockServer, mockSock1, mockSock2);
 	require("./client/markers.js")(client1, client2, database, mockServer, mockSock1, mockSock2);
+	require("./client/admin.js")(client1, client2, database, mockServer, mockSock1, mockSock2);
 });
