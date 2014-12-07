@@ -130,5 +130,16 @@ module.exports = function(client1, client2, database, server, mockSock1, mockSoc
 				});
 			});
 		});
+		it("can't add markers without location or icon", function(done) {
+			mockSock1.callMockedListener("addMarker", {
+				name : "Testmarker 3",
+				description : "This is a testmarker",
+				icon : "fa-trash",
+				visibility : 'friends'}, function(answer) {
+					assert(!answer.okay);
+					done();
+				}
+			);
+		});
 	});
 };
