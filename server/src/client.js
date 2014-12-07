@@ -584,14 +584,14 @@ Client.prototype.loadUser = function(username, callback) {
 				if(!user.admin) {
 					this.database.addAdmin(user.id, function() {
 						Winston.info("First registered user was granted adminprivileges.");
-						callback();
-					});
+						this.loadUser(username, callback);
+					}.bind(this));
 				}
 				else if(!user.enabled) {
 					this.database.enableUser(user.id, function() {
 						Winston.info("First registered user was enabled.");
-						callback();
-					});
+						this.loadUser(username, callback);
+					}.bind(this));
 				}
 				else {
 					callback();
