@@ -104,14 +104,14 @@ module.exports = function(grunt) {
 			server_html: {
 				options: {
 					reporter: 'html-cov',
-					output: 'coverage/server.html'
+					output: 'coverage/server_' + Date.now() + '.html'
 				},
 				src:['server/tests/*.js']
 			},
 			server_json: {
 				options: {
 					reporter: 'json-cov',
-					output: 'coverage/server.json'
+					output: 'coverage/server_' + Date.now() + '.json'
 				},
 				src:['server/tests/*.js']
 			},
