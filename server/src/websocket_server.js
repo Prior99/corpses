@@ -14,6 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with CORPSES. If not, see <http://www.gnu.org/licenses/>.
  */
+var Winston = require('winston');
 
 var Connection = function(socket){
 	this.listeners = {};
@@ -61,9 +62,16 @@ Connection.prototype = {
 
 	receive: function(message){
 		var self = this;
-		var obj = JSON.parse(message);
+		var obj;
+		try {
+			obj = JSON.parse(message);
+		}
+		catch(e) {
+			Winston.error("received broken packet");
+			return;
+		}
 		if(obj.type === undefined || obj.id === undefined){
-			console.error("received broken packet: " + message + " - Required field missing");
+			Winston.error("received broken packet: " + message + " - Required field missing");
 			return;
 		}
 
@@ -103,7 +111,7 @@ Connection.prototype = {
 			}
 		}
 		else{
-			console.error("received broken packet: " + message + " - Invalid type");
+			Winston.error("received broken packet: " + message + " - Invalid type");
 			return;
 		}
 	}
