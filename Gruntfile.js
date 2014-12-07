@@ -1,4 +1,5 @@
 module.exports = function(grunt) {
+	var date = Date.now();
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 		concat: {
@@ -104,14 +105,14 @@ module.exports = function(grunt) {
 			server_html: {
 				options: {
 					reporter: 'html-cov',
-					output: 'coverage/server_' + Date.now() + '.html'
+					output: 'coverage/server_' + date + '.html'
 				},
 				src:['server/tests/*.js']
 			},
 			server_json: {
 				options: {
 					reporter: 'json-cov',
-					output: 'coverage/server_' + Date.now() + '.json'
+					output: 'coverage/server_' + date + '.json'
 				},
 				src:['server/tests/*.js']
 			},
@@ -147,7 +148,7 @@ module.exports = function(grunt) {
 		grunt.task.run(this.data);
 	});
 	grunt.registerTask('printcoverage', 'Print the overall coverage the the commandline.', function() {
-		var json = require('./coverage/server.json');
+		var json = require('./coverage/server_' + date + '.json');
 		console.log("Coverage: " + json.coverage + "%");
 	});
 	grunt.registerTask('client', 'Test and build the client.', ['test:client', 'build:client']);
