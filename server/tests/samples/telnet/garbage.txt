@@ -1,0 +1,2 @@
+2014-12-08T06:58:25 473688.590 Telnet executed "listknonwplayers" from: 127.0.0.1:45871
+*** ERROR: unknown command 'listknonwplayers'
