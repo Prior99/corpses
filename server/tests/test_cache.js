@@ -1,7 +1,7 @@
 var assert = require("assert");
 
 describe('The cache holding the information from the 7DTD server', function() {
-	var sample = require("./samples/telnet_sampledata1.js");
+	var sample = require("./samples/cache_sampledata.js");
 	var handlers = [];
 	var handlerMap = {};
 	var triggerGetTime = false;

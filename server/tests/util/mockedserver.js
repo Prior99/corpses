@@ -1,4 +1,4 @@
-var sample = require("../samples/telnet_sampledata1.js");
+var sample = require("../samples/cache_sampledata.js");
 
 MockServer = {
 	newUser : false,
