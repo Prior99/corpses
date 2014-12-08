@@ -17,12 +17,11 @@
 
 var Winston = require('winston');
 var net = require("net");
-var config = require("../config.json");
 var Regexes = require("./regex.js");
 var Events = require('events');
 var Util = require("util");
 
-function Connection() {
+function Connection(config) {
 	process.stdout.write("Initializing Telnetclient... ");
 	this.client = new net.Socket();
 	this.client.on("error", function() {

@@ -29,7 +29,7 @@ Winston.add(Winston.transports.File, { filename: 'server.log' });
 function Server() {
 	this.wsServer = null;
 	this.cache = new Cache({time : 5000, knownPlayers : 10000, playersExtended : 1000});
-	this.telnetClient = new TelnetClient();
+	this.telnetClient = new TelnetClient(config);
 	this.telnetClient.on("open", function(){
 		Winston.info("Connection to 7DTD established.");
 		this.telnetClient.triggerListKnownPlayers();
