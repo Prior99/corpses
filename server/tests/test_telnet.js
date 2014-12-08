@@ -78,14 +78,56 @@ describe("The interconnect to the 7DTD-Server", function() {
 		socket.write(FS.readFileSync("server/tests/samples/telnet/time.txt"));
 	});
 
-	it("emits \"listKnownPlayers\" when listKnownPlayers is written", function(done) {
-		telnetClient.once("getTime", function(obj) {
-			assert.equal(obj.day, 164);
-			assert.equal(obj.hour, 8);
-			assert.equal(obj.minute, 39);
+	it("emits \"listPlayersExtended\" when listPlayersExtended is written", function(done) {
+		telnetClient.once("listPlayersExtended", function(players) {
+			assert.equal(players.length, 3);
+			var p = players[0];
+			assert.equal(p.id, 113);
+			assert.equal(p.name, "Test1");
+			assert.deepEqual(p.position, {x : -8, y : 29.3324234, z : 0});
+			assert.deepEqual(p.rotation, {x : -0.6, y : 94.2, z : 0.0});
+			assert.equal(p.remote, true);
+			assert.equal(p.health, 70);
+			assert.equal(p.deaths, 0);
+			assert.equal(p.zombieKills, 1682);
+			assert.equal(p.playerKills, 6);
+			assert.equal(p.score, 3);
+			assert.equal(p.steamid, 61725147);
+			assert.equal(p.ip, "127.0.0.1");
+			assert.equal(p.ping, 3);
+
+			p = players[1];
+			assert.equal(p.id, 145);
+			assert.equal(p.name, "Bröüä\\ufe3b\\u30c7l");
+			assert.deepEqual(p.position, {x : 4.5, y : 0.0, z : 288.8});
+			assert.deepEqual(p.rotation, {x : 4334.6, y : 5.2, z : 0.0});
+			assert.equal(p.remote, true);
+			assert.equal(p.health, 0);
+			assert.equal(p.deaths, 3);
+			assert.equal(p.zombieKills, 2);
+			assert.equal(p.playerKills, 0);
+			assert.equal(p.score, 0);
+			assert.equal(p.steamid, 7611776561198);
+			assert.equal(p.ip, "0.0.0.0");
+			assert.equal(p.ping, 100);
+
+			p = players[2];
+			assert.equal(p.id, 182);
+			assert.equal(p.name, "Sascha");
+			assert.deepEqual(p.position, {x : -121234.534, y : 29.3, z : 288.8});
+			assert.deepEqual(p.rotation, {x : -1, y : 94.2, z : 0.0});
+			assert.equal(p.remote, true);
+			assert.equal(p.health, 100);
+			assert.equal(p.deaths, 39000);
+			assert.equal(p.zombieKills, 162);
+			assert.equal(p.playerKills, 1);
+			assert.equal(p.score, 1501);
+			assert.equal(p.steamid, 61198079807725147);
+			assert.equal(p.ip, "1.2.3.4");
+			assert.equal(p.ping, 0);
 			done();
 		});
-		socket.write(FS.readFileSync("server/tests/samples/telnet/time.txt"));
+		socket.write(FS.readFileSync("server/tests/samples/telnet/players.txt"));
 	});
 
 	it("can close the server and the telnetClient emits \"close\"", function(done) {

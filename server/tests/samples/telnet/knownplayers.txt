@@ -1,9 +1,9 @@
 2014-12-08T06:58:31 473694.373 Telnet executed "listknownplayers" from: 127.0.0.1:45871
-1. penguinized, id=181, steamid=76561198073470883, online=False, ip=149.201.244.229, playtime=132 m, seen=2014-12-02 20:53
-2. Sascha, id=182, steamid=76561198007725147, online=False, ip=77.10.213.18, playtime=4149 m, seen=2014-12-07 23:36
-3. Soana, id=320, steamid=76561198073518287, online=False, ip=88.153.209.165, playtime=435 m, seen=2014-11-27 20:44
-4. BRÖML, id=471, steamid=76561198025814985, online=False, ip=88.153.209.165, playtime=828 m, seen=2014-12-02 19:36
-5. Mörrrlin, id=1302, steamid=76561198044544566, online=False, ip=31.150.96.148, playtime=901 m, seen=2014-12-03 14:25
-6. Gunsmoke \ufe3b\u30c7\u2550\u4e00, id=3672, steamid=76561198069070346, online=False, ip=37.201.138.209, playtime=2783 m, seen=2014-12-07 23:08
-7. OSZY, id=4325, steamid=76561198013193804, online=False, ip=178.26.108.151, playtime=564 m, seen=2014-11-30 22:34
+1. Test1, id=1, steamid=561870198073470, online=True, ip=127.0.0.1, playtime=0 m, seen=2014-12-02 20:53
+2. Sascha, id=182, steamid=5618701567870, online=True, ip=127.0.0.1, playtime=4149 m, seen=2014-12-07 23:36
+3. Test2, id=35650, steamid=123456789, online=False, ip=127.0.0.1, playtime=2 m, seen=2014-11-27 20:44
+4. Törst, id=47123, steamid=3264982734273, online=False, ip=127.0.0.1, playtime=76868 m, seen=2014-12-02 19:36
+5. Häör, id=13, steamid=90998234244, online=False, ip=127.0.0.1, playtime=4 m, seen=2014-12-03 14:25
+6. Testutf \ufe3b\u30c7\u2550\u4e00, id=3672, steamid=2342344234, online=False, ip=0.0.0.0, playtime=2783 m, seen=2014-12-07 23:08
+7. A, id=45, steamid=23454334, online=False, ip=129.123.56.4, playtime=564 m, seen=2014-11-30 22:34
 Total of 7 known
