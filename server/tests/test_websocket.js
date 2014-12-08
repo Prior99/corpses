@@ -48,8 +48,11 @@ describe("The websocketwrapper", function() {
 			setTimeout(function() {
 				done();
 			}, 30);
+			ws1.on("error", function(err) {
+				assert(false);
+			});
 			ws2.on("open", function() {
-				ws2.send(3);
+				ws2.send(JSON.stringify(3));
 			});
 		});
 		ws2 = new WS("http://localhost:" + Config.port + "/");
