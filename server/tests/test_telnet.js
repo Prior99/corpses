@@ -78,7 +78,22 @@ describe("The interconnect to the 7DTD-Server", function() {
 		socket.write(FS.readFileSync("server/tests/samples/telnet/time.txt"));
 	});
 
-	it("can close the server", function() {
-		server.close();
+	it("emits \"listKnownPlayers\" when listKnownPlayers is written", function(done) {
+		telnetClient.once("getTime", function(obj) {
+			assert.equal(obj.day, 164);
+			assert.equal(obj.hour, 8);
+			assert.equal(obj.minute, 39);
+			done();
+		});
+		socket.write(FS.readFileSync("server/tests/samples/telnet/time.txt"));
+	});
+
+	it("can close the server and the telnetClient emits \"close\"", function(done) {
+		telnetClient.on("close", function() {
+			server.close(function() {
+				done();
+			});
+		});
+		socket.end();
 	});
 });
