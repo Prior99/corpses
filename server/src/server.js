@@ -24,7 +24,18 @@ var Database = require("./database.js");
 var Client = require("./client.js");
 var Cache = require("./cache.js");
 
-Winston.add(Winston.transports.File, { filename: 'server.log' });
+Winston.add(Winston.transports.File, {
+	filename : 'server.log',
+	maxsize : '512000',
+	maxFiles : 7,
+	json: false,
+	colorize: true,
+	timestamp: function() {
+		var d = new Date();
+		return d.getYear() + "." + (d.getMonth() + 1) + "." + d.getDate() + " " +
+		d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds() + "." + d.getMilliseconds();
+	}
+});
 
 function Server() {
 	this.wsServer = null;
