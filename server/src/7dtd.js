@@ -22,7 +22,7 @@ var Events = require('events');
 var Util = require("util");
 
 function Connection(config) {
-	process.stdout.write("Initializing Telnetclient... ");
+	Winston.info("Initializing Telnetclient... ");
 	this.client = new net.Socket();
 	this.client.on("error", function() {
 		Winston.info("Initializing Telnetclient failed. Is the server running and reachable?");
