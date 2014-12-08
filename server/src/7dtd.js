@@ -55,7 +55,7 @@ Connection.prototype.checkMessage = function() {
 
 			}
 			else {
-				if(msgs.length == 0) {
+				if(msgs.length === 0) {
 					this.buffer = string;
 					break;
 				}
