@@ -1,3 +1,5 @@
+var FS = require('fs');
+
 module.exports = function(grunt) {
 	var date = Date.now();
 	grunt.initConfig({
@@ -150,8 +152,18 @@ module.exports = function(grunt) {
 	grunt.registerTask('printcoverage', 'Print the overall coverage the the commandline.', function() {
 		var json = require('./coverage/server_' + date + '.json');
 		console.log("Coverage: " + json.coverage + "%");
+		console.log("HTML-Report for Coverage stored at:");
+		console.log('server_' + date + '.html');
+	});
+	grunt.registerTask('linkcoverage', 'Link the coverageresult to server.html.', function(done) {
+		var done = this.async;
+		FS.unlink('coverage/server_latest.html', function() {
+			FS.symlink('server_' + date + '.html', 'coverage/server_latest.html', function() {
+				done();
+			});
+		});
 	});
 	grunt.registerTask('client', 'Test and build the client.', ['test:client', 'build:client']);
-	grunt.registerTask('server', 'Test and build the server.', ['test:server', 'build:server', 'printcoverage']);
+	grunt.registerTask('server', 'Test and build the server.', ['test:server', 'build:server', 'printcoverage', 'linkcoverage']);
 	grunt.registerTask('default', 'Test and build both client and server.', ['server', 'client']);
 };
