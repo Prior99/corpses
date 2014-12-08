@@ -1,0 +1,68 @@
+2014-12-08T16:17:04 507206.785 Time: 8453.20m FPS: 67.13 Heap: 187.8MB Max: 363.3MB Chunks: 1000 CGO: 0 Ply: 0 Zom: 0 Ent: 0 (213) Items: 37
+2014-12-08T16:17:04 507206.786 STATS: 8453.20,67.13,187.8,363.3,1000,0,0,0,0,213,37
+A client which was not in the connected player list disconnected. ???
+A client which was not in the connected player list disconnected. ???
+2014-12-08T16:17:25 507227.863 OnPlayerConnected 77
+2014-12-08T16:17:25 507227.987 PlayerLogin: 797137134604260575/AllocatedID: 0/Sascha/Alpha 10.2
+2014-12-08T16:17:25 507227.987 Token: FAAAAIKjCmcOoZ0AWyzUAgEAEAGAwIVUGAAAAAEAAAACAAAAEtUKTQAAAACnFwIAAgAAALIAAAAyAAAABAAAAFss1AIBABABstYDAFjcCk0DAajAAAAAAACTgFSAQpxUAQAVeAAAAAAAAJ6kWW5RMl5HGTxA5l+iu8wQlAN
+5QykpzGB/8ZN0jIrXV01Kka1H56VEcNrXZ8FSLq3PdSdVxBuF6CD5HeLQE2ANEiKoYpG15rDuY+L8OtzBdyE63va0SU5vB5X+6NDzRS8j/DlCRGKfjC8HQRm16HoBDgdvNtCmL3zRNSb4sBZnAADQOYo4AHeGBVxn/QoADKlXgHOGBQIAQABAfIYFAQA/AIBzhgUiAAAAWMaL
+CcqspVeAc4YF0P+oV4BzhgVcZ/0KXGf9CgYAAAYYAAAAAACoVxAHdgdo+xkBGAd2BwcQAAAQAAABBQAAAPCOGAFgAhEBcC2+AQYAAACwBKlXhOU5OLT5jAlguD93B25VLf7////8xIsJsxY+dwAAAADwDhgBAAARAfAOGAEAALwAIAAAACAAAADcxIsJZbClV1AKeQVQCnkF9
+MSLCfTEiwl0rqVXUAp5BVAKeQUUxosJDMaLCcjWCjhQCnkFAAAAAAUAAACAc4YF8A4YAQCAAADwDhgBmJ6lVwQAAAAAAAAAVMWLCQnbO3cAlAAAIB68AAAAvACYDocHz6WlVwEAAAAAgAAAOAG8AEABvACYDocHoMWLCRoYPncCAAAA0P+oVwgJ6wpcZ/0KeMaLCYcGplc7AA
+AAOwAAAAAAAACMxosJhwamVzsAAACUtaZXAAARAQAAAACoxYsJZbClV+DrowW0xYsJZbClV+AowAXgKMAFzMWLCczFiwl0rqVX0MWLCWWwpVdAz20FQM9tBejFiwnoxYsJdK6lV+zFiwllsKVXgCnABYApwAUExosJ0P+oVwjV81dig+g8BQAAALT5jAnIZP0KAQAAAPjFiwmgO0I4DDjyVwAAAAC43YwJCNXzV2YA0H/2KgEA+l4HCAAAAAB69Z8IAAAAAABn/QpYxosJZgDQf/YqAQD/////AHeGAHzGiwlbe0I4BAAAAAcAAAAFAAAAAHeGBWYA0H/2KgEAtRwBAIjGiwmgxosJuz5COAB3hgUAd4YFmIkKOAB3hgX9PUI4AAAAAAAAAQC0xosJJDLyVwB3hgUAAAEAXGf9CmzHjAlGOvJXXGf9CgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==
+2014-12-08T16:17:25 507227.987 [Steamworks.NET] Auth.AuthenticateUser()
+2014-12-08T16:17:25 507227.989 [Steamworks.NET] Authenticating player: Sascha SteamId: 76561198007725147 TicketLen: 1024 Result: k_EBeginAuthSessionResultOK
+2014-12-08T16:17:25 507227.992 Started thread_CommReader: cl=77, ch=1
+2014-12-08T16:17:25 507227.995 Started thread_CommWriter: cl=77, ch=1
+2014-12-08T16:17:25 507227.997 Started thread_CommReader: cl=77, ch=2
+2014-12-08T16:17:25 507228.000 Started thread_CommWriter: cl=77, ch=2
+2014-12-08T16:17:25 507228.000 Allowing player with id 77
+2014-12-08T16:17:25 507228.356 [Steamworks.NET] Authentication callback. ID: 76561198007725147, owner: 76561198007725147, result: k_EAuthSessionResponseOK
+2014-12-08T16:17:25 507228.406 [EAC] UserStatusHandler callback. Status: Authenticated GUID: 76561198007725147 ReqKick: False
+2014-12-08T16:17:33 507235.954 RequestToEnterGame: 77/Sascha
+2014-12-08T16:17:33 507235.956 GMSG: Sascha joined the game
+2014-12-08T16:17:34 507236.804 Time: 8453.70m FPS: 123.90 Heap: 209.7MB Max: 363.3MB Chunks: 1000 CGO: 0 Ply: 0 Zom: 0 Ent: 0 (213) Items: 37
+2014-12-08T16:17:34 507236.804 STATS: 8453.70,123.90,209.7,363.3,1000,0,0,0,0,213,37
+2014-12-08T16:17:34 507237.509 RequestToSpawnPlayer: 182, 77, Sascha, 5
+2014-12-08T16:17:34 507237.616 Created player with id=182
+2014-12-08T16:17:34 507237.617 Adding observed entity: 89, (-803.4, 29.3, 288.8), 5
+2014-12-08T16:17:34 507237.617 Player connected, clientid=77, entityid=182, name=Sascha, steamid=76561198007725147, ip=77.10.213.18
+2014-12-08T16:17:34 507237.618 Player set to online: 76561198007725147
+listplayers
+2014-12-08T16:17:37 507240.024 Telnet executed "listplayers" from: 127.0.0.1:57047
+1. id=182, Sascha, pos=(-803.4, 29.3, 288.8), rot=(-43.6, 94.2, 0.0), remote=True, health=60, deaths=39, zombies=1682, players=1, score=1501, steamid=76561198007725147, ip=77.10.213.18, ping=0
+Total of 1 in the game
+listknownplayers
+2014-12-08T16:17:47 507249.984 Telnet executed "listknownplayers" from: 127.0.0.1:57047
+1. penguinized, id=181, steamid=76561198073470883, online=False, ip=149.201.244.229, playtime=132 m, seen=2014-12-02 20:53
+2. Sascha, id=182, steamid=76561198007725147, online=True, ip=77.10.213.18, playtime=4149 m, seen=2014-12-08 16:17
+3. Soana, id=320, steamid=76561198073518287, online=False, ip=88.153.209.165, playtime=435 m, seen=2014-11-27 20:44
+4. BRÖML, id=471, steamid=76561198025814985, online=False, ip=88.153.209.165, playtime=828 m, seen=2014-12-02 19:36
+5. Mörrrlin, id=1302, steamid=76561198044544566, online=False, ip=31.150.96.148, playtime=901 m, seen=2014-12-03 14:25
+6. Gunsmoke ︻デ═一, id=3672, steamid=76561198069070346, online=False, ip=37.201.138.209, playtime=2783 m, seen=2014-12-07 23:08
+7. OSZY, id=4325, steamid=76561198013193804, online=False, ip=178.26.108.151, playtime=564 m, seen=2014-11-30 22:34
+Total of 7 known
+listplayers
+2014-12-08T16:18:03 507265.953 Telnet executed "listplayers" from: 127.0.0.1:57047
+1. id=182, Sascha, pos=(-803.4, 29.3, 288.8), rot=(-43.6, 94.2, 0.0), remote=True, health=60, deaths=39, zombies=1682, players=1, score=1501, steamid=76561198007725147, ip=77.10.213.18, ping=58
+Total of 1 in the game
+2014-12-08T16:18:04 507267.279 Time: 8454.20m FPS: 151.59 Heap: 241.8MB Max: 363.3MB Chunks: 1000 CGO: 6 Ply: 1 Zom: 2 Ent: 3 (216) Items: 37
+2014-12-08T16:18:04 507267.279 STATS: 8454.20,151.59,241.8,363.3,1000,6,1,2,3,216,37
+2014-12-08T16:18:22 507285.233 Player Sascha disconnected after 0.8 minutes
+2014-12-08T16:18:22 507285.233 Player set to offline: 76561198007725147
+2014-12-08T16:18:22 507285.235 Removing player with id clientId=77, entityId=182
+2014-12-08T16:18:22 507285.235 [EAC] FreeUser (Sascha)
+2014-12-08T16:18:22 507285.236 GMSG: Sascha left the game
+2014-12-08T16:18:22 507285.236 Removing observed entity 89
+No objects for the given player ID were deleted 77
+2014-12-08T16:18:22 507285.236 Exited thread_CommWriter: cl=77, ch=1
+2014-12-08T16:18:22 507285.236 Exited thread_CommWriter: cl=77, ch=2
+2014-12-08T16:18:22 507285.332 Exited thread_CommReader: cl=77, ch=1
+2014-12-08T16:18:22 507285.332 Exited thread_CommReader: cl=77, ch=2
+2014-12-08T16:18:22 507285.387 OnPlayerDisconnected 77
+2014-12-08T16:18:22 507285.388 Disconnected player not found in client list...
+No objects for the given player ID were deleted 77
+listplayers
+2014-12-08T16:18:27 507289.786 Telnet executed "listplayers" from: 127.0.0.1:57047
+Total of 0 in the game
+2014-12-08T16:18:34 507297.320 Time: 8454.70m FPS: 40.72 Heap: 231.1MB Max: 363.3MB Chunks: 1000 CGO: 0 Ply: 0 Zom: 0 Ent: 0 (215) Items: 37
+2014-12-08T16:18:34 507297.320 STATS: 8454.70,40.72,231.1,363.3,1000,0,0,0,0,215,37
