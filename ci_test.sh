@@ -10,10 +10,11 @@ echo "Now building/testing ... "
 grunt | iconv -ctascii | tee grunt.log
 grep --quiet "Done, without errors." grunt.log
 RESULT=$?
+HTML=$(grep -P "server_\\d+.html" grunt.log)
 if [ "$RESULT" = "0" ]; then
 	echo "The build was successfull."
-	echo "Sharing codecoverage overview"
-	share coverage/server*.html
+	echo "Sharing codecoverage overview $HTML"
+	share "coverage/$HTML"
 	exit 0
 else
 	echo "Some tests were detected to have failed."
