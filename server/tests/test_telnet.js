@@ -51,8 +51,7 @@ describe("The interconnect to the 7DTD-Server", function() {
 	});
 
 	it("emits \"info\" when info is written", function(done) {
-		telnetClient.on("info", function(obj) {
-			done();
+		telnetClient.once("info", function(obj) {
 			assert.equal(obj.fps, 40.12);
 			assert.equal(obj.worldTime, 7894.44);
 			assert.equal(obj.memoryUsed, 200.9);
@@ -64,8 +63,19 @@ describe("The interconnect to the 7DTD-Server", function() {
 			assert.equal(obj.entitiesLoaded, 0);
 			assert.equal(obj.entitiesOverall, 213);
 			assert.equal(obj.items, 37);
+			done();
 		});
 		socket.write(FS.readFileSync("server/tests/samples/telnet/info.txt"));
+	});
+
+	it("emits \"getTime\" when getTime is written", function(done) {
+		telnetClient.once("getTime", function(obj) {
+			assert.equal(obj.day, 164);
+			assert.equal(obj.hour, 8);
+			assert.equal(obj.minute, 39);
+			done();
+		});
+		socket.write(FS.readFileSync("server/tests/samples/telnet/time.txt"));
 	});
 
 	it("can close the server", function() {
