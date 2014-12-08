@@ -28,22 +28,16 @@ function Connection(config) {
 		Winston.info("Initializing Telnetclient failed. Is the server running and reachable?");
 	});
 	this.client.on("close", function() {
-		// Winston.info("[Telnet] CLOSE!");
 		this.emit("close");
-		// Winston.info("[Telnet] close finished");
 	}.bind(this));
 	this.buffer = "";
 	this.client.on("data", function(data) {
-		// Winston.info("[Telnet] DATA!");
 		this.buffer += data.toString();
 		this.checkMessage();
-		// Winston.info("[Telnet] data finished");
 	}.bind(this));
 	this.client.connect(config.telnetPort, config.telnetHost, function() {
-		// Winston.info("[Telnet] CONNECT!");
 		Winston.info("Initializing Telnetclient okay.");
 		this.emit("open");
-		// Winston.info("[Telnet] connect finished");
 	}.bind(this));
 }
 
@@ -54,11 +48,19 @@ Connection.prototype.checkMessage = function() {
 	var reg = /^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\s\d+\.\d\d\d\s/gm;
 	if((index = this.buffer.search(reg)) !== -1) {
 		var msgs = this.buffer.split(reg);
-		for(var i = 0; i < msgs.length -1; i++) {
-			//Winston.info("CHUNK: +++" + msgs[i] + "+++");
-			this.parseMessage(msgs[i]);
+		Winston.info(msgs);
+		while(msgs.length > 0) {
+			var string = msgs.shift();
+			if(this.parseMessage(string)) {
+
+			}
+			else {
+				if(msgs.length == 0) {
+					this.buffer = string;
+					break;
+				}
+			}
 		}
-		this.buffer = msgs[msgs.length - 1];
 	}
 };
 
@@ -85,11 +87,9 @@ Connection.prototype.triggerKickPlayer = function(name, reason){
 Connection.prototype.parseMessage = function(string) {
 	var result;
 	Events.EventEmitter.call(this);
-	//Winston.info("RECEIVED MSG: \"" + string + "\"");
 	for(var type in Regexes) {
 		var regex = Regexes[type];
 		if((result = regex.exec(string)) !== null) {
-			//Winston.info("DETECTED:" + type + ":" + result);
 			if(type === "listPlayersExtended" || type === "listKnownPlayers") {
 				var array = [];
 				array.push(result);
@@ -101,9 +101,10 @@ Connection.prototype.parseMessage = function(string) {
 			else {
 				this.computeMessage(type, result);
 			}
-			break;
+			return true;
 		}
 	}
+	return false;
 };
 
 Connection.prototype.computeMessage = function(type, array) {
