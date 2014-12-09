@@ -1,4 +1,6 @@
 {
+  "clientDirectory" : "htdocs/",
+  "mapDirectory" : "/home/sdtd/instances/my_instance/Random Gen/my_map/map",
   "database" : {
       "host" : "localhost",
       "user" : "corpsestest",
@@ -6,5 +8,8 @@
       "database" : "corpsestest",
       "multipleStatements" : "true"
   },
-  "port" : 54678
+  "websocketPort" : 7434,
+  "port" : 54678,
+  "kickUnregistered": true,
+  "website": "example.org"
 }
