@@ -15,10 +15,12 @@
  *  along with CORPSES. If not, see <http://www.gnu.org/licenses/>.
  */
 var Winston = require('winston');
+var Events = require('events');
+var Util = require("util");
 var WS = require("ws");
-var Websocket = require("./websocket_server.js");
 var FS = require("fs");
 var Client = require("./client.js");
+var Websocket = require("./websocket_server.js");
 
 function Server(cache, telnetClient, database, config) {
 	this.config = config;
@@ -34,8 +36,11 @@ function Server(cache, telnetClient, database, config) {
 		this.startWebsocketServer();
 		this.initTelnetClient();
 		this.symlinkMap();
+		this.emit("started");
 	}.bind(this));
 }
+
+Util.inherits(Server, Events.EventEmitter);
 
 Server.prototype.symlinkMap = function() {
 	FS.symlink(this.config.mapDirectory, this.config.clientDirectory + "/map", function(err) {
@@ -72,7 +77,7 @@ Server.prototype.startWebsocketServer = function() {
 				"Please create it manually with the following content:\n" + portfile + "\n");
 		}
 		else {
-			wsServer = new WS.Server({
+			this.wsServer = new WS.Server({
 				host : "0.0.0.0",
 				port : this.config.websocketPort
 			}).on("connection", function(ws) {
@@ -165,6 +170,25 @@ Server.prototype.initTelnetClient = function() {
 	});
 	this.telnetClient.on("listPlayersExtended", function(evt) {
 		me.broadcast("updated", "playersExtended");
+	});
+};
+
+Server.prototype.shutdown = function() {
+	var i = 3;
+	function closed() {
+		i--;
+		if(i == 0) {
+			this.emit("stopped");
+		}
+	}
+	this.telnetClient.shutdown(function() {
+		closed();
+	});
+	this.wsServer.close(function() {
+		closed();
+	});
+	this.database.shutdown(function() {
+		closed();
 	});
 };
 
