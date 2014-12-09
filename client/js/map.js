@@ -166,6 +166,7 @@ MapSystem.removeMarker = function(id) {
 MapSystem.invokeRemoveMarker = function(marker, popup) {
 	NET.removeMarker(marker.id, function() {
 		MapSystem.map.removeLayer(popup);
+		MapSystem.removeMarker(marker.id);
 	});
 };
 

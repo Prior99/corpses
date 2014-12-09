@@ -100,6 +100,7 @@ function Client(websocket, database, server) {
 							this.broadcastMarker(result, false, done);
 						}
 						else {
+							this.sendMarker(result);
 							done();
 						}
 					}
