@@ -15,6 +15,28 @@
  *  along with CORPSES. If not, see <http://www.gnu.org/licenses/>.
  */
 
+var Winston = require('winston');
+var TelnetClient = require("./7dtd.js");
+var Database = require("./database.js");
+var Cache = require("./cache.js");
 var Server = require("./server.js");
+var config = require("../config.json");
 
-new Server();
+var cache = new Cache({time : 5000, knownPlayers : 10000, playersExtended : 1000});
+var telnetClient = new TelnetClient(config);
+var database = new Database(config);
+
+Winston.add(Winston.transports.File, {
+    filename : 'server.log',
+    maxsize : '512000',
+    maxFiles : 7,
+    json: false,
+    colorize: true,
+    timestamp: function() {
+        var d = new Date();
+        return d.getYear() + "." + (d.getMonth() + 1) + "." + d.getDate() + " " +
+        d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds() + "." + d.getMilliseconds();
+    }
+});
+
+new Server(cache, telnetClient, database, config);

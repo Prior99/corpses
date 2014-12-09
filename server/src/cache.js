@@ -19,8 +19,8 @@ var Winston = require('winston');
 function Cache(times) {
 	this.times = times;
 	this.time = undefined;
-	this.knownPlayers = undefined;
-	this.playersExtended = undefined;
+	this.knownPlayers = [];
+	this.playersExtended = [];
 	this.info = undefined;
 	this.intervals = {};
 }
