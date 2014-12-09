@@ -80,7 +80,7 @@ Connection.prototype.triggerListPlayersExtended = function() {
 };
 
 Connection.prototype.triggerKickPlayer = function(name, reason){
-	this.client.write("kick " + name + (reason === undefined ? "": " " + reason));
+	this.client.write("kick " + name + (reason === undefined ? "": " " + reason) + "\n");
 };
 
 Connection.prototype.parseMessage = function(string) {
