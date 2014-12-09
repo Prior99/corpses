@@ -130,6 +130,131 @@ describe("The interconnect to the 7DTD-Server", function() {
 		socket.write(FS.readFileSync("server/tests/samples/telnet/players.txt"));
 	});
 
+	it("emits \"listKnownPlayers\" when listKnownPlayers is written", function(done) {
+		telnetClient.once("listKnownPlayers", function(players) {
+			assert.equal(players.length, 3);
+			var p = players[0];
+			assert.equal(p.name, "Sascha");
+			assert.equal(p.id, 182);
+			assert.equal(p.steamid, 5618701567870);
+			assert.equal(p.online, true);
+			assert.equal(p.ip, "127.0.0.1");
+			assert.equal(p.playtime, 4149);
+			assert.equal(p.seen, "2014-12-07 23:36");
+
+			p = players[1];
+			assert.equal(p.name, "Häör");
+			assert.equal(p.id, 13);
+			assert.equal(p.steamid, 90998234244);
+			assert.equal(p.online, false);
+			assert.equal(p.ip, "127.0.0.1");
+			assert.equal(p.playtime, 4);
+			assert.equal(p.seen, "2014-12-03 14:25");
+
+			p = players[2];
+			assert.equal(p.name, "A");
+			assert.equal(p.id, 45);
+			assert.equal(p.steamid, 23454334);
+			assert.equal(p.online, false);
+			assert.equal(p.ip, "129.123.56.4");
+			assert.equal(p.playtime, 564);
+			assert.equal(p.seen, "2014-11-30 22:34");
+			done();
+		});
+		socket.write(FS.readFileSync("server/tests/samples/telnet/knownplayers.txt"));
+	});
+
+	it("emits \"playerConnected\" when a player connects", function(done) {
+		telnetClient.once("playerConnected", function(player) {
+			assert.equal(player.clientID, 77);
+			assert.equal(player.id, 182);
+			assert.equal(player.name, "Sascha");
+			assert.equal(player.steamid, 76561198007725147);
+			assert.equal(player.ip, "77.10.213.18");
+			done();
+		});
+		socket.write(FS.readFileSync("server/tests/samples/telnet/playerjoined.txt"));
+	});
+
+	it("emits \"playerSetOnline\" when a player connects", function(done) {
+		telnetClient.once("playerSetOnline", function(player) {
+			assert.equal(player.steamid, 76561198007725147);
+			done();
+		});
+		socket.write(FS.readFileSync("server/tests/samples/telnet/playerjoined.txt"));
+	});
+
+	it("emits \"playerDisconnected\" when a player disconnects", function(done) {
+		telnetClient.once("playerDisconnected", function(player) {
+			assert.equal(player.name, "Sascha");
+			assert.equal(player.playTime, 0.8);
+			done();
+		});
+		socket.write(FS.readFileSync("server/tests/samples/telnet/playerleft.txt"));
+	});
+
+	it("emits \"playerSetOffline\" when a player disconnects", function(done) {
+		telnetClient.once("playerSetOffline", function(player) {
+			assert.equal(player.steamid, 76561198007725147);
+			done();
+		});
+		socket.write(FS.readFileSync("server/tests/samples/telnet/playerleft.txt"));
+	});
+
+	it("can trigger \"listKnownPlayer\"", function(done) {
+		socket.setEncoding("utf8");
+		socket.once("data", function(data) {
+			assert.equal(data, "listknownplayers\n");
+			done();
+		});
+		telnetClient.triggerListKnownPlayers();
+	});
+
+	it("can trigger \"listPlayersExtended\"", function(done) {
+		socket.setEncoding("utf8");
+		socket.once("data", function(data) {
+			assert.equal(data, "listplayers\n");
+			done();
+		});
+		telnetClient.triggerListPlayersExtended();
+	});
+
+	it("can trigger \"getTime\"", function(done) {
+		socket.setEncoding("utf8");
+		socket.once("data", function(data) {
+			assert.equal(data, "gettime\n");
+			done();
+		});
+		telnetClient.triggerGetTime();
+	});
+
+	it("can trigger \"mem\"", function(done) {
+		socket.setEncoding("utf8");
+		socket.once("data", function(data) {
+			assert.equal(data, "mem\n");
+			done();
+		});
+		telnetClient.triggerMem();
+	});
+
+	it("can kick a player with a reason", function(done) {
+		socket.setEncoding("utf8");
+		socket.once("data", function(data) {
+			assert.equal(data, "kick Test123 Lorem\n");
+			done();
+		});
+		telnetClient.triggerKickPlayer("Test123", "Lorem");
+	});
+
+	it("can kick a player without a reason", function(done) {
+		socket.setEncoding("utf8");
+		socket.once("data", function(data) {
+			assert.equal(data, "kick Test123\n");
+			done();
+		});
+		telnetClient.triggerKickPlayer("Test123");
+	});
+
 	it("can close the server and the telnetClient emits \"close\"", function(done) {
 		telnetClient.on("close", function() {
 			server.close(function() {
