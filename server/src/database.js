@@ -205,23 +205,6 @@ Database.prototype.areFriends = function(user1, user2, callback) {
 	);
 };
 
-Database.prototype.isFriendOf = function(me, friendOf, callback) {
-	this.pool.query("SELECT id FROM Friends WHERE user = ? AND friend = ?", [friendOf, me], function(err, rows) {
-		if(err) {
-			reportError("Unable to check, if someone is someones friend", err);
-			callback(err);
-		}
-		else {
-			if(rows === undefined || rows.length < 1) {
-				callback(undefined, false);
-			}
-			else {
-				callback(undefined, true);
-			}
-		}
-	});
-};
-
 Database.prototype.fetchMarkers = function(id, callback) {
 	if(id === undefined) {
 		this.pool.query("SELECT id, name, description, lat, lng, visibility, author, icon " +
