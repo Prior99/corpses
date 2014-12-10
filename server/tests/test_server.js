@@ -12,33 +12,41 @@ var cache = new Cache({time : 5000, knownPlayers : 10000, playersExtended : 1000
 
 var socket;
 var theServer;
-var server = net.createServer(function(sock) {
-	socket = sock;
-});
-server.listen(config.port);
+var server;
+var telnetClient;
 
-var telnetClient = new TelnetClient({
-	"telnetPort" : config.port,
-	"telnetHost" : "localhost"
-});
 var database = new Database(config);
 
 describe('The server itself', function() {
-	it("can start without crashing", function() {
-		theServer = new Server(cache, telnetClient, database, config);
-		theServer.once("started", function() {
+	it("can setup a mocked 7dtd testserver", function(done) {
+		server = net.createServer(function(sock) {
+			socket = sock;
+		});
+		//server.listen(config.port);
+		telnetClient = new TelnetClient({
+			"telnetPort" : config.port,
+			"telnetHost" : "localhost"
+		});
+		server.once("listening", function() {
 			done();
 		});
 	});
 
-	it("can stop everything", function() {
+	it("can start without crashing", function(done) {
+		theServer = new Server(cache, telnetClient, database, config);
+		theServer.once("started", function() {
+			done();
+		});
+		telnetClient.connect();
+	});
+
+	it("can stop everything", function(done) {
 		theServer.shutdown();
 		theServer.once("stopped", function() {
 			server.close(function() {
 				done();
 			});
 			socket.end();
-			done();
 		});
 	});
 });
