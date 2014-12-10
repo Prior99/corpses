@@ -39,17 +39,16 @@ Connection.prototype.addCloseListener = function(func) {
 	this.closeListeners.push(func);
 };
 
-Connection.prototype.addListener = function(key, listener, async){
+Connection.prototype.addListener = function(key, listener){
 	this.listeners[key] = {
-		listener: listener,
-		async: async === true
+		listener: listener
 	};
 };
 
 Connection.prototype.on = Connection.prototype.addListener;
 
 Connection.prototype.removeListener = function(key) {
-	delete this.listener[key];
+	delete this.listeners[key];
 };
 
 Connection.prototype.send = function(key, param, handler){
