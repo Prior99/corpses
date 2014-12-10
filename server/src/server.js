@@ -155,7 +155,7 @@ Server.prototype.initTelnetClient = function() {
 				else{
 					me.broadcast("playerConnected", evt);
 				}
-			});
+			}.bind(this));
 		}
 	}.bind(this));
 	this.telnetClient.on("playerDisconnected", function(evt) {
