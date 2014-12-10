@@ -1,6 +1,6 @@
 {
   "clientDirectory" : "htdocs/",
-  "mapDirectory" : "/home/sdtd/instances/my_instance/Random Gen/my_map/map",
+  "mapDirectory" : "maptest",
   "database" : {
       "host" : "localhost",
       "user" : "corpsestest",

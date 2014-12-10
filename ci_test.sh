@@ -1,4 +1,6 @@
 #!/bin/bash
+mkdir htdocs
+mkdir maptest
 echo -n "Installing npm components ... "
 npm install --silent | iconv -ctascii -c &> npm.log
 echo "Done."
