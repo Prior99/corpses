@@ -55,24 +55,28 @@ describe('The server itself', function() {
 	it("can broadcast some events", function(done) {
 		function testConnect() {
 			websocket.addListener("playerConnected", function() {
+				websocket.removeListener("playerConnected");
 				testSetOnline();
 			});
 			socket.write(FS.readFileSync("server/tests/samples/telnet/playerjoined.txt"));
 		}
 		function testSetOnline() {
 			websocket.addListener("playerSetOnline", function() {
+				websocket.removeListener("playerSetOnline");
 				testDisconnect();
 			});
 			socket.write(FS.readFileSync("server/tests/samples/telnet/playerjoined.txt"));
 		}
 		function testDisconnect() {
-			websocket.addListener("playerDisconnect", function() {
-				testDisconnect();
+			websocket.addListener("playerDisconnected", function() {
+				websocket.removeListener("playerDisconnected");
+				testSetOffline();
 			});
 			socket.write(FS.readFileSync("server/tests/samples/telnet/playerleft.txt"));
 		}
 		function testSetOffline() {
 			websocket.addListener("playerSetOffline", function() {
+			websocket.removeListener("playerSetOffline");
 				done();
 			});
 			socket.write(FS.readFileSync("server/tests/samples/telnet/playerleft.txt"));

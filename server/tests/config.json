@@ -10,6 +10,6 @@
   },
   "websocketPort" : 7434,
   "port" : 54678,
-  "kickUnregistered": true,
+  "kickUnregistered": false,
   "website": "example.org"
 }
