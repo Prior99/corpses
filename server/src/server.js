@@ -33,6 +33,8 @@ function Server(cache, telnetClient, database, config) {
 	this.telnetClient.on("open", function(){
 		Winston.info("Connection to 7DTD established.");
 		this.telnetClient.triggerListKnownPlayers();
+		this.telnetClient.triggerMem();
+		this.telnetClient.triggerGetTime();
 		this.cache.connectionEstablished(this.telnetClient);
 		this.clients = [];
 		this.initTelnetClient();
