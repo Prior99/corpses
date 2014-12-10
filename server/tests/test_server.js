@@ -11,7 +11,7 @@ var Database = require("../src/database.js");
 var Cache = require("../src/cache.js");
 var config = require("./config.json");
 
-var cache = new Cache({time : 5000, knownPlayers : 10000, playersExtended : 1000});
+var cache = new Cache({time : 500000, knownPlayers : 1000000, playersExtended : 100000});
 
 var socket;
 var theServer;
@@ -22,10 +22,16 @@ var ws;
 
 var database = new Database(config);
 
-describe('The server itself', function() {
+describe('The server', function() {
+
 	it("can setup a mocked 7dtd testserver", function(done) {
 		server = net.createServer(function(sock) {
 			socket = sock;
+				socket.setEncoding("utf8");
+				socket.once("data", function(msg) {
+					
+				});
+
 		});
 		server.listen(config.port);
 		telnetClient = new TelnetClient({
@@ -82,6 +88,15 @@ describe('The server itself', function() {
 			socket.write(FS.readFileSync("server/tests/samples/telnet/playerleft.txt"));
 		}
 		testConnect();
+	});
+
+	it("will kick unregistered players", function(done) {
+		config.kickUnregistered = true;
+		socket.once("data", function(msg) {
+			assert.equal(msg, "kick Sascha You must have an enabled account on example.org to play on this server\n");
+			done();
+		});
+		socket.write(FS.readFileSync("server/tests/samples/telnet/playerjoined.txt"));
 	});
 
 	it("can stop everything", function(done) {
