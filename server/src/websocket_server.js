@@ -35,85 +35,90 @@ var Connection = function(socket){
 	});
 };
 
-Connection.prototype = {
-	addCloseListener : function(func) {
-		this.closeListeners.push(func);
-	},
-	addListener: function(key, listener, async){
-		this.listeners[key] = {
-			listener: listener,
-			async: async === true
-		};
-	},
+Connection.prototype.addCloseListener = function(func) {
+	this.closeListeners.push(func);
+};
 
-	send: function(key, param, handler){
-		var meta = {
-			param: param,
-			key: key,
-			type: "req",
-			id: this.id
-		};
-		this.responses[this.id] = handler;
-		if(!this.dead) {
-			this.socket.send(JSON.stringify(meta));
-		}
-		this.id++;
-	},
+Connection.prototype.addListener = function(key, listener, async){
+	this.listeners[key] = {
+		listener: listener,
+		async: async === true
+	};
+};
 
-	receive: function(message){
-		var self = this;
-		var obj;
-		try {
-			obj = JSON.parse(message);
-		}
-		catch(e) {
-			Winston.error("received broken packet");
-			return;
-		}
-		if(obj.type === undefined || obj.id === undefined){
-			Winston.error("received broken packet: " + message + " - Required field missing");
-			return;
-		}
+Connection.prototype.on = Connection.prototype.addListener;
 
-		if(obj.type === "req" && obj.key !== undefined ){
-			var listener = this.listeners[obj.key];
-			if(listener !== undefined){
-				if(listener.async){
-					listener.listener(obj.param, function(ans){
-						var answer = {
-							id: obj.id,
-							type: "res",
-							param: ans
-						};
-						if(!self.dead) {
-							self.socket.send(JSON.stringify(answer));
-						}
-					});
-				}
-				else{
-					var ans = listener.listener(obj.param);
+Connection.prototype.removeListener = function(key) {
+	delete this.listener[key];
+};
+
+Connection.prototype.send = function(key, param, handler){
+	var meta = {
+		param: param,
+		key: key,
+		type: "req",
+		id: this.id
+	};
+	this.responses[this.id] = handler;
+	if(!this.dead) {
+		this.socket.send(JSON.stringify(meta));
+	}
+	this.id++;
+};
+
+Connection.prototype.receive = function(message){
+	var self = this;
+	var obj;
+	try {
+		obj = JSON.parse(message);
+	}
+	catch(e) {
+		Winston.error("received broken packet");
+		return;
+	}
+	if(obj.type === undefined || obj.id === undefined){
+		Winston.error("received broken packet: " + message + " - Required field missing");
+		return;
+	}
+
+	if(obj.type === "req" && obj.key !== undefined ){
+		var listener = this.listeners[obj.key];
+		if(listener !== undefined){
+			if(listener.listener.length === 2){
+				listener.listener(obj.param, function(ans){
 					var answer = {
 						id: obj.id,
 						type: "res",
 						param: ans
 					};
 					if(!self.dead) {
-						this.socket.send(JSON.stringify(answer));
+						self.socket.send(JSON.stringify(answer));
 					}
+				});
+			}
+			else{
+				var ans = listener.listener(obj.param);
+				var answer = {
+					id: obj.id,
+					type: "res",
+					param: ans
+				};
+				if(!self.dead) {
+					this.socket.send(JSON.stringify(answer));
 				}
 			}
 		}
-		else if(obj.type === "res"){
-			var handler = this.responses[obj.id];
-			if(handler !== undefined){
-				handler(obj.param);
-				this.responses[obj.id] = undefined;
-			}
+	}
+	else if(obj.type === "res"){
+		var handler = this.responses[obj.id];
+		if(handler !== undefined){
+			handler(obj.param);
+			this.responses[obj.id] = undefined;
 		}
-		else{
-			Winston.error("received broken packet: " + message + " - Invalid type");
-			return;
-		}
+	}
+	else{
+		Winston.error("received broken packet: " + message + " - Invalid type");
+		return;
 	}
 };
 
