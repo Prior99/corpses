@@ -35,13 +35,22 @@ function Connection(config) {
 		this.buffer += data.toString();
 		this.checkMessage();
 	}.bind(this));
-	this.client.connect(config.telnetPort, config.telnetHost, function() {
+	this.config = config;
+};
+
+Util.inherits(Connection, Events.EventEmitter);
+
+Connection.prototype.connect = function() {
+	this.client.connect(this.config.telnetPort, this.config.telnetHost, function() {
 		Winston.info("Initializing Telnetclient okay.");
 		this.emit("open");
 	}.bind(this));
-}
+};
 
-Util.inherits(Connection, Events.EventEmitter);
+Connection.prototype.shutdown = function(callback) {
+	this.client.once("close", callback);
+	this.client.end();
+};
 
 Connection.prototype.checkMessage = function() {
 	var index;

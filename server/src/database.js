@@ -112,6 +112,10 @@ function Database(config) {
 	}.bind(this));
 }
 
+Database.prototype.shutdown = function(callback) {
+	this.pool.end(callback);
+}
+
 Database.prototype.addMarker = function(obj, author, callback) {
 	this.pool.query("INSERT INTO Markers (name, description, lat, lng, icon, visibility, author) VALUES(?, ?, ?, ?, ?, ?, ?)",
 		[obj.name, obj.description, obj.lat, obj.lng, obj.icon, obj.visibility, author], function(err, result) {

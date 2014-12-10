@@ -40,3 +40,4 @@ Winston.add(Winston.transports.File, {
 });
 
 new Server(cache, telnetClient, database, config);
+telnetClient.connect();
