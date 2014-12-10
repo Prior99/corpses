@@ -9,6 +9,8 @@ cp server/config.json.example server/config.json
 echo "Now building/testing ... "
 grunt | iconv -ctascii | tee grunt.log
 grep --quiet "Done, without errors." grunt.log
+echo "The log is as follows:"
+cat server_test.log
 RESULT=$?
 HTML=$(grep -P "server_\\d+.html" grunt.log)
 if [ "$RESULT" = "0" ]; then
