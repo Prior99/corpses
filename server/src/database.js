@@ -114,7 +114,7 @@ function Database(config) {
 
 Database.prototype.shutdown = function(callback) {
 	this.pool.end(callback);
-}
+};
 
 Database.prototype.addMarker = function(obj, author, callback) {
 	this.pool.query("INSERT INTO Markers (name, description, lat, lng, icon, visibility, author) VALUES(?, ?, ?, ?, ?, ?, ?)",

@@ -36,7 +36,7 @@ function Connection(config) {
 		this.checkMessage();
 	}.bind(this));
 	this.config = config;
-};
+}
 
 Util.inherits(Connection, Events.EventEmitter);
 

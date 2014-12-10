@@ -189,7 +189,7 @@ Server.prototype.shutdown = function() {
 	var self = this;
 	function closed() {
 		i--;
-		if(i == 0) {
+		if(i === 0) {
 			Winston.info("Server is now down!");
 			self.emit("stopped");
 		}
