@@ -39,6 +39,7 @@ describe("The interconnect to the 7DTD-Server", function() {
 			telnetClient.on("playerSetOffline", allListeners);
 			done();
 		});
+		telnetClient.connect();
 	});
 
 	it("ignores the initial greeting sent from the server", function(done) {

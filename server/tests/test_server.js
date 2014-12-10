@@ -22,7 +22,7 @@ describe('The server itself', function() {
 		server = net.createServer(function(sock) {
 			socket = sock;
 		});
-		//server.listen(config.port);
+		server.listen(config.port);
 		telnetClient = new TelnetClient({
 			"telnetPort" : config.port,
 			"telnetHost" : "localhost"
