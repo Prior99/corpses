@@ -29,7 +29,7 @@ describe('The server', function() {
 			socket = sock;
 				socket.setEncoding("utf8");
 				socket.once("data", function(msg) {
-					
+
 				});
 
 		});
@@ -57,37 +57,72 @@ describe('The server', function() {
 		done();
 	});
 
+	it("will broadcast playerConnected on player joined", function(done) {
+		websocket.addListener("playerConnected", function() {
+			websocket.removeListener("playerConnected");
+			done();
+		});
+		socket.write(FS.readFileSync("server/tests/samples/telnet/playerjoined.txt"));
+	});
 
-	it("can broadcast some events", function(done) {
-		function testConnect() {
-			websocket.addListener("playerConnected", function() {
-				websocket.removeListener("playerConnected");
-				testSetOnline();
-			});
-			socket.write(FS.readFileSync("server/tests/samples/telnet/playerjoined.txt"));
-		}
-		function testSetOnline() {
-			websocket.addListener("playerSetOnline", function() {
-				websocket.removeListener("playerSetOnline");
-				testDisconnect();
-			});
-			socket.write(FS.readFileSync("server/tests/samples/telnet/playerjoined.txt"));
-		}
-		function testDisconnect() {
-			websocket.addListener("playerDisconnected", function() {
-				websocket.removeListener("playerDisconnected");
-				testSetOffline();
-			});
-			socket.write(FS.readFileSync("server/tests/samples/telnet/playerleft.txt"));
-		}
-		function testSetOffline() {
-			websocket.addListener("playerSetOffline", function() {
-			websocket.removeListener("playerSetOffline");
-				done();
-			});
-			socket.write(FS.readFileSync("server/tests/samples/telnet/playerleft.txt"));
-		}
-		testConnect();
+	it("will broadcast playerSetOnline on player joined", function(done) {
+		websocket.addListener("playerSetOnline", function() {
+			websocket.removeListener("playerSetOnline");
+			done();
+		});
+		socket.write(FS.readFileSync("server/tests/samples/telnet/playerjoined.txt"));
+	});
+
+	it("will broadcast playerDisconnected when player left", function(done) {
+		websocket.addListener("playerDisconnected", function() {
+			websocket.removeListener("playerDisconnected");
+			done();
+		});
+		socket.write(FS.readFileSync("server/tests/samples/telnet/playerleft.txt"));
+	});
+
+	it("will broadcast playerSetOffline when player left", function(done) {
+		websocket.addListener("playerSetOffline", function() {
+		websocket.removeListener("playerSetOffline");
+			done();
+		});
+		socket.write(FS.readFileSync("server/tests/samples/telnet/playerleft.txt"));
+	});
+
+	it("will broadcast correct updated on time", function(done) {
+		websocket.addListener("updated", function(obj) {
+			websocket.removeListener("updated");
+			assert.equal(obj, "time");
+			done();
+		});
+		socket.write(FS.readFileSync("server/tests/samples/telnet/time.txt"));
+	});
+
+	it("will broadcast correct updated on knownPlayers", function(done) {
+		websocket.addListener("updated", function(obj) {
+			websocket.removeListener("updated");
+			assert.equal(obj, "knownPlayers");
+			done();
+		});
+		socket.write(FS.readFileSync("server/tests/samples/telnet/knownplayers.txt"));
+	});
+
+	it("will broadcast correct updated on info", function(done) {
+		websocket.addListener("updated", function(obj) {
+			websocket.removeListener("updated");
+			assert.equal(obj, "info");
+			done();
+		});
+		socket.write(FS.readFileSync("server/tests/samples/telnet/info.txt"));
+	});
+
+	it("will broadcast correct updated on playersExtended", function(done) {
+		websocket.addListener("updated", function(obj) {
+			websocket.removeListener("updated");
+			assert.equal(obj, "playersExtended");
+			done();
+		});
+		socket.write(FS.readFileSync("server/tests/samples/telnet/players.txt"));
 	});
 
 	it("will kick unregistered players", function(done) {
@@ -97,6 +132,27 @@ describe('The server', function() {
 			done();
 		});
 		socket.write(FS.readFileSync("server/tests/samples/telnet/playerjoined.txt"));
+	});
+
+	it("can notify about a new user", function(done) {
+		websocket.addListener("updated", function(answer) {
+			assert(answer === "users");
+			websocket.removeListener("updated");
+			done();
+		});
+		theServer.notifyNewUser();
+	});
+
+	it("can broadcast to a particular user", function(done) {
+		websocket.send("login", { name : "Test1", password : "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3"}, function(answer) {
+			assert(answer.okay);
+			websocket.addListener("test1", function(obj) {
+				websocket.removeListener("test1");
+				assert(obj === 5);
+				done();
+			});
+			theServer.broadcastToUser(345, "test1", 5);
+		});
 	});
 
 	it("can stop everything", function(done) {
