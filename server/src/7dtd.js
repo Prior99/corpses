@@ -57,6 +57,7 @@ Connection.prototype.checkMessage = function() {
 	var reg = /^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\s\d+\.\d\d\d\s/gm;
 	if((index = this.buffer.search(reg)) !== -1) {
 		var msgs = this.buffer.split(reg);
+		this.buffer = "";
 		while(msgs.length > 0) {
 			var string = msgs.shift();
 			if(this.parseMessage(string)) {
