@@ -524,7 +524,9 @@ Client.prototype.broadcastMarker = function(marker, friendsOnly, callback) {
 };
 
 Client.prototype.isUser = function(steamid) {
-	return this.isLoggedIn() && this.user.steamid === steamid;
+	//jshint ignore:start
+	return this.isLoggedIn() && this.user.steamid == steamid; //== instead of === needed as string may be passed
+	//jshint ignore:end
 };
 
 Client.prototype.checkAdmin = function(callback, async) {
