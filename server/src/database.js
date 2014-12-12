@@ -21,92 +21,29 @@ function Database(config) {
 	this.pool = MySQL.createPool(config.database);
 	Winston.info("Connecting to Database... ");
 	this.pool.getConnection(function(err, conn) {
-		function checkError(err) {
-			if(err) {
-				reportError("An error occured when creating the tables", err);
-				return false;
-			}
-			else {
-				return true;
-			}
-		}
-		function createUsers() {
-			pool.query(
-				"CREATE TABLE IF NOT EXISTS Users (" +
-				"id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT," +
-				"name			VARCHAR(128) NOT NULL UNIQUE," +
-				"steamid		VARCHAR(128) NOT NULL UNIQUE," +
-				"enabled		BOOL," +
-				"password		VARCHAR(128) NOT NULL)", function(err) {
-					if(checkError(err)) {
-						createFriends();
-					}
-				});
-			}
-			function createFriends() {
-				pool.query(
-					"CREATE TABLE IF NOT EXISTS Friends (" +
-					"id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT," +
-					"user			INT NOT NULL," +
-					"friend			INT NOT NULL," +
-					"FOREIGN KEY(user) REFERENCES Users(id) ON DELETE CASCADE," +
-					"FOREIGN KEY(friend) REFERENCES Users(id) ON DELETE CASCADE)", function(err) {
-						if(checkError(err)) {
-							createAdmins();
-						}
-				});
-			}
-			function createAdmins() {
-				pool.query(
-					"CREATE TABLE IF NOT EXISTS Admins (" +
-					"id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT," +
-					"user			INT NOT NULL UNIQUE," +
-					"FOREIGN KEY(user) REFERENCES Users(id) ON DELETE CASCADE)", function(err) {
-						if(checkError(err)) {
-							createMarkers();
-						}
-				});
-			}
-			function createMarkers() {
-				pool.query(
-					"CREATE TABLE IF NOT EXISTS Markers (" +
-					"id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT," +
-					"name			VARCHAR(128) NOT NULL," +
-					"description	TEXT," +
-					"lat			FLOAT NOT NULL," +
-					"lng			FLOAT NOT NULL," +
-					"visibility		ENUM('private', 'friends', 'public') NOT NULL DEFAULT 'public', " +
-					"author			INT NOT NULL, " +
-					"icon			VARCHAR(32) NOT NULL," +
-					"FOREIGN KEY(author) REFERENCES Users(id) ON DELETE CASCADE)", function(err) {
-						if(checkError(err)) {
-							createMarkerIgnore();
-						}
-				});
-			}
-			function createMarkerIgnore() {
-				pool.query(
-					"CREATE TABLE IF NOT EXISTS MarkerIgnore (" +
-					"id				INT NOT NULL PRIMARY KEY AUTO_INCREMENT," +
-					"user			INT NOT NULL," +
-					"marker			INT NOT NULL," +
-					"FOREIGN KEY(user) REFERENCES Users(id) ON DELETE CASCADE," +
-					"FOREIGN KEY(marker) REFERENCES Markers(id) ON DELETE CASCADE)", function(err) {
-						if(checkError(err)) {
-							Winston.info("All tables okay.");
-						}
-				});
-			}
-
-	    if(err) {
+		if(err) {
 			Winston.info("Connecting to Database failed.");
-	    }
-	    else {
-	        conn.release();
-	        Winston.info("Connecting to Database done.");
+		}
+		else {
+			conn.release();
+			Winston.info("Connecting to Database done.");
 			Winston.info("Getting tables ready ... ");
 			var pool = this.pool;
-			createUsers();
+			FS.readFile("server/database.sql", function(err, data) {
+				if(err) {
+					Winston.error("Could not read file for database configuration.");
+				}
+				else {
+					pool.query(data, function(err) {
+						if(err) {
+							Winston.error("An error occured while configuring database:", err);
+						}
+						else {
+							Winston.info("All tables okay.");
+						}
+					});
+				}
+			});
 		}
 	}.bind(this));
 }
