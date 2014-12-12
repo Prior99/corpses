@@ -351,9 +351,6 @@ function Client(websocket, database, server) {
 					});
 				}
 			}
-			else {
-				decCounter();
-			}
 		}
 
 		if(this.checkLoggedIn(async)) {
