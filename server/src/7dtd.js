@@ -25,8 +25,9 @@ function Connection(config) {
 	Winston.info("Initializing Telnetclient... ");
 	this.client = new net.Socket();
 	this.client.on("error", function() {
-		Winston.info("Initializing Telnetclient failed. Is the server running and reachable?");
-	});
+		Winston.error("Initializing Telnetclient failed. Is the server running and reachable?");
+		this.emit("error");
+	}.bind(this));
 	this.client.on("close", function() {
 		this.emit("close");
 	}.bind(this));
