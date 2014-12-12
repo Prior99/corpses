@@ -20,7 +20,9 @@ var net = require("net");
 var Regexes = require("./regex.js");
 var Events = require('events');
 var Util = require("util");
-
+/**
+ * @module TelnetClient
+ */
 function Connection(config) {
 	Winston.info("Initializing Telnetclient... ");
 	this.client = new net.Socket();
