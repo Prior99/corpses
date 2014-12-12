@@ -6,6 +6,52 @@ var MySQL = require('mysql');
 var ResetDB = require("./util/resetdb.js");
 
 describe("The database when failing", function() {
+	it("can not connect with wrong config", function(done) {
+		var database = new Database({
+			host : "example.org",
+			user : "test",
+			password : "12345",
+			database : "testdb"}, function(okay) {
+				assert(!okay);
+				done();
+			}
+		);
+	});
+	it("cannot setup the database when file not existing", function(done) {
+		FS.renameSync("server/database.sql", "server/database.sql.tmp");
+		var database = new Database(dbConfig, function(okay) {
+			assert(!okay);
+			done();
+		});
+	});
+	it("cannot setup the database when file is wrong", function(done) {
+		FS.writeFileSync("server/database.sql", "THIS IS A TEST;\nTHIS IS NOT VALID SQL;");
+		var database = new Database(dbConfig, function(okay) {
+			assert(!okay);
+			FS.unlinkSync("server/database.sql");
+			FS.renameSync("server/database.sql.tmp", "server/database.sql");
+			done();
+		});
+	});
+	it("cannot validate user with no information given", function(done) {
+		database.validateUser(undefined, undefined, function(err, result) {
+			assert.notEqual(err, undefined);
+			done();
+		});
+	});
+	it("cannot validate admin with no information given", function(done) {
+		database.validateAdmin(undefined, function(err, result) {
+			assert.notEqual(err, undefined);
+			done();
+		});
+	});
+	it("returns an empty result if non-existing user is looked up via name", function(done) {
+		database.getUserByName("Horst Hubert", function(err, result) {
+			assert.equal(err, undefined);
+			assert.equal(result, undefined);
+			done();
+		});
+	});
 	var database = new Database(dbConfig);
 	it("can prepare the database to fail", function(done) {
 		ResetDB.purgeDatabase(done);
