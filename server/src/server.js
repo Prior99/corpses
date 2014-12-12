@@ -57,6 +57,7 @@ Server.prototype.symlinkMap = function() {
 				Winston.error("Unable to create symlink for map.\n" +
 					"Please create it manually by executing the following command:\n\n" +
 					"ln -s " + this.config.mapDirectory + " " + this.config.clientDirectory + "/map");
+				this.emit("error", err);
 			}
 		}
 		else {
@@ -82,13 +83,15 @@ Server.prototype.startWebsocketServer = function() {
 			Winston.error("Unable to create file \"" +
 				this.config.clientDirectory + "/port.js\"." +
 				"Please create it manually with the following content:\n" + portfile + "\n");
+			this.emit("error", err);
 		}
 		else {
-			this.httpServer = HTTP.createServer(function (req, res) {
-				res.writeHead(200, {'Content-Type': 'text/plain'});
-				res.end('Not implemented');
-			});
-			this.httpServer.listen(this.config.websocketPort, "0.0.0.0", function() {
+			this.httpServer = HTTP.createServer();
+			this.httpServer.on("error", function(err) {
+				Winston.error("The websocketserver could not be started. Is the port maybe in use?");
+				this.emit("error", err);
+			}.bind(this));
+			this.httpServer.listen(this.config.websocketPort, function() {
 				this.wsServer = new WS.Server({
 					server : this.httpServer
 				});
@@ -97,9 +100,6 @@ Server.prototype.startWebsocketServer = function() {
 						var client = new Client(wsc, me.database, me);
 						me.clients.push(client);
 					})(new Websocket(ws));
-				});
-				this.wsServer.on("error", function() {
-					Winston.error("The websocketserver could not be started. Is the port maybe in use?");
 				});
 				Winston.info("Websocketserver started.");
 				this.websocketStarted();
@@ -137,12 +137,7 @@ Server.prototype.broadcastToUser = function(steamid, name, obj) {
 Server.prototype.initTelnetClient = function() {
 	var me = this;
 	this.telnetClient.on("close", function() {
-		try{
-			me.cache.connectionLost();
-		}
-		catch(error){
-			console.err("Error closing TelnetClient: " + error);
-		}
+		me.cache.connectionLost();
 	});
 	this.telnetClient.on("playerConnected", function(evt) {
 		if(this.config.kickUnregistered !== undefined && this.config.kickUnregistered === true){
