@@ -7,29 +7,35 @@ var mockServer = require("./util/mockedserver.js");
 var MockWebsocket = require("./util/mockedwebsocket.js");
 
 describe("The interface to the client", function() {
-	it("can setup the connection to the testdatabase", function(done) {
-		ResetDB.purgeDatabase(function() {
-			ResetDB.createDatabase(function() {
-				ResetDB.prepareDatabase(done);
-			});
-		});
-	});
 	var requiredListeners = ["login", "register", "addMarker", "removeMarker", "fetchMarkers",
 		"ignoreMarker", "addFriend", "removeFriend", "enableUser",
 		"disableUser", "getTime", "getKnownPlayers", "getInfo", "getPlayers", "getUserData", "getUsers",
 		"addAdmin", "removeAdmin"];
-	var database = new Database(dbConfig);
 
-	var mockSock1 = new MockWebsocket();
-	var mockSock2 = new MockWebsocket();
+	var database;
+	var mockSock1;
+	var mockSock2;
+	var client1;
+	var client2;
+	
+	database = new Database(dbConfig);
+	mockSock1 = new MockWebsocket();
+	mockSock2 = new MockWebsocket();
 
-	var client1 = new Client(mockSock1, database, mockServer);
-	var client2 = new Client(mockSock2, database, mockServer);
+	client1 = new Client(mockSock1, database, mockServer);
+	client2 = new Client(mockSock2, database, mockServer);
 
 	mockServer.clients.push(client1);
 	mockServer.clients.push(client2);
 
-	describe("The general system", function() {
+	describe("In general", function() {
+		it("can setup the connection to the testdatabase", function(done) {
+			ResetDB.purgeDatabase(function() {
+				ResetDB.createDatabase(function() {
+					ResetDB.prepareDatabase(done);
+				});
+			});
+		});
 		it("registers all listeners", function() {
 			for(var i in requiredListeners) {
 				var r = requiredListeners[i];

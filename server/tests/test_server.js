@@ -19,27 +19,29 @@ var server;
 var telnetClient;
 var websocket;
 var ws;
-
-var database = new Database(config);
+var database;
 
 describe('The server', function() {
 
 	it("can setup a mocked 7dtd testserver", function(done) {
-		server = net.createServer(function(sock) {
-			socket = sock;
+		FS.unlinkSync(config.clientDirectory + "/map");
+		database = new Database(config, function() {
+			server = net.createServer(function(sock) {
+				socket = sock;
 				socket.setEncoding("utf8");
 				socket.once("data", function(msg) {
 
 				});
 
-		});
-		server.listen(config.port);
-		telnetClient = new TelnetClient({
-			"telnetPort" : config.port,
-			"telnetHost" : "localhost"
-		});
-		server.once("listening", function() {
-			done();
+			});
+			server.listen(config.port);
+			telnetClient = new TelnetClient({
+				"telnetPort" : config.port,
+				"telnetHost" : "localhost"
+			});
+			server.once("listening", function() {
+				done();
+			});
 		});
 	});
 

@@ -18,12 +18,15 @@ var Winston = require('winston');
 var MySQL = require('mysql');
 var FS = require("fs");
 
-function Database(config) {
+function Database(config, callback) {
 	this.pool = MySQL.createPool(config.database);
 	Winston.info("Connecting to Database... ");
 	this.pool.getConnection(function(err, conn) {
 		if(err) {
 			Winston.info("Connecting to Database failed.");
+			if(callback) {
+				callback(false);
+			}
 		}
 		else {
 			conn.release();
@@ -33,14 +36,23 @@ function Database(config) {
 			FS.readFile("server/database.sql", {encoding : "utf8"}, function(err, data) {
 				if(err) {
 					Winston.error("Could not read file for database configuration.");
+					if(callback) {
+						callback(false);
+					}
 				}
 				else {
 					pool.query(data, function(err) {
 						if(err) {
 							Winston.error("An error occured while configuring database:", err);
+							if(callback) {
+								callback(false);
+							}
 						}
 						else {
 							Winston.info("All tables okay.");
+							if(callback) {
+								callback(true);
+							}
 						}
 					});
 				}
@@ -116,7 +128,7 @@ Database.prototype.validateUser = function(username, password, callback) {
 		});
 	}
 	else {
-		callback(undefined, false);
+		callback(true);
 	}
 };
 
@@ -276,7 +288,7 @@ Database.prototype.validateAdmin = function(id, callback) {
 	}
 	else {
 		reportError("Unable to validate user, either username, password or both were not supplied.");
-		callback(err);
+		callback(true);
 	}
 };
 
