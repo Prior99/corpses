@@ -340,15 +340,7 @@ function Client(websocket, database, server) {
 
 		function handlePlayer(err, playerDB) {
 			if(!checkError(err, async)) {
-				if(playerDB === undefined) {
-					decCounter();
-					Winston.error("Unknown player on the server");
-					async({
-						okay : false,
-						reason : "internal_error"
-					});
-				}
-				else {
+				if(playerDB !== undefined) {
 					database.areFriends(thisClient.user.id, playerDB.id, function(err, f) {
 						if(!checkError(err)) {
 							if(f) {
