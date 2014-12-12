@@ -3,21 +3,12 @@ var dbConfig = require("./config.json");
 var assert = require("assert");
 var FS = require("fs");
 var MySQL = require('mysql');
+var ResetDB = require("./util/resetdb.js");
 
 describe("The database when failing", function() {
 	var database = new Database(dbConfig);
 	it("can prepare the database to fail", function(done) {
-		require("./util/resetdb.js")(next);
-		function next() {
-			var sql = FS.readFileSync("server/tests/samples/delete_database.sql", {encoding : "utf8"});
-			var connection = MySQL.createConnection(dbConfig.database);
-			connection.connect(function(err) { if(err) throw err; });
-			connection.query(sql, function(err, rows, fields) { if(err) throw err; });
-			connection.end(function(err) {
-				if(err) throw err;
-				done();
-			});
-		}
+		ResetDB.purgeDatabase(done);
 	});
 	it("reacts fine to adding a marker", function(done) {
 		database.addMarker({

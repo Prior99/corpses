@@ -2,18 +2,23 @@ var Database = require("../src/database.js");
 var Client = require("../src/client.js");
 var dbConfig = require("./config.json");
 var assert = require("assert");
+var ResetDB = require("./util/resetdb.js");
+var mockServer = require("./util/mockedserver.js");
+var MockWebsocket = require("./util/mockedwebsocket.js");
 
 describe("The interface to the client", function() {
 	it("can setup the connection to the testdatabase", function(done) {
-		require("./util/resetdb.js")(done);
+		ResetDB.purgeDatabase(function() {
+			ResetDB.createDatabase(function() {
+				ResetDB.prepareDatabase(done);
+			});
+		});
 	});
 	var requiredListeners = ["login", "register", "addMarker", "removeMarker", "fetchMarkers",
 		"ignoreMarker", "addFriend", "removeFriend", "enableUser",
 		"disableUser", "getTime", "getKnownPlayers", "getInfo", "getPlayers", "getUserData", "getUsers",
 		"addAdmin", "removeAdmin"];
-	var MockWebsocket = require("./util/mockedwebsocket.js");
 	var database = new Database(dbConfig);
-	var mockServer = require("./util/mockedserver.js");
 
 	var mockSock1 = new MockWebsocket();
 	var mockSock2 = new MockWebsocket();
