@@ -2,6 +2,15 @@ var FS = require('fs');
 
 module.exports = function(grunt) {
 	var date = Date.now();
+	var testfiles = [
+		'server/tests/require.js',
+		'server/tests/test_cache.js',
+		'server/tests/test_client.js',
+		'server/tests/test_server.js',
+		'server/tests/test_telnet.js',
+		'server/tests/test_websocket.js',
+		'server/tests/test_database_fail.js'
+	];
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 		concat: {
@@ -109,20 +118,20 @@ module.exports = function(grunt) {
 					reporter: 'html-cov',
 					output: 'coverage/server_' + date + '.html'
 				},
-				src:['server/tests/*.js']
+				src: testfiles
 			},
 			server_json: {
 				options: {
 					reporter: 'json-cov',
 					output: 'coverage/server_' + date + '.json'
 				},
-				src:['server/tests/*.js']
+				src: testfiles
 			},
 			server_spec: {
 				options: {
 					reporter: 'spec'
 				},
-				src:['server/tests/*.js']
+				src: testfiles
 			}
 		},
 		build: {
