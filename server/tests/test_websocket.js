@@ -43,15 +43,15 @@ describe("The websocketwrapper", function() {
 		wsServer = new WS.Server({
 			host : "0.0.0.0",
 			port : Config.port
-		}).on("connection", function(ws1) {
+		}).once("connection", function(ws1) {
 			websocket1 = new Websocket(ws1);
 			setTimeout(function() {
 				done();
 			}, 30);
-			ws1.on("error", function(err) {
+			ws1.once("error", function(err) {
 				assert(false);
 			});
-			ws2.on("open", function() {
+			ws2.once("open", function() {
 				ws2.send(JSON.stringify(3));
 			});
 		});
