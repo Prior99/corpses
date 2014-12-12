@@ -1,4 +1,6 @@
 var assert = require("assert");
+var MockWebsocket = require("../util/mockedwebsocket.js");
+var Client = require("../../src/client.js");
 
 module.exports = function(client1, client2, database, server, mockSock1, mockSock2) {
 	describe("Adding Markers", function() {
@@ -23,6 +25,17 @@ module.exports = function(client1, client2, database, server, mockSock1, mockSoc
 				}
 			);
 		});
+		it("can fetch public markers when not logged in", function(done) {
+			var mockSock3 = new MockWebsocket();
+			var client3 = new Client(mockSock3, database, server);
+			server.clients.push(client3);
+			mockSock3.callMockedListener("fetchMarkers", null, function(answer) {
+				assert.equal(answer.markers.length, 1);
+				assert.equal(answer.markers[0].lat, 14.3);
+				assert.equal(answer.markers[0].lng, -3.4);
+				done();
+			});
+		})
 		it("can add a private marker", function(done) {
 			mockSock1.callMockedListener("addMarker", {
 				name : "Testmarker 2",
