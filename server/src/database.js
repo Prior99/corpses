@@ -16,6 +16,7 @@
  */
 var Winston = require('winston');
 var MySQL = require('mysql');
+var FS = require("fs");
 
 function Database(config) {
 	this.pool = MySQL.createPool(config.database);
@@ -29,7 +30,7 @@ function Database(config) {
 			Winston.info("Connecting to Database done.");
 			Winston.info("Getting tables ready ... ");
 			var pool = this.pool;
-			FS.readFile("server/database.sql", function(err, data) {
+			FS.readFile("server/database.sql", {encoding : "utf8"}, function(err, data) {
 				if(err) {
 					Winston.error("Could not read file for database configuration.");
 				}
