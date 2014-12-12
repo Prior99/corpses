@@ -23,7 +23,7 @@ var Util = require("util");
 /**
  * @module TelnetClient
  */
-function Connection(config) {
+function TelnetClient(config) {
 	Winston.info("Initializing Telnetclient... ");
 	this.client = new net.Socket();
 	this.client.on("error", function() {
@@ -41,21 +41,21 @@ function Connection(config) {
 	this.config = config;
 }
 
-Util.inherits(Connection, Events.EventEmitter);
+Util.inherits(TelnetClient, Events.EventEmitter);
 
-Connection.prototype.connect = function() {
+TelnetClient.prototype.connect = function() {
 	this.client.connect(this.config.telnetPort, this.config.telnetHost, function() {
 		Winston.info("Initializing Telnetclient okay.");
 		this.emit("open");
 	}.bind(this));
 };
 
-Connection.prototype.shutdown = function(callback) {
+TelnetClient.prototype.shutdown = function(callback) {
 	this.client.once("close", callback);
 	this.client.end();
 };
 
-Connection.prototype.checkMessage = function() {
+TelnetClient.prototype.checkMessage = function() {
 	var index;
 	var reg = /^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\s\d+\.\d\d\d\s/gm;
 	if((index = this.buffer.search(reg)) !== -1) {
@@ -76,27 +76,27 @@ Connection.prototype.checkMessage = function() {
 	}
 };
 
-Connection.prototype.triggerGetTime = function() {
+TelnetClient.prototype.triggerGetTime = function() {
 	this.client.write("gettime\n");
 };
 
-Connection.prototype.triggerMem = function() {
+TelnetClient.prototype.triggerMem = function() {
 	this.client.write("mem\n");
 };
 
-Connection.prototype.triggerListKnownPlayers = function() {
+TelnetClient.prototype.triggerListKnownPlayers = function() {
 	this.client.write("listknownplayers\n");
 };
 
-Connection.prototype.triggerListPlayersExtended = function() {
+TelnetClient.prototype.triggerListPlayersExtended = function() {
 	this.client.write("listplayers\n");
 };
 
-Connection.prototype.triggerKickPlayer = function(name, reason){
+TelnetClient.prototype.triggerKickPlayer = function(name, reason){
 	this.client.write("kick " + name + (reason === undefined ? "": " " + reason) + "\n");
 };
 
-Connection.prototype.parseMessage = function(string) {
+TelnetClient.prototype.parseMessage = function(string) {
 	var result;
 	Events.EventEmitter.call(this);
 	for(var type in Regexes) {
@@ -119,7 +119,7 @@ Connection.prototype.parseMessage = function(string) {
 	return false;
 };
 
-Connection.prototype.computeMessage = function(type, array) {
+TelnetClient.prototype.computeMessage = function(type, array) {
 	switch(type) {
 		case "info": {
 			this.emit("info", {
@@ -229,4 +229,4 @@ Connection.prototype.computeMessage = function(type, array) {
 	}
 };
 
-module.exports = Connection;
+module.exports = TelnetClient;
