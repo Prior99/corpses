@@ -53,6 +53,36 @@ describe('The server', function() {
 		telnetClient.connect();
 	});
 
+	it("can not start the websocketserver twice", function(done) {
+		var server2 = new Server(cache, telnetClient, database, config);
+		server2.startWebsocketServer();
+		server2.once("error", function() {
+			done();
+		});
+	});
+
+	it("can not start the websocketserver if the clientdirectory is not accessible", function(done) {
+		FS.renameSync(theServer.config.clientDirectory, theServer.config.clientDirectory + ".tmp");
+		theServer.once("error", function() {
+			FS.renameSync(theServer.config.clientDirectory + ".tmp", theServer.config.clientDirectory);
+			done();
+		});
+		theServer.startWebsocketServer();
+	});
+
+	it("will throw an error if it can not symlink the map for another reason as that the link already exists", function(done) {
+		FS.renameSync(theServer.config.clientDirectory, theServer.config.clientDirectory + ".tmp");
+		theServer.once("error", function() {
+			FS.renameSync(theServer.config.clientDirectory + ".tmp", theServer.config.clientDirectory);
+			done();
+		});
+		theServer.symlinkMap();
+	});
+
+	it("does not crash when removing an unknown client", function() {
+		theServer.removeClient({ });
+	});
+
 	it("can react properly to a connecting client", function(done) {
 		ws = new WS("http://localhost:" + config.websocketPort + "/")
 		websocket = new Websocket(ws);
@@ -60,6 +90,15 @@ describe('The server', function() {
 	});
 
 	it("will broadcast playerConnected on player joined", function(done) {
+		websocket.addListener("playerConnected", function() {
+			websocket.removeListener("playerConnected");
+			done();
+		});
+		socket.write(FS.readFileSync("server/tests/samples/telnet/playerjoined.txt"));
+	});
+
+	it("will broadcast playerConnected on player joined with kickUnregistered off", function(done) {
+		theServer.config.kickUnregistered = undefined;
 		websocket.addListener("playerConnected", function() {
 			websocket.removeListener("playerConnected");
 			done();
@@ -127,6 +166,13 @@ describe('The server', function() {
 		socket.write(FS.readFileSync("server/tests/samples/telnet/players.txt"));
 	});
 
+	it("will broadcast correct on spawningWanderingHorde", function(done) {
+		websocket.addListener("spawningWanderingHorde", function(obj) {
+			done();
+		});
+		socket.write(FS.readFileSync("server/tests/samples/telnet/spawninghorde.txt"));
+	});
+
 	it("will kick unregistered players", function(done) {
 		config.kickUnregistered = true;
 		socket.once("data", function(msg) {
@@ -134,6 +180,15 @@ describe('The server', function() {
 			done();
 		});
 		socket.write(FS.readFileSync("server/tests/samples/telnet/playerjoined.txt"));
+	});
+
+	it("will not kick registered players", function(done) {
+		config.kickUnregistered = true;
+		websocket.addListener("playerConnected", function() {
+			websocket.removeListener("playerConnected");
+			done();
+		});
+		socket.write(FS.readFileSync("server/tests/samples/telnet/playerknownjoined.txt"));
 	});
 
 	it("can notify about a new user", function(done) {

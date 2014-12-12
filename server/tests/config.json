@@ -1,5 +1,5 @@
 {
-  "clientDirectory" : "htdocs/",
+  "clientDirectory" : "htdocs",
   "mapDirectory" : "maptest",
   "database" : {
       "host" : "localhost",
