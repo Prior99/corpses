@@ -128,16 +128,24 @@ function Client(websocket, database, server) {
 								okay : true
 							});
 						}
-						if(!checkError(err, async)) {
-							if(result.visibility === 'friends') {
-								this.broadcastRemoveMarker(id, true, done);
+						if(result) {
+							if(!checkError(err, async)) {
+								if(result.visibility === 'friends') {
+									this.broadcastRemoveMarker(id, true, done);
+								}
+								else if(result.visibility === 'public') {
+									this.broadcastRemoveMarker(id, false, done);
+								}
+								else {
+									done();
+								}
 							}
-							else if(result.visibility === 'public') {
-								this.broadcastRemoveMarker(id, false, done);
-							}
-							else {
-								done();
-							}
+						}
+						else {
+							async({
+								okay : false,
+								reason : "unknown_marker"
+							});
 						}
 					}.bind(this));
 				}.bind(this));

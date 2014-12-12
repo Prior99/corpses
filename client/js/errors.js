@@ -43,6 +43,10 @@ Errors = {
 	"no_admin" : {
 		name : "Not an admin",
 		description : "You tried to invoke a command that is for admins only."
+	},
+	"unknown_marker" : {
+		name : "Unknown marker",
+		description : "You supplied a marker that is not exitent."
 	}
 };
 
