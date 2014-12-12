@@ -22,13 +22,22 @@ var FS = require("fs");
 var Client = require("./client.js");
 var Websocket = require("./websocket_server.js");
 var HTTP = require('http');
+/**
+ * This module represents the server that will attach to the 7 Days to Die server,
+ * leech it's events and proxy it to the connected clients. It utilizes a database
+ * in order to store users and created markers as well as relations between the users.
+ * A cache makes sure to keep information from the 7DTD server stored and up-to-date.
+ *
+ * @module Server
+ */
 
 /**
- * This class represents the server itself. It utilizes the database, the cache,
- * the telnetclient and starts a websocketserver to listen for incoming connections.
- * @constructor @class
- * @param {object} cache - an instance of the cache that stores the information of the telnetclient
- * @param {object} telnetClient - an instance of the telnetclient connected to the 7DTD server
+ * The constructor takes all necessary and not yet initalized modules it needs
+ * to operate. Please start everything after passing it to the server so the
+ * respective events can be catched and used.
+ * @constructor
+ * @param {Cache} cache - an instance of the cache that stores the information of the telnetclient
+ * @param {TelnetClient} telnetClient - an instance of the telnetclient connected to the 7DTD server
  * @param {object} database - an instance of the wrapper for the databaseconnection
  * @param {object} config - the parsed json of the configfile
  */
@@ -46,7 +55,7 @@ function Server(cache, telnetClient, database, config) {
 		this.telnetClient.triggerGetTime();
 		this.cache.connectionEstablished(this.telnetClient);
 		this.clients = [];
-		this.initTelnetClient();
+		this._initTelnetClient();
 		this._symlinkMap();
 		this._startWebsocketServer();
 	}.bind(this));
@@ -140,8 +149,8 @@ Server.prototype.removeClient = function(client) {
 /**
  * Broadcast a message to all clients know to this server. There will be no
  * callback. This is a write-only operation on the websocket.
- * @param {string} name - name of the event to broadcast to all clients
- * @param {*} obj - data to broadcast in this event. This may be anything you like.
+ * @param {string} name - Name of the event to broadcast to all clients
+ * @param {*} obj - The data to broadcast in this event. This may be anything you like.
  */
 Server.prototype.broadcast = function(name, obj) {
 	for(var i in this.clients) {
@@ -149,6 +158,15 @@ Server.prototype.broadcast = function(name, obj) {
 	}
 };
 
+/**
+ * This method will broadcast a message to all clients that are logged in as a
+ * certain user. This is a write-only operation on the websockets and callbacks
+ * are not provided.
+ * @param {number} steamid - The steamid of the user to which's clients should
+ *                           Be broadcastet to.
+ * @param {string} name - The name of the event to broadcast
+ * @param {*} obj - The data to broadcast to each client.
+ */
 Server.prototype.broadcastToUser = function(steamid, name, obj) {
 	for(var i in this.clients) {
 		var client = this.clients[i];
@@ -158,7 +176,7 @@ Server.prototype.broadcastToUser = function(steamid, name, obj) {
 	}
 };
 
-Server.prototype.initTelnetClient = function() {
+Server.prototype._initTelnetClient = function() {
 	var me = this;
 	this.telnetClient.on("close", function() {
 		me.cache.connectionLost();
@@ -207,7 +225,17 @@ Server.prototype.initTelnetClient = function() {
 		me.broadcast("updated", "playersExtended");
 	});
 };
+/**
+ * Event that will be fired when the server was stopped.
+ * @event module:Server#stopped
+ */
 
+/**
+ * This will shutdown the whole server including all subsystems initialized
+ * by the server itself or associated with it.
+ * If the shutdown succeeds, a "stopped" event will be emitted.
+ * @fires module:Server#stopped
+ */
 Server.prototype.shutdown = function() {
 	var i = 3;
 	var self = this;

@@ -6,7 +6,7 @@ var FS = require("fs");
 
 var Websocket = require("../src/websocket_server.js");
 var Server = require("../src/server.js");
-var TelnetClient = require("../src/7dtd.js");
+var TelnetClient = require("../src/telnetclient.js");
 var Database = require("../src/database.js");
 var Cache = require("../src/cache.js");
 var config = require("./config.json");

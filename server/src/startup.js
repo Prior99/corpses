@@ -16,7 +16,7 @@
  */
 
 var Winston = require('winston');
-var TelnetClient = require("./7dtd.js");
+var TelnetClient = require("./telnetclient.js");
 var Database = require("./database.js");
 var Cache = require("./cache.js");
 var Server = require("./server.js");
