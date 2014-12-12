@@ -9,7 +9,7 @@ describe("The websocketwrapper", function() {
 		wsServer = new WS.Server({
 			host : "0.0.0.0",
 			port : Config.port
-		}).on("connection", function(ws1) {
+		}).once("connection", function(ws1) {
 			websocket1 = new Websocket(ws1);
 			done();
 		});
