@@ -20,12 +20,12 @@ var Winston = require('winston');
  * This class will save informations transmitted from the telnetconnection to the
  * 7DTD server. It will trigger the refreshing of these information automatically
  * Every few seconds. You can specify these intervals in the options. module:corpses/server/cache
- * @constructor @class
+ * @constructor
  * @param {object} times - Information about the duration of the intervals.
  * 						   This specifies how often the information of the cache should be refreshed,
- * @param times.timeInterval - How often the time of the server should be refreshed in milliseconds
- * @param times.knownPlayersInterval - How often the list of known players should be refreshed in milliseconds
- * @param times.playersExtendedInterval - How often the the information about all connected players should be refreshed in milliseconds
+ * @param {number} times.timeInterval - How often the time of the server should be refreshed in milliseconds
+ * @param {number} times.knownPlayersInterval - How often the list of known players should be refreshed in milliseconds
+ * @param {number} times.playersExtendedInterval - How often the the information about all connected players should be refreshed in milliseconds
  */
 function Cache(times) {
 	this.times = times;
