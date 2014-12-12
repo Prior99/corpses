@@ -26,6 +26,7 @@
     "grunt-jsdoc": "^0.5.7",
     "grunt-mocha-cov": "^0.3.0",
     "grunt-wiredep": "^2.0.0",
+    "grunt-jsdoc": "^0.6.1",
     "mysql": "^2.5.2",
     "should": "^4.3.0",
     "winston": "^0.8.3",

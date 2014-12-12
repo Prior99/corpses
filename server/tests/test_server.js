@@ -56,7 +56,7 @@ describe('The server', function() {
 
 	it("can not start the websocketserver twice", function(done) {
 		var server2 = new Server(cache, telnetClient, database, config);
-		server2.startWebsocketServer();
+		server2._startWebsocketServer();
 		server2.once("error", function() {
 			done();
 		});
@@ -68,7 +68,7 @@ describe('The server', function() {
 			FS.renameSync(theServer.config.clientDirectory + ".tmp", theServer.config.clientDirectory);
 			done();
 		});
-		theServer.startWebsocketServer();
+		theServer._startWebsocketServer();
 	});
 
 	it("will throw an error if it can not symlink the map for another reason as that the link already exists", function(done) {
@@ -77,7 +77,7 @@ describe('The server', function() {
 			FS.renameSync(theServer.config.clientDirectory + ".tmp", theServer.config.clientDirectory);
 			done();
 		});
-		theServer.symlinkMap();
+		theServer._symlinkMap();
 	});
 
 	it("does not crash when removing an unknown client", function() {

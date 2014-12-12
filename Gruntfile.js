@@ -141,6 +141,14 @@ module.exports = function(grunt) {
 		test: {
 			server: ['mochacov:server_spec', 'mochacov:server_html', 'mochacov:server_json'],
 			client: []
+		},
+		jsdoc : {
+			server : {
+				src: ['server/src/*.js'],
+				options: {
+					destination: 'doc/server'
+				}
+			}
 		}
 	});
 	grunt.loadNpmTasks('grunt-contrib-uglify');
@@ -152,6 +160,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-mocha-cov');
+	grunt.loadNpmTasks('grunt-jsdoc');
 	grunt.registerMultiTask('test', 'Run tests and code coverage for server and client.', function() {
 		grunt.task.run(this.data);
 	});
