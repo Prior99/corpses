@@ -154,5 +154,14 @@ module.exports = function(client1, client2, database, server, mockSock1, mockSoc
 				}
 			);
 		});
+		it("can remove friends-only markers and a respective event is cast", function(done) {
+			mockSock2.lastMsg = null;
+			mockSock1.callMockedListener("removeMarker", 9, function(answer) {
+				assert(answer.okay);
+				assert.notEqual(mockSock2.lastMsg, null);
+				assert.equal(mockSock2.lastMsg.key, "removeMarker");
+				done();
+			});
+		})
 	});
 };
