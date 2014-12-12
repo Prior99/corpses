@@ -129,7 +129,7 @@ function Client(websocket, database, server) {
 							});
 						}
 						if(!checkError(err, async)) {
-							if(result.visbility === 'friends') {
+							if(result.visibility === 'friends') {
 								this.broadcastRemoveMarker(id, true, done);
 							}
 							else if(result.visibility === 'public') {
