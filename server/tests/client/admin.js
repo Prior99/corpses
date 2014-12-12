@@ -35,6 +35,30 @@ module.exports = function(client1, client2, database, server, mockSock1, mockSoc
 				done();
 			});
 		});
+		it("can not enable users that do not exist", function(done) {
+			mockSock1.callMockedListener("enableUser", 2344324, function(answer) {
+				assert(!answer.okay);
+				done();
+			});
+		});
+		it("can not disable users that do not exist", function(done) {
+			mockSock1.callMockedListener("disableUser", 2344324, function(answer) {
+				assert(!answer.okay);
+				done();
+			});
+		});
+		it("can not add admins that do not exist", function(done) {
+			mockSock1.callMockedListener("addAdmin", 2344324, function(answer) {
+				assert(!answer.okay);
+				done();
+			});
+		});
+		it("can not remove admins that do not exist", function(done) {
+			mockSock1.callMockedListener("removeAdmin", 2344324, function(answer) {
+				assert(!answer.okay);
+				done();
+			});
+		});
 		it("can not remove admins if not an admin", function(done) {
 			mockSock2.callMockedListener("removeAdmin", 345, function(answer) {
 				assert(!answer.okay);

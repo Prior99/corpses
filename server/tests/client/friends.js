@@ -51,6 +51,18 @@ module.exports = function(client1, client2, database, server, mockSock1, mockSoc
 				done();
 			});
 		});
+		it("can not add a friend that does not exist", function(done) {
+			mockSock2.callMockedListener("addFriend", 45634566, function(answer) {
+				assert(!answer.okay);
+				done();
+			});
+		});
+		it("can not remove a friend that does not exist", function(done) {
+			mockSock2.callMockedListener("removeFriend", 45634566, function(answer) {
+				assert(!answer.okay);
+				done();
+			});
+		});
 		it("they are both friends from client1's perspective", function(done) {
 			mockSock1.callMockedListener("getUsers", null, function(answer) {
 				assert(answer.okay);

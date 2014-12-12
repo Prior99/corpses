@@ -162,6 +162,36 @@ module.exports = function(client1, client2, database, server, mockSock1, mockSoc
 				assert.equal(mockSock2.lastMsg.key, "removeMarker");
 				done();
 			});
-		})
+		});
+		it("can not remove a non-existing marker", function(done) {
+			mockSock1.callMockedListener("removeMarker", 686, function(answer) {
+				assert(!answer.okay);
+				done();
+			});
+		});
+		it("can not remove a marker if not enough arguments are given", function(done) {
+			mockSock1.callMockedListener("removeMarker", undefined, function(answer) {
+				assert(!answer.okay);
+				done();
+			});
+		});
+		it("can not remove a private marker", function(done) {
+			mockSock1.callMockedListener("removeMarker", 7, function(answer) {
+				assert(answer.okay);
+				done();
+			});
+		});
+		it("can not ignore a marker without supplying it's id", function(done) {
+			mockSock1.callMockedListener("ignoreMarker", undefined, function(answer) {
+				assert(!answer.okay);
+				done();
+			});
+		});
+		it("can not ignore a non-existent marker", function(done) {
+			mockSock1.callMockedListener("ignoreMarker", 678, function(answer) {
+				assert(!answer.okay);
+				done();
+			});
+		});
 	});
 };
