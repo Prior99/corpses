@@ -17,6 +17,16 @@ describe("The interconnect to the 7DTD-Server", function() {
 		called = false;
 		return c;
 	};
+	it("can not connect when there is no server to connect to", function(done) {
+		telnetClient = new TelnetClient({
+			telnetPort : Config.port,
+			telnetHost : "localhost"
+		});
+		telnetClient.on("error", function() {
+			done();
+		});
+		telnetClient.connect();
+	})
 	it("can setup a server for testing and the interconnect can reach it", function(done) {
 		server = net.createServer(function(sock) {
 			socket = sock;
@@ -192,6 +202,13 @@ describe("The interconnect to the 7DTD-Server", function() {
 			done();
 		});
 		socket.write(FS.readFileSync("server/tests/samples/telnet/playerleft.txt"));
+	});
+
+	it("emits \"spawningWanderingHorde\" when a horde was spawned", function(done) {
+		telnetClient.once("spawningWanderingHorde", function(player) {
+			done();
+		});
+		socket.write(FS.readFileSync("server/tests/samples/telnet/spawninghorde.txt"));
 	});
 
 	it("emits \"playerSetOffline\" when a player disconnects", function(done) {
