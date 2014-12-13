@@ -15,8 +15,21 @@
  *  along with CORPSES. If not, see <http://www.gnu.org/licenses/>.
  */
 var Winston = require('winston');
-
-var Connection = function(socket){
+/**
+ * This module is a wrapper around a websocket from the 'ws' library.
+ * It implements a bidirectional event base protocol for client-server
+ * communication. It is possible to fire events with arguments that will
+ * be transmitted to the remote end as well as listening for events and answering
+ * them respectivly.
+ *
+ * @module Websocket
+ */
+/**
+ * This wraps around an already initialized websocket.
+ * @constructor
+ * @param {object} socket - The websocket to wrap around.
+ */
+var Websocket = function(socket){
 	this.listeners = {};
 	this.closeListeners = [];
 	this.responses = {};
@@ -35,23 +48,29 @@ var Connection = function(socket){
 	});
 };
 
-Connection.prototype.addCloseListener = function(func) {
+/**
+ * Append a closelistener to this wrapper that will be called when the socket
+ * was closed. This could happen when either the remote or the local end abort
+ * the connection.
+ * @param {requestCallback} func - Called when the socket was closed.
+ */
+Websocket.prototype.addCloseListener = function(func) {
 	this.closeListeners.push(func);
 };
 
-Connection.prototype.addListener = function(key, listener){
+Websocket.prototype.addListener = function(key, listener){
 	this.listeners[key] = {
 		listener: listener
 	};
 };
 
-Connection.prototype.on = Connection.prototype.addListener;
+Websocket.prototype.on = Websocket.prototype.addListener;
 
-Connection.prototype.removeListener = function(key) {
+Websocket.prototype.removeListener = function(key) {
 	delete this.listeners[key];
 };
 
-Connection.prototype.send = function(key, param, handler){
+Websocket.prototype.send = function(key, param, handler){
 	var meta = {
 		param: param,
 		key: key,
@@ -65,7 +84,7 @@ Connection.prototype.send = function(key, param, handler){
 	this.id++;
 };
 
-Connection.prototype.receive = function(message){
+Websocket.prototype.receive = function(message){
 	var self = this;
 	var obj;
 	try {
@@ -121,4 +140,4 @@ Connection.prototype.receive = function(message){
 	}
 };
 
-module.exports = Connection;
+module.exports = Websocket;

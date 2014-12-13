@@ -48,7 +48,7 @@ var Util = require("util");
  * Just constructing this module will not connect it. You will have to invoke
  * [connect()]{@link module:TelnetClient~TelnetClient#connect} in order to connect.
  * @constructor
- * @param {objec} config - The configuration this telnetclient will use to connect.
+ * @param {object} config - The configuration this telnetclient will use to connect.
  * @param {number} config.telnetPort - The port the 7 Days to Die server is running on.
  * @param {string} config.telnetHost - The host of the 7DTD server.
  * @fires module:TelnetClient#close
