@@ -1,4 +1,16 @@
+var FS = require('fs');
+
 module.exports = function(grunt) {
+	var date = Date.now();
+	var testfiles = [
+		'server/tests/require.js',
+		'server/tests/test_cache.js',
+		'server/tests/test_client.js',
+		'server/tests/test_server.js',
+		'server/tests/test_telnet.js',
+		'server/tests/test_websocket.js',
+		'server/tests/test_database_fail.js'
+	];
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 		concat: {
@@ -96,6 +108,48 @@ module.exports = function(grunt) {
 				},
 			},
 		},
+		mochacov: {
+			options : {
+				timeout : 5000,
+				require: ['should']
+			},
+			server_html: {
+				options: {
+					reporter: 'html-cov',
+					output: 'coverage/server_' + date + '.html'
+				},
+				src: testfiles
+			},
+			server_json: {
+				options: {
+					reporter: 'json-cov',
+					output: 'coverage/server_' + date + '.json'
+				},
+				src: testfiles
+			},
+			server_spec: {
+				options: {
+					reporter: 'spec'
+				},
+				src: testfiles
+			}
+		},
+		build: {
+			server: ['jshint:server'],
+			client: ['jshint:client', 'concat', 'uglify', 'less', 'copy', 'wiredep']
+		},
+		test: {
+			server: ['mochacov:server_spec', 'mochacov:server_html', 'mochacov:server_json'],
+			client: []
+		},
+		jsdoc : {
+			server : {
+				src: ['server/src/*.js'],
+				options: {
+					destination: 'doc/server'
+				}
+			}
+		}
 	});
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-concat');
@@ -105,7 +159,29 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-wiredep');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-clean');
-	grunt.registerTask('client', ['jshint:client', 'concat', 'uglify', 'less', 'copy', 'wiredep']);
-	grunt.registerTask('server', ['jshint:server']);
-	grunt.registerTask('default', ['server', 'client']);
+	grunt.loadNpmTasks('grunt-mocha-cov');
+	grunt.loadNpmTasks('grunt-jsdoc');
+	grunt.registerMultiTask('test', 'Run tests and code coverage for server and client.', function() {
+		grunt.task.run(this.data);
+	});
+	grunt.registerMultiTask('build', 'Build server and client.', function() {
+		grunt.task.run(this.data);
+	});
+	grunt.registerTask('printcoverage', 'Print the overall coverage the the commandline.', function() {
+		var json = require('./coverage/server_' + date + '.json');
+		console.log("Coverage: " + json.coverage + "%");
+		console.log("HTML-Report for Coverage stored at:");
+		console.log('server_' + date + '.html');
+	});
+	grunt.registerTask('linkcoverage', 'Link the coverageresult to server.html.', function(done) {
+		var done = this.async;
+		FS.unlink('coverage/server_latest.html', function() {
+			FS.symlink('server_' + date + '.html', 'coverage/server_latest.html', function() {
+				done();
+			});
+		});
+	});
+	grunt.registerTask('client', 'Test and build the client.', ['test:client', 'build:client']);
+	grunt.registerTask('server', 'Test and build the server.', ['test:server', 'build:server', 'printcoverage', 'linkcoverage']);
+	grunt.registerTask('default', 'Test and build both client and server.', ['server', 'client']);
 };

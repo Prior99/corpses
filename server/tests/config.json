@@ -1,0 +1,15 @@
+{
+  "clientDirectory" : "htdocs",
+  "mapDirectory" : "maptest",
+  "database" : {
+      "host" : "localhost",
+      "user" : "corpsestest",
+      "password" : "HufuLSAAnuSmdCeD",
+      "database" : "corpsestest",
+      "multipleStatements" : "true"
+  },
+  "websocketPort" : 7434,
+  "port" : 54678,
+  "kickUnregistered": false,
+  "website": "example.org"
+}

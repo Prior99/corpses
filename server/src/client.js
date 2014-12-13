@@ -1,3 +1,21 @@
+/*
+ *  This file is part of CORPSES, a webinterface for 7 Days to Die.
+ *
+ *  CORPSES is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  CORPSES is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with CORPSES. If not, see <http://www.gnu.org/licenses/>.
+ */
+var Winston = require('winston');
+
 function Client(websocket, database, server) {
 	this.websocket = websocket;
 	this.database = database;
@@ -10,9 +28,10 @@ function Client(websocket, database, server) {
 		database.validateUser(obj.name, obj.password, function(err, okay) {
 			if(!checkError(err, async)) {
 				if(okay) {
-					this.loadUser(obj.name);
-					async({
-						okay : true
+					this.loadUser(obj.name, function() {
+						async({
+							okay : true
+						});
 					});
 				}
 				else {
@@ -38,11 +57,12 @@ function Client(websocket, database, server) {
 					});
 				}
 				else {
-					this.loadUser(obj.name);
-					async({
-						okay : true
+					this.loadUser(obj.name, function() {
+						server.notifyNewUser();
+						async({
+							okay : true
+						});
 					});
-					server.notifyNewUser();
 				}
 			}.bind(this));
 		}
@@ -67,11 +87,22 @@ function Client(websocket, database, server) {
 			}
 			else {
 				database.addMarker(obj, this.user.id, function(err, result) {
-					if(!checkError(err, async)) {
-						this.server.broadcastMarker(result);
+					function done() {
 						async({
 							okay : true
 						});
+					}
+					if(!checkError(err, async)) {
+						if(result.visibility === 'friends') {
+							this.broadcastMarker(result, true, done);
+						}
+						else if(result.visibility === 'public') {
+							this.broadcastMarker(result, false, done);
+						}
+						else {
+							this.sendMarker(result);
+							done();
+						}
 					}
 				}.bind(this));
 			}
@@ -90,13 +121,33 @@ function Client(websocket, database, server) {
 				});
 			}
 			else {
-				database.removeMarker(id, this.user.id, function(err, result) {
-					this.server.broadcastRemoveMarker(id);
-					if(!checkError(err, async)) {
-						async({
-							okay : true
-						});
-					}
+				database.getMarker(id, function(err, result) {
+					database.removeMarker(id, this.user.id, function(err) {
+						function done() {
+							async({
+								okay : true
+							});
+						}
+						if(result) {
+							if(!checkError(err, async)) {
+								if(result.visibility === 'friends') {
+									this.broadcastRemoveMarker(id, true, done);
+								}
+								else if(result.visibility === 'public') {
+									this.broadcastRemoveMarker(id, false, done);
+								}
+								else {
+									done();
+								}
+							}
+						}
+						else {
+							async({
+								okay : false,
+								reason : "unknown_marker"
+							});
+						}
+					}.bind(this));
 				}.bind(this));
 			}
 		}
@@ -113,36 +164,6 @@ function Client(websocket, database, server) {
 				});
 			}
 		});
-	}.bind(this), true);
-	/*
-	 * Listener for Callback getFriendsOf
-	 */
-	websocket.addListener("getFriendsOf", function(obj, async) {
-		if(this.checkLoggedIn(async)) {
-			database.getFriendsOf(this.user.id, function(err, friends) {
-				if(!checkError(err, async)) {
-					async({
-						okay : true,
-						friends : friends
-					});
-				}
-			});
-		}
-	}.bind(this), true);
-	/*
-	 * Listener for Callback getFriendsBy
-	 */
-	websocket.addListener("getFriendsBy", function(obj, async) {
-		if(this.checkLoggedIn(async)) {
-			database.getFriendsBy(this.user.id, function(err, friends) {
-				if(!checkError(err, async)) {
-					async({
-						okay : true,
-						friends : friends
-					});
-				}
-			});
-		}
 	}.bind(this), true);
 
 	/*
@@ -178,10 +199,10 @@ function Client(websocket, database, server) {
 					if(friend !== undefined) {
 						database.addFriend(this.user.id, friend.id, function(err) {
 							if(!checkError(err, async)) {
+								server.broadcastToUser(steamid, "updated", "friends");
 								async({
 									okay : true
 								});
-								server.broadcastToUser(steamid, "updated", "friends");
 							}
 						});
 					}
@@ -313,25 +334,14 @@ function Client(websocket, database, server) {
 			if(counter === 0) {
 				done();
 			}
-			if(counter < 0) {
-				console.error("Error: Counter lower than 0");
-			}
 		}
 
 		var thisClient = this;
 
 		function handlePlayer(err, playerDB) {
 			if(!checkError(err, async)) {
-				if(playerDB === undefined) {
-					decCounter();
-					console.error("Unknown player on the server");
-					async({
-						okay : false,
-						reason : "internal_error"
-					});
-				}
-				else {
-					database.isFriendOf(thisClient.user.id, playerDB.id, function(err, f) {
+				if(playerDB !== undefined) {
+					database.areFriends(thisClient.user.id, playerDB.id, function(err, f) {
 						if(!checkError(err)) {
 							if(f) {
 								visiblePlayers.push(player);
@@ -341,17 +351,14 @@ function Client(websocket, database, server) {
 					});
 				}
 			}
-			else {
-				decCounter();
-			}
 		}
 
 		if(this.checkLoggedIn(async)) {
 			var visiblePlayers = [];
-			var counter = 0;
-			for(var i in server.cache.playersExtended) {
-				var player = server.cache.playersExtended[i];
-				counter++;
+			var plEx =  server.cache.playersExtended;
+			var counter = plEx.length;
+			for(var i in plEx) {
+				var player = plEx[i];
 				if(player.steamid === this.user.steamid) {
 					visiblePlayers.push(player);
 					decCounter();
@@ -444,8 +451,79 @@ function Client(websocket, database, server) {
 	}.bind(this), true);
 }
 
+
+Client.prototype.broadcastRemoveMarker = function(id, friendsOnly, callback) {
+	var self = this;
+	var j = this.server.clients.length;
+	function decrease() {
+		j--;
+		if(j === 0) {
+			callback();
+		}
+	}
+	function sendMarker(client) {
+		if(friendsOnly && client.user.id !== self.user.id) {
+			self.database.areFriends(client.user.id, self.user.id, function(err, okay) {
+				if(!err && okay) {
+					client.sendRemoveMarker(id);
+				}
+				decrease();
+			});
+		}
+		else {
+			client.sendRemoveMarker(id);
+			decrease();
+		}
+	}
+	for(var i in this.server.clients) {
+		var client = this.server.clients[i];
+		if(client.isLoggedIn()) {
+			sendMarker(client);
+		}
+		else {
+			decrease();
+		}
+	}
+};
+
+Client.prototype.broadcastMarker = function(marker, friendsOnly, callback) {
+	var self = this;
+	var j = this.server.clients.length;
+	function decrease() {
+		j--;
+		if(j === 0) {
+			callback();
+		}
+	}
+	function sendMarker(client) {
+		if(friendsOnly && client.user.id !== self.user.id) {
+			self.database.areFriends(client.user.id, self.user.id, function(err, okay) {
+				if(!err && okay) {
+					client.sendMarker(marker);
+				}
+				decrease();
+			});
+		}
+		else {
+			client.sendMarker(marker);
+			decrease();
+		}
+	}
+	for(var i in this.server.clients) {
+		var client = this.server.clients[i];
+		if(client.isLoggedIn()) {
+			sendMarker(client);
+		}
+		else {
+			decrease();
+		}
+	}
+};
+
 Client.prototype.isUser = function(steamid) {
-	return this.isLoggedIn() && this.user.steamid === steamid;
+	//jshint ignore:start
+	return this.isLoggedIn() && this.user.steamid == steamid; //== instead of === needed as string may be passed
+	//jshint ignore:end
 };
 
 Client.prototype.checkAdmin = function(callback, async) {
@@ -498,11 +576,31 @@ Client.prototype.sendEvent = function(action, obj) {
 	this.websocket.send(action, obj);
 };
 
-Client.prototype.loadUser = function(username) {
+Client.prototype.loadUser = function(username, callback) {
 	this.database.getUserByName(username, function(err, user) {
 		if(!err) {
 			this.user = user;
-		}
+			if(user.id === 1) {
+				if(!user.admin) {
+					this.database.addAdmin(user.id, function() {
+						Winston.info("First registered user was granted adminprivileges.");
+						this.loadUser(username, callback);
+					}.bind(this));
+				}
+				else if(!user.enabled) {
+					this.database.enableUser(user.id, function() {
+						Winston.info("First registered user was enabled.");
+						this.loadUser(username, callback);
+					}.bind(this));
+				}
+				else {
+					callback();
+				}
+			}
+			else {
+				callback();
+			}
+		} //TODO: Errorhandlers
 	}.bind(this));
 };
 
@@ -511,26 +609,7 @@ Client.prototype.sendRemoveMarker = function(id) {
 };
 
 Client.prototype.sendMarker = function(marker) {
-	var me = this;
-	function send() {
-		me.websocket.send("marker", marker);
-	}
-	if(marker.visibility === "public") {
-		send();
-	}
-	else if(marker.visibility === "friends") {
-		this.database.isFriendOf(this.user.id, marker.author, function(err, okay) {
-			send();
-		});
-	}
-	else if(marker.visibility === "private") {
-		if(marker.author === this.user.id) {
-			send();
-		}
-	}
-	else {
-		console.error("Assert failed: invalid visibility of marker");
-	}
+	this.websocket.send("marker", marker);
 };
 
 module.exports = Client;

@@ -1,98 +1,187 @@
-var TelnetClient = require("./7dtd.js");
+/*
+ *  This file is part of CORPSES, a webinterface for 7 Days to Die.
+ *
+ *  CORPSES is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  CORPSES is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with CORPSES. If not, see <http://www.gnu.org/licenses/>.
+ */
+var Winston = require('winston');
+var Events = require('events');
+var Util = require("util");
 var WS = require("ws");
-var Websocket = require("./websocket_server.js");
-var config = require("../config.json");
 var FS = require("fs");
-var Database = require("./database.js");
 var Client = require("./client.js");
-var Cache = require("./cache.js");
+var Websocket = require("./websocket_server.js");
+var HTTP = require('http');
+/**
+ * This module represents the server that will attach to the 7 Days to Die server,
+ * leech it's events and proxy it to the connected clients. It utilizes a database
+ * in order to store users and created markers as well as relations between the users.
+ * A cache makes sure to keep information from the 7DTD server stored and up-to-date.
+ *
+ * @module Server
+ */
 
-function Server() {
+/**
+ * Event that will be fired when something goes wrong.
+ * @event module:Server#error
+ */
+/**
+ * Event that will be fired when the server was stopped.
+ * @event module:Server#stopped
+ */
+/**
+ * Event that will be fired when the server is fully started.
+ * @event module:Server#started
+ */
+
+/**
+ * The constructor takes all necessary and not yet initalized modules it needs
+ * to operate. Please start everything after passing it to the server so the
+ * respective events can be catched and used.
+ * @constructor
+ * @param {Cache} cache - an instance of the cache that stores the information of the telnetclient
+ * @param {TelnetClient} telnetClient - an instance of the telnetclient connected to the 7DTD server
+ * @param {object} database - an instance of the wrapper for the databaseconnection
+ * @param {object} config - the parsed json of the configfile
+ * @fires module:Server#started
+ * @fires module:Server#error
+ */
+function Server(cache, telnetClient, database, config) {
+	Winston.info("The server is starting...");
+	this.config = config;
+	this.cache = cache;
+	this.telnetClient = telnetClient;
+	this.database = database;
 	this.wsServer = null;
-	this.cache = new Cache();
-	this.telnetClient = new TelnetClient();
 	this.telnetClient.on("open", function(){
-		console.log("Connection to 7DTD established.");
+		Winston.info("Connection to 7DTD established.");
 		this.telnetClient.triggerListKnownPlayers();
+		this.telnetClient.triggerMem();
+		this.telnetClient.triggerGetTime();
 		this.cache.connectionEstablished(this.telnetClient);
-		this.database = new Database();
 		this.clients = [];
-		this.startWebsocketServer();
-		this.initTelnetClient();
-		this.symlinkMap();
+		this._initTelnetClient();
+		this._symlinkMap();
+		this._startWebsocketServer();
 	}.bind(this));
 }
 
-Server.prototype.broadcastRemoveMarker = function(id) {
-	for(var i in this.clients) {
-		this.clients[i].sendRemoveMarker(id);
-	}
+Util.inherits(Server, Events.EventEmitter);
+
+Server.prototype._websocketStarted = function() {
+	Winston.info("Server up and running!");
+	this.emit("started");
 };
 
-Server.prototype.broadcastMarker = function(marker) {
-	for(var i in this.clients) {
-		this.clients[i].sendMarker(marker);
-	}
-};
-
-Server.prototype.symlinkMap = function() {
-	FS.symlink(config.mapDirectory, config.clientDirectory + "/map", function(err) {
+Server.prototype._symlinkMap = function() {
+	FS.symlink(this.config.mapDirectory, this.config.clientDirectory + "/map", function(err) {
 		if(err) {
-			console.error("Unable to create symlink for map.\nPlease create it manually by executing the following command:\n\nln -s " + config.mapDirectory + " " + config.clientDirectory + "/map");
+			if(err.errno !== 47) {
+				Winston.error("Unable to create symlink for map.\n" +
+					"Please create it manually by executing the following command:\n\n" +
+					"ln -s " + this.config.mapDirectory + " " + this.config.clientDirectory + "/map");
+				this.emit("error", err);
+			}
 		}
 		else {
-			console.log("Map successfully linked. (" + config.mapDirectory + " -> " + config.clientDirectory + "/map");
+			Winston.info("Map successfully linked. (" + this.config.mapDirectory +
+				" -> " + this.config.clientDirectory + "/map");
 		}
-	});
+	}.bind(this));
 };
 
+/**
+ * Tells this server that a new user connected. A respective "updated" will be broadcasted
+ * To each conencted client.
+ */
 Server.prototype.notifyNewUser = function() {
 	this.broadcast("updated", "users");
 };
 
-Server.prototype.startWebsocketServer = function() {
-	console.log("Starting Websocketserver...");
+Server.prototype._startWebsocketServer = function() {
 	var me = this;
-	var portfile = "/*\n * This is an generated file.\n * Do not edit this file!\n * It will be overwritten on every start of the server.\n */\n\nvar _port = " + config.websocketPort + ";\n";
-	FS.writeFile(config.clientDirectory + "/port.js", portfile, function(err) {
+	var portfile = "/*\n * This is an generated file.\n" +
+		" * Do not edit this file!\n" +
+		" * It will be overwritten on every start of the server.\n" +
+		" */\n\n" +
+		"var _port = " + this.config.websocketPort + ";\n";
+	FS.writeFile(this.config.clientDirectory + "/port.js", portfile, function(err) {
 		if(err) {
-			console.error("Unable to create file \"" + config.clientDirectory + "/port.js\". Please create it manually with the following content:\n" + portfile + "\n");
+			Winston.error("Unable to create file \"" +
+				this.config.clientDirectory + "/port.js\"." +
+				"Please create it manually with the following content:\n" + portfile + "\n");
+			this.emit("error", err);
 		}
 		else {
-			wsServer = new WS.Server({
-				host : "0.0.0.0",
-				port : config.websocketPort
-			}).on("connection", function(ws) {
-				(function(wsc) {
-					var client = new Client(wsc, me.database, me);
-					me.clients.push(client);
-					console.log("New client connected. Currently " + me.clients.length + " clients connected.");
-				})(new Websocket(ws));
-			})
-			.on("error", function() {
-				console.error("The websocketserver could not be started. Is the port maybe in use?");
-			});
+			this.httpServer = HTTP.createServer();
+			this.httpServer.on("error", function(err) {
+				Winston.error("The websocketserver could not be started. Is the port maybe in use?");
+				this.emit("error", err);
+			}.bind(this));
+			this.httpServer.listen(this.config.websocketPort, function() {
+				this.wsServer = new WS.Server({
+					server : this.httpServer
+				});
+				this.wsServer.on("connection", function(ws) {
+					(function(wsc) {
+						var client = new Client(wsc, me.database, me);
+						me.clients.push(client);
+					})(new Websocket(ws));
+				});
+				Winston.info("Websocketserver started.");
+				this._websocketStarted();
+			}.bind(this));
 		}
-	});
+	}.bind(this));
 };
 
+/**
+ * Will remove a client from the list of connected clients.
+ * @param {object}  - The client to be removed. If the client is not in the list
+ * 				      of known clients, an error will be logged.
+ */
 Server.prototype.removeClient = function(client) {
 	var index;
 	if((index = this.clients.indexOf(client)) !== -1) {
 		this.clients.splice(index, 1);
-		console.log("Client disconnected. Currently " + this.clients.length + " clients connected.");
+		Winston.info("Client disconnected. Currently " + this.clients.length + " clients connected.");
 	}
 	else {
-		console.error("Tried to remove client from clients that was not known.");
+		Winston.error("Tried to remove client from clients that was not known.");
 	}
 };
 
+/**
+ * Broadcast a message to all clients know to this server. There will be no
+ * callback. This is a write-only operation on the websocket.
+ * @param {string} name - Name of the event to broadcast to all clients
+ * @param {*} obj - The data to broadcast in this event. This may be anything you like.
+ */
 Server.prototype.broadcast = function(name, obj) {
 	for(var i in this.clients) {
 		this.clients[i].sendEvent(name, obj);
 	}
 };
 
+/**
+ * This method will broadcast a message to all clients that are logged in as a
+ * certain user. This is a write-only operation on the websockets and callbacks
+ * are not provided.
+ * @param {number} steamid - The steamid of the user to which's clients should
+ *                           Be broadcastet to.
+ * @param {string} name - The name of the event to broadcast
+ * @param {*} obj - The data to broadcast to each client.
+ */
 Server.prototype.broadcastToUser = function(steamid, name, obj) {
 	for(var i in this.clients) {
 		var client = this.clients[i];
@@ -102,30 +191,30 @@ Server.prototype.broadcastToUser = function(steamid, name, obj) {
 	}
 };
 
-Server.prototype.initTelnetClient = function() {
-	console.log("Initializing Telnetclient...");
+Server.prototype._initTelnetClient = function() {
 	var me = this;
 	this.telnetClient.on("close", function() {
-		console.log("Connection to 7DTD closed. Restarting it!");
-		try{
-			me.cache.connectionLost();
-		}
-		catch(error){
-			console.err("Error closing TelnetClient: " + error);
-		}
+		me.cache.connectionLost();
 	});
 	this.telnetClient.on("playerConnected", function(evt) {
-		if(config.kickUnregistered !== undefined && config.kickUnregistered === true){
+		if(this.config.kickUnregistered !== undefined && this.config.kickUnregistered === true){
 			me.database.getUserBySteamID(evt.steamid, function(err, result){
 				if(err === undefined && result === undefined){
-					me.telnetClient.triggerKickPlayer(evt.name, "You must have an enabled account on " + (config.website === undefined ? "our website": config.website) + " to play on this server");
+					me.telnetClient.triggerKickPlayer(evt.name,
+						"You must have an enabled account on " +
+						(this.config.website === undefined ? "our website": this.config.website) +
+						" to play on this server"
+					);
 				}
 				else{
 					me.broadcast("playerConnected", evt);
 				}
-			});
+			}.bind(this));
 		}
-	});
+		else {
+			me.broadcast("playerConnected", evt);
+		}
+	}.bind(this));
 	this.telnetClient.on("playerDisconnected", function(evt) {
 		me.broadcast("playerDisconnected", evt);
 	});
@@ -149,6 +238,38 @@ Server.prototype.initTelnetClient = function() {
 	});
 	this.telnetClient.on("listPlayersExtended", function(evt) {
 		me.broadcast("updated", "playersExtended");
+	});
+};
+
+/**
+ * This will shutdown the whole server including all subsystems initialized
+ * by the server itself or associated with it.
+ * If the shutdown succeeds, a "stopped" event will be emitted.
+ * @fires module:Server#stopped
+ */
+Server.prototype.shutdown = function() {
+	var i = 3;
+	var self = this;
+	function closed() {
+		i--;
+		if(i === 0) {
+			Winston.info("Server is now down!");
+			self.emit("stopped");
+		}
+	}
+	Winston.info("Server is about to shutdown...");
+	this.telnetClient.shutdown(function() {
+		Winston.info("Connection to 7DTD closed.");
+		closed();
+	});
+	this.wsServer.close();
+	this.httpServer.close(function() {
+		Winston.info("Websocketserver closed.");
+		closed();
+	});
+	this.database.shutdown(function() {
+		Winston.info("Disconnected from database.");
+		closed();
 	});
 };
 

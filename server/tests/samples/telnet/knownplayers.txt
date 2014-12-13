@@ -1,0 +1,5 @@
+2014-12-08T06:58:31 473694.373 Telnet executed "listknownplayers" from: 127.0.0.1:45871
+1. Sascha, id=182, steamid=5618701567870, online=True, ip=127.0.0.1, playtime=4149 m, seen=2014-12-07 23:36
+2. Häör, id=13, steamid=90998234244, online=False, ip=127.0.0.1, playtime=4 m, seen=2014-12-03 14:25
+3. A, id=45, steamid=23454334, online=False, ip=129.123.56.4, playtime=564 m, seen=2014-11-30 22:34
+Total of 7 known

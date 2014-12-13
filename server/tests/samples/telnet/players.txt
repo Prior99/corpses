@@ -1,0 +1,5 @@
+2014-12-08T16:18:03 507265.953 Telnet executed "listplayers" from: 127.0.0.1:57047
+1. id=113, Test1, pos=(-8, 29.3324234, 0), rot=(-0.6, 94.2, 0.0), remote=True, health=70, deaths=0, zombies=1682, players=6, score=3, steamid=61725147, ip=127.0.0.1, ping=3
+2. id=145, Bröüä\ufe3b\u30c7l, pos=(4.5, 0.0, 288.8), rot=(4334.6, 5.2, 0.0), remote=True, health=0, deaths=3, zombies=2, players=0, score=0, steamid=7611776561198, ip=0.0.0.0, ping=100
+3. id=182, Sascha, pos=(-121234.534, 29.3, 288.8), rot=(-1, 94.2, 0.0), remote=True, health=100, deaths=39000, zombies=162, players=1, score=1501, steamid=61198079807725147, ip=1.2.3.4, ping=0
+Total of 3 in the game

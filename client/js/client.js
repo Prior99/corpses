@@ -1,3 +1,20 @@
+/*
+ *  This file is part of CORPSES, a webinterface for 7 Days to Die.
+ *
+ *  CORPSES is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  CORPSES is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with CORPSES. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 var NET = {};
 
 NET.onUpdate = function(what) {
@@ -18,11 +35,15 @@ NET.onUpdate = function(what) {
 			NET.refreshUsers();
 			break;
 		case "friends":
-			UI.clearPlayers();
-			NET.refreshPlayers();
-			NET.refreshUsers();
-			MapSystem.reloadMarkers();
+			NET.refreshFriends();
 	}
+};
+
+NET.refreshFriends = function() {
+	UI.clearPlayers();
+	NET.refreshPlayers();
+	NET.refreshUsers();
+	MapSystem.reloadMarkers();
 };
 
 NET.addMarker = function(obj, callback) {
@@ -150,7 +171,7 @@ NET.toggleFriend = function(player) {
 	if(player.friend) {
 		Websocket.send("removeFriend", player.steamid, function(obj) {
 			if(obj.okay) {
-				NET.refreshUsers();
+				NET.refreshFriends();
 			}
 			else {
 				Errors.displayError(obj.reason);
@@ -160,7 +181,7 @@ NET.toggleFriend = function(player) {
 	else {
 		Websocket.send("addFriend", player.steamid, function(obj) {
 			if(obj.okay) {
-				NET.refreshUsers();
+				NET.refreshFriends();
 			}
 			else {
 				Errors.displayError(obj.reason);

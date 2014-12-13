@@ -6,3 +6,6 @@ npm-debug.log
 htdocs
 bower_components/
 tmp
+coverage/
+*.log
+doc

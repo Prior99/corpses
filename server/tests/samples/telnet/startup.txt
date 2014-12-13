@@ -1,0 +1,14 @@
+*** Connected with 7DTD server.
+*** Server version: Alpha 10.2
+*** Dedicated server only build
+*** Allocs server fixes loaded
+
+Server IP:   Any
+Server port: 26900
+Max players: 8
+Game mode:   GameModeSurvivalMP
+World:       Random Gen
+Game name:   IchEsseSonntagsImmerKäsebrötchenZumFrühstück
+Difficulty:  2
+
+Press 'help' to get a list of all commands. Press 'exit' to end session.

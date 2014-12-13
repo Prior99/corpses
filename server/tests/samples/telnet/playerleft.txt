@@ -1,0 +1,14 @@
+2014-12-08T16:18:22 507285.233 Player Sascha disconnected after 0.8 minutes
+2014-12-08T16:18:22 507285.233 Player set to offline: 76561198007725147
+2014-12-08T16:18:22 507285.235 Removing player with id clientId=77, entityId=182
+2014-12-08T16:18:22 507285.235 [EAC] FreeUser (Sascha)
+2014-12-08T16:18:22 507285.236 GMSG: Sascha left the game
+2014-12-08T16:18:22 507285.236 Removing observed entity 89
+No objects for the given player ID were deleted 77
+2014-12-08T16:18:22 507285.236 Exited thread_CommWriter: cl=77, ch=1
+2014-12-08T16:18:22 507285.236 Exited thread_CommWriter: cl=77, ch=2
+2014-12-08T16:18:22 507285.332 Exited thread_CommReader: cl=77, ch=1
+2014-12-08T16:18:22 507285.332 Exited thread_CommReader: cl=77, ch=2
+2014-12-08T16:18:22 507285.387 OnPlayerDisconnected 77
+2014-12-08T16:18:22 507285.388 Disconnected player not found in client list...
+No objects for the given player ID were deleted 77
