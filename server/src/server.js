@@ -32,6 +32,19 @@ var HTTP = require('http');
  */
 
 /**
+ * Event that will be fired when something goes wrong.
+ * @event module:Server#error
+ */
+/**
+ * Event that will be fired when the server was stopped.
+ * @event module:Server#stopped
+ */
+/**
+ * Event that will be fired when the server is fully started.
+ * @event module:Server#started
+ */
+
+/**
  * The constructor takes all necessary and not yet initalized modules it needs
  * to operate. Please start everything after passing it to the server so the
  * respective events can be catched and used.
@@ -40,6 +53,8 @@ var HTTP = require('http');
  * @param {TelnetClient} telnetClient - an instance of the telnetclient connected to the 7DTD server
  * @param {object} database - an instance of the wrapper for the databaseconnection
  * @param {object} config - the parsed json of the configfile
+ * @fires module:Server#started
+ * @fires module:Server#error
  */
 function Server(cache, telnetClient, database, config) {
 	Winston.info("The server is starting...");
@@ -225,10 +240,6 @@ Server.prototype._initTelnetClient = function() {
 		me.broadcast("updated", "playersExtended");
 	});
 };
-/**
- * Event that will be fired when the server was stopped.
- * @event module:Server#stopped
- */
 
 /**
  * This will shutdown the whole server including all subsystems initialized
