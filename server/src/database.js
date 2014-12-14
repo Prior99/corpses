@@ -130,7 +130,27 @@ Database.prototype.addMarker = function(obj, author, callback) {
 		}
 	});
 };
-
+/**
+ * Called once the marker was looked up.
+ * @callback Database~getMarkerCallback
+ * @param {object} error - If this is not undefined it contains an error thrown
+ *						   from the database
+ * @param {string} result - If the request succeeded, this contains an object
+ * 							with information about the created marker.
+ * @param {string} result.name - Name of the marker
+ * @param {string} result.description - Description of the marker
+ * @param {number} result.lat - Latitude of the marker
+ * @param {number} result.lng - Longitude of the marker
+ * @param {string} result.icon - Icon of the marker (font awesome id)
+ * @param {string} result.visibility - Visibility of the marker ('public', 'friends' or 'private')
+ * @param {number} result.id - Database id of the created marker
+ * @param {number} result.author - Author of the marker.
+ */
+/**
+ * Will return a marker which is identified by the supplied id.
+ * @param {number} id - Id of the marker to look up
+ * @param {Database~getMarkerCallback} callback - called when query suceeded
+ */
 Database.prototype.getMarker = function(id, callback) {
 	this.pool.query("SELECT id, name, description, lat, lng, icon, visibility, author FROM Markers WHERE id = ?", [id],
 		function(err, rows) {
@@ -149,7 +169,19 @@ Database.prototype.getMarker = function(id, callback) {
 		}
 	);
 };
-
+/**
+ * Called once the marker was tried to be removed.
+ * @callback Database~removeMarkerCallback
+ * @param {object} error - If this is not undefined it contains an error thrown
+ *						   from the database.
+ */
+/**
+ * Remove a marker specified by its id from the database if the userid is authorized to do so.
+ * @param {number} id - Id of the marker to delete.
+ * @param {number} userid - Id of the user that tries to remove the marker. This
+ * 							will only suceed if the user is the author of the marker.
+ * @param {Database~removeMarkerCallback} callback - Called once the query is done.
+ */
 Database.prototype.removeMarker = function(id, userid, callback) {
 	this.pool.query("DELETE FROM Markers WHERE id = ? AND author = ?", [id, userid], function(err) {
 		if(err) {
@@ -162,6 +194,10 @@ Database.prototype.removeMarker = function(id, userid, callback) {
 	});
 };
 
+/**
+ * Validates that a user with the given username and password exists.
+ * 
+ */
 Database.prototype.validateUser = function(username, password, callback) {
 	if(username !== undefined && password !== undefined) {
 		this.pool.query("SELECT id FROM Users WHERE name = ? AND password = ? AND (enabled = true OR id = 1)", [username, password], function(err, rows) {
