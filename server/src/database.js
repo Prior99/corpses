@@ -18,8 +18,22 @@ var Winston = require('winston');
 var MySQL = require('mysql');
 var FS = require("fs");
 
+/**
+ * Open a connection to the database specified in config. If all goes well and
+ * provided, callback will be called when the connection was opened and all tables
+ * are setup correctly.
+ * @constructor
+ * @param {object} config - The configuration providing the information on how to connect
+ *                          to the database
+ * @param {string} config.host - The host of the database.
+ * @param {string} config.user - The user to use to connect to the database.
+ * @param {string} config.password - The password to use while connecting.
+ * @param {string} config.database - The database to connect to.
+ * @param {requestCallback} [callback] - Will be called once the connection is opened
+ * 										 and the database is fully usable.
+ */
 function Database(config, callback) {
-	this.pool = MySQL.createPool(config.database);
+	this.pool = MySQL.createPool(config);
 	Winston.info("Connecting to Database... ");
 	this.pool.getConnection(function(err, conn) {
 		if(err) {
@@ -65,10 +79,43 @@ var reportError = function(desc, err) {
 	Winston.error("Database error: \"" + desc + "\"\n", err);
 };
 
+/**
+ * Will shutdown the database and end all current connections.
+ * @param {requestCallback} [callback] - Called once the connection is down.
+ */
 Database.prototype.shutdown = function(callback) {
 	this.pool.end(callback);
 };
 
+/**
+ * Called once the query to add a marker was finished.
+ * @callback Database~addMarkerCallback
+ * @param {object} error - If this is not undefined it contains an error thrown
+ *						   from the database
+ * @param {string} result - If the request succeeded, this contains an object
+ * 							with information about the created marker.
+ * @param {string} result.name - Name of the marker
+ * @param {string} result.description - Description of the marker
+ * @param {number} result.lat - Latitude of the marker
+ * @param {number} result.lng - Longitude of the marker
+ * @param {string} result.icon - Icon of the marker (font awesome id)
+ * @param {string} result.visibility - Visibility of the marker ('public', 'friends' or 'private')
+ * @param {number} result.id - Database id of the created marker
+ * @param {number} result.author - Author of the marker.
+ */
+
+/**
+ * Add a marker to the database.
+ * @param {object} obj - Information about the marker to store
+ * @param {string} obj.name - Name of the marker
+ * @param {string} obj.description - Description of the marker
+ * @param {number} obj.lat - Latitude of the marker
+ * @param {number} obj.lng - Longitude of the marker
+ * @param {string} obj.icon - Icon of the marker (font awesome id)
+ * @param {string} obj.visibility - Visibility of the marker ('public', 'friends' or 'private')
+ * @param {number} author - The database id of the author of this marker
+ * @param {Database~addMarkerCallback} callback - called when the marker was added
+ */
 Database.prototype.addMarker = function(obj, author, callback) {
 	this.pool.query("INSERT INTO Markers (name, description, lat, lng, icon, visibility, author) VALUES(?, ?, ?, ?, ?, ?, ?)",
 		[obj.name, obj.description, obj.lat, obj.lng, obj.icon, obj.visibility, author], function(err, result) {

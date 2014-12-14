@@ -37,7 +37,7 @@ Winston.add(Winston.transports.File, {
 
 var cache = new Cache({time : 5000, knownPlayers : 10000, playersExtended : 1000});
 var telnetClient = new TelnetClient(config);
-var database = new Database(config, function() {
+var database = new Database(config.database, function() {
 	new Server(cache, telnetClient, database, config);
 	telnetClient.connect();
 });

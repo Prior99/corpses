@@ -17,8 +17,8 @@ describe("The interface to the client", function() {
 	var mockSock2;
 	var client1;
 	var client2;
-	
-	database = new Database(dbConfig);
+
+	database = new Database(dbConfig.database);
 	mockSock1 = new MockWebsocket();
 	mockSock2 = new MockWebsocket();
 

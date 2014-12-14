@@ -25,7 +25,7 @@ describe('The server', function() {
 
 	it("can setup a mocked 7dtd testserver", function(done) {
 		FS.unlink(config.clientDirectory + "/map", function() {
-			database = new Database(config, function() {
+			database = new Database(config.database, function() {
 				server = net.createServer(function(sock) {
 					socket = sock;
 					socket.setEncoding("utf8");
