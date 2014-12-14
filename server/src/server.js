@@ -22,14 +22,6 @@ var FS = require("fs");
 var Client = require("./client.js");
 var Websocket = require("./websocket_server.js");
 var HTTP = require('http');
-/**
- * This module represents the server that will attach to the 7 Days to Die server,
- * leech it's events and proxy it to the connected clients. It utilizes a database
- * in order to store users and created markers as well as relations between the users.
- * A cache makes sure to keep information from the 7DTD server stored and up-to-date.
- *
- * @module Server
- */
 
 /**
  * Event that will be fired when something goes wrong.
@@ -45,6 +37,10 @@ var HTTP = require('http');
  */
 
 /**
+ * This module represents the server that will attach to the 7 Days to Die server,
+ * leech it's events and proxy it to the connected clients. It utilizes a database
+ * in order to store users and created markers as well as relations between the users.
+ * A cache makes sure to keep information from the 7DTD server stored and up-to-date.
  * The constructor takes all necessary and not yet initalized modules it needs
  * to operate. Please start everything after passing it to the server so the
  * respective events can be catched and used.

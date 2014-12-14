@@ -21,10 +21,6 @@ var Winston = require('winston');
  * communication. It is possible to fire events with arguments that will
  * be transmitted to the remote end as well as listening for events and answering
  * them respectivly.
- *
- * @module Websocket
- */
-/**
  * This wraps around an already initialized websocket.
  * @constructor
  * @param {object} socket - The websocket to wrap around.
@@ -38,7 +34,7 @@ var Websocket = function(socket){
 	this.socket = socket;
 	var self = this;
 	this.socket.on("message", function(message){
-		self.receive(message);
+		self._receive(message);
 	});
 	this.socket.on("close", function(){
 		this.dead = true;
@@ -47,29 +43,72 @@ var Websocket = function(socket){
 		}
 	});
 };
-
+/**
+ * Will be called once the connection was closed.
+ * @callback Websocket~closeCallback
+ */
+/**
+ * Can be called to answer to a listener.
+ * @callback Websocket~async
+ * @param {*} answer - The answer to send back.
+ */
+/**
+ * Will be called once the event this listener was added for occured.
+ * @param {*} obj - Any data sent by the event
+ * @param {Websocket~async} [async] - If this is specified, the listener will
+ *									  be asynchroneous which means that not the
+ * 									  return value of the method will be sent as
+ *									  answer but this callback mus be called with
+ *									  the answer to send.
+ * @callback Websocket~listener
+ */
 /**
  * Append a closelistener to this wrapper that will be called when the socket
  * was closed. This could happen when either the remote or the local end abort
  * the connection.
- * @param {requestCallback} func - Called when the socket was closed.
+ * @param {Websocket~closeCallback} func - Called when the socket was closed.
  */
 Websocket.prototype.addCloseListener = function(func) {
 	this.closeListeners.push(func);
 };
 
+/**
+ * Listen for a certain event and answer to it. Please note that there is only
+ * one listener allowed per event.
+ * @param {string} key - The name of the event to listen to.
+ * @param {Websocket~listener} listener - Will be called once the event was received.
+ */
 Websocket.prototype.addListener = function(key, listener){
 	this.listeners[key] = {
 		listener: listener
 	};
 };
 
+/**
+ * Alias for {@link Websocket#addListener}.
+ */
 Websocket.prototype.on = Websocket.prototype.addListener;
 
+/**
+ * Will remove the listener for the respective event.
+ * @param {string} key - The listener to remove.
+ */
 Websocket.prototype.removeListener = function(key) {
 	delete this.listeners[key];
 };
-
+/**
+ * Will be called once the remote end answers to the event.
+ * @callback Websocket~answerListener
+ * @param {*} answer - The answer sent by the remote end. Can be anything
+ */
+/**
+ * Send an event. This will fire the event on the remote site and may eventually
+ * call the callback if the remote site answers.
+ * @param {string} key - The name of the event to fire
+ * @param {*} param - Data to send with this event. Can be anything
+ * @param {Websocket~answerListener} handler - Listener to call once the remote
+ *											   end answered.
+ */
 Websocket.prototype.send = function(key, param, handler){
 	var meta = {
 		param: param,
@@ -84,7 +123,7 @@ Websocket.prototype.send = function(key, param, handler){
 	this.id++;
 };
 
-Websocket.prototype.receive = function(message){
+Websocket.prototype._receive = function(message){
 	var self = this;
 	var obj;
 	try {

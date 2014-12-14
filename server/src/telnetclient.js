@@ -20,14 +20,6 @@ var net = require("net");
 var Regexes = require("./regex.js");
 var Events = require('events');
 var Util = require("util");
-/**
- * This module will connect to the 7 Days to Die server and run a number of triggers
- * on it as well as fetching inromation provided by the server.
- * It utilizes the regular expressions defined in regex.js in order to compute the
- * messages provided by the server and retrieve the relevant data.
- *
- * @module TelnetClient
- */
 
 /**
  * Event that will be fired when something goes wrong.
@@ -43,10 +35,14 @@ var Util = require("util");
  */
 
 /**
+ * This module will connect to the 7 Days to Die server and run a number of triggers
+ * on it as well as fetching inromation provided by the server.
+ * It utilizes the regular expressions defined in regex.js in order to compute the
+ * messages provided by the server and retrieve the relevant data.
  * Initialize the telnet client with a given configuration about host and port.
  * You will most likely pass parsed json configurationfile here.
  * Just constructing this module will not connect it. You will have to invoke
- * [connect()]{@link module:TelnetClient~TelnetClient#connect} in order to connect.
+ * {@link TelnetClient#connect} in order to connect.
  * @constructor
  * @param {object} config - The configuration this telnetclient will use to connect.
  * @param {number} config.telnetPort - The port the 7 Days to Die server is running on.
@@ -73,7 +69,6 @@ function TelnetClient(config) {
 }
 
 Util.inherits(TelnetClient, Events.EventEmitter);
-
 /**
  * This will make the telnet client connect to the specified server.
  * @fires module:TelnetClient#open
@@ -86,9 +81,13 @@ TelnetClient.prototype.connect = function() {
 };
 
 /**
+ * This callback is called when the request was fullfilled.
+ * @callback TelnetClient~requestCallback
+ */
+/**
  * This will shutdown the connection to the 7 Days to Die server. After a
  * successfull shutdown, the callback will be called.
- * @param {requestCallback} callback - Will be called once the client is closed.
+ * @param {TelnetClient~requestCallback} callback - Will be called once the client is closed.
  */
 TelnetClient.prototype.shutdown = function(callback) {
 	this.client.once("close", callback);
