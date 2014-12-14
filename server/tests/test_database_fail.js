@@ -11,6 +11,7 @@ describe("The database when failing", function() {
 			host : "example.org",
 			user : "test",
 			password : "12345",
+			connectTimeout : 500,
 			database : "testdb"}, function(okay) {
 				assert(!okay);
 				done();
