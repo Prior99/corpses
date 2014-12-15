@@ -92,16 +92,8 @@ Database.prototype.shutdown = function(callback) {
  * @callback Database~addMarkerCallback
  * @param {object} error - If this is not undefined it contains an error thrown
  *						   from the database
- * @param {string} result - If the request succeeded, this contains an object
- * 							with information about the created marker.
- * @param {string} result.name - Name of the marker
- * @param {string} result.description - Description of the marker
- * @param {number} result.lat - Latitude of the marker
- * @param {number} result.lng - Longitude of the marker
- * @param {string} result.icon - Icon of the marker (font awesome id)
- * @param {string} result.visibility - Visibility of the marker ('public', 'friends' or 'private')
- * @param {number} result.id - Database id of the created marker
- * @param {number} result.author - Author of the marker.
+ * @param {Database~Marker} result - If the request succeeded, this contains an object
+ * 							         with information about the created marker.
  */
 
 /**
@@ -135,16 +127,8 @@ Database.prototype.addMarker = function(obj, author, callback) {
  * @callback Database~getMarkerCallback
  * @param {object} error - If this is not undefined it contains an error thrown
  *						   from the database
- * @param {string} result - If the request succeeded, this contains an object
+ * @param {Database~Marker} result - If the request succeeded, this contains an object
  * 							with information about the created marker.
- * @param {string} result.name - Name of the marker
- * @param {string} result.description - Description of the marker
- * @param {number} result.lat - Latitude of the marker
- * @param {number} result.lng - Longitude of the marker
- * @param {string} result.icon - Icon of the marker (font awesome id)
- * @param {string} result.visibility - Visibility of the marker ('public', 'friends' or 'private')
- * @param {number} result.id - Database id of the created marker
- * @param {number} result.author - Author of the marker.
  */
 /**
  * Will return a marker which is identified by the supplied id.
@@ -195,8 +179,18 @@ Database.prototype.removeMarker = function(id, userid, callback) {
 };
 
 /**
+ * Called when the query for validating a user has finished.
+ * @callback Database~validateUserCallback
+ * @param {object} error - If this is not undefined it contains an error thrown
+ *						   from the database.
+ * @param {boolean} result - If the user exists and the password matches and the
+ * 							 user is enabled this will be true.
+ */
+/**
  * Validates that a user with the given username and password exists.
- * 
+ * @param {string} username - The username of the user to validate
+ * @param {string} password - The SHA-128 checksum of the users password
+ * @param {Database~validateUserCallback} callback - Called when the query has completed.
  */
 Database.prototype.validateUser = function(username, password, callback) {
 	if(username !== undefined && password !== undefined) {
@@ -215,6 +209,21 @@ Database.prototype.validateUser = function(username, password, callback) {
 	}
 };
 
+/**
+ * Called when the check if two users are friends has finished.
+ * @callback Database~areFriendsCallback
+ * @param {object} error - If this is not undefined it contains an error thrown
+ *						   from the database.
+ * @param {boolean} result - If this is true, both users have added each other
+ *							 as friends.
+ */
+/**
+ * Checks whether two users are friends. This implies that both users have added
+ * each other as friends and not just one of them.
+ * @param {number} user1 - Id of the first user
+ * @param {number} user2 - Id of the other user
+ * @param {Database~areFriendsCallback} callback - Called when the query was finished
+ */
 Database.prototype.areFriends = function(user1, user2, callback) {
 	this.pool.query("SELECT " +
 						"(" +
@@ -237,7 +246,31 @@ Database.prototype.areFriends = function(user1, user2, callback) {
 		}
 	);
 };
-
+/**
+ * A single marker
+ * @typedef {object} Database~Marker
+ * @property {string} name - Name of the marker
+ * @property {string} description - Description of the marker
+ * @property {number} lat - Latitude of the marker
+ * @property {number} lng - Longitude of the marker
+ * @property {string} icon - Icon of the marker (font awesome id)
+ * @property {string} visibility - Visibility of the marker ('public', 'friends' or 'private')
+ * @property {number} id - Database id of the created marker
+ * @property {number} author - Author of the marker.
+ */
+/**
+ * Called when fetching markers was done.
+ * @callback Database~fetchMarkersCallback
+ * @param {object} error - If this is not undefined it contains an error thrown
+ *						   from the database.
+ * @param {Database~Marker[]} markers - Markers that were found.
+ */
+/**
+ * Will fetch all markers either specific for the supplied user or for the public.
+ * @param {number} id - Id of the user to fetch the markers for or undefined if
+ *						only public markers should be fetched.
+ * @param {Database~fetchMarkersCallback} callback - Called on query finished.
+ */
 Database.prototype.fetchMarkers = function(id, callback) {
 	if(id === undefined) {
 		this.pool.query("SELECT id, name, description, lat, lng, visibility, author, icon " +
@@ -273,6 +306,20 @@ Database.prototype.fetchMarkers = function(id, callback) {
 	}
 };
 
+/**
+ * Called when the database finished adding the user.
+ * @param {object} error - If this is not undefined it contains an error thrown
+ *						   from the database.
+ */
+/**
+ * Add a user to the database.
+ * @param {object} obj - The user to add
+ * @param {string} obj.name - The users name
+ * @param {string} obj.password - The SHA-128 checksum of the users password
+ * @param {string} obj.steamid - The steam64 id of the user used to associate him
+ *								 with the correpsonding ingame player.
+ * @param {Database~addUserCallback} callback - Called on query done.
+ */
 Database.prototype.addUser = function(obj, callback) {
 	this.pool.query("INSERT INTO Users(name, steamid, password, enabled) VALUES(?, ?, ?, false)", [obj.name, obj.steamid, obj.password], function(err) {
 		if(err) {
