@@ -99,6 +99,7 @@ module.exports = function(client1, client2, database, server, mockSock1, mockSoc
 		it("can disable an user if user is admin", function(done) {
 			mockSock1.callMockedListener("disableUser", 234, function(answer) {
 				assert(answer.okay);
+				assert(!client2.isLoggedIn());
 				mockSock2.callMockedListener("login", {name : "Test2", password : "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3"},
 					function(answer) {
 						assert(!answer.okay);

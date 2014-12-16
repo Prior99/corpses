@@ -292,10 +292,14 @@ function Client(websocket, database, server) {
 					if(toEnable !== undefined) {
 						database.disableUser(toEnable.id, function(err) {
 							if(!checkError(err, async)) {
+								server.broadcastToUser(steamid, "reload");
+								var list = server.getUserClients(steamid);
+								for(var u in list) {
+									list[u].logout();
+								}
 								async({
 									okay : true
 								});
-								server.broadcastToUser(steamid, "reload");
 							}
 						});
 					}
@@ -576,19 +580,24 @@ Client.prototype.isUser = function(steamid) {
  * @param {Client~AsyncAnswer} async - Called if an error happens to terminate the request.
  */
 Client.prototype.checkAdmin = function(callback, async) {
-	this.database.validateAdmin(this.user.id, function(err, admin) {
-		if(!checkError(err, async)) {
-			if(admin) {
-				callback(admin);
+	if(!this.isLoggedIn()) {
+		callback(false);
+	}
+	else {
+		this.database.validateAdmin(this.user.id, function(err, admin) {
+			if(!checkError(err, async)) {
+				if(admin) {
+					callback(admin);
+				}
+				else {
+					async({
+						okay : false,
+						reason : "no_admin"
+					});
+				}
 			}
-			else {
-				async({
-					okay : false,
-					reason : "no_admin"
-				});
-			}
-		}
-	});
+		});
+	}
 };
 
 function checkError(err, async) {
@@ -675,6 +684,13 @@ Client.prototype.loadUser = function(username, callback) {
 			}
 		} //TODO: Errorhandlers
 	}.bind(this));
+};
+
+/**
+ * Will log this client out.
+ */
+Client.prototype.logout = function() {
+	delete this.user;
 };
 
 /**
