@@ -17,6 +17,8 @@ RESULT=$?
 HTML=$(grep -P "server_\\d+.html" grunt.log)
 if [ "$RESULT" = "0" ]; then
 	echo "The build was successfull."
+	echo "Deploying current doc."
+	cp -Rf doc/server /var/websites/ci_drops/corpses_server_doc
 	echo "Sharing codecoverage overview $HTML"
 	share "coverage/$HTML"
 	exit 0
