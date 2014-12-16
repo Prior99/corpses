@@ -6,7 +6,7 @@ var FS = require("fs");
 
 var Websocket = require("../src/websocket_server.js");
 var Server = require("../src/server.js");
-var TelnetClient = require("../src/7dtd.js");
+var TelnetClient = require("../src/telnetclient.js");
 var Database = require("../src/database.js");
 var Cache = require("../src/cache.js");
 var config = require("./config.json");
@@ -25,7 +25,7 @@ describe('The server', function() {
 
 	it("can setup a mocked 7dtd testserver", function(done) {
 		FS.unlink(config.clientDirectory + "/map", function() {
-			database = new Database(config, function() {
+			database = new Database(config.database, function() {
 				server = net.createServer(function(sock) {
 					socket = sock;
 					socket.setEncoding("utf8");

@@ -182,6 +182,6 @@ module.exports = function(grunt) {
 		});
 	});
 	grunt.registerTask('client', 'Test and build the client.', ['test:client', 'build:client']);
-	grunt.registerTask('server', 'Test and build the server.', ['test:server', 'build:server', 'printcoverage', 'linkcoverage']);
-	grunt.registerTask('default', 'Test and build both client and server.', ['server', 'client']);
+	grunt.registerTask('server', 'Test and build the server.', ['test:server', 'build:server', 'printcoverage', 'linkcoverage', 'jsdoc:server']);
+	grunt.registerTask('default', 'Test and build both client and server.', ['client', 'server']);
 };

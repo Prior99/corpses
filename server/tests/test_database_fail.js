@@ -11,6 +11,7 @@ describe("The database when failing", function() {
 			host : "example.org",
 			user : "test",
 			password : "12345",
+			connectTimeout : 500,
 			database : "testdb"}, function(okay) {
 				assert(!okay);
 				done();
@@ -19,14 +20,14 @@ describe("The database when failing", function() {
 	});
 	it("cannot setup the database when file not existing", function(done) {
 		FS.renameSync("server/database.sql", "server/database.sql.tmp");
-		var database = new Database(dbConfig, function(okay) {
+		var database = new Database(dbConfig.database, function(okay) {
 			assert(!okay);
 			done();
 		});
 	});
 	it("cannot setup the database when file is wrong", function(done) {
 		FS.writeFileSync("server/database.sql", "THIS IS A TEST;\nTHIS IS NOT VALID SQL;");
-		var database = new Database(dbConfig, function(okay) {
+		var database = new Database(dbConfig.database, function(okay) {
 			assert(!okay);
 			FS.unlinkSync("server/database.sql");
 			FS.renameSync("server/database.sql.tmp", "server/database.sql");
@@ -52,7 +53,7 @@ describe("The database when failing", function() {
 			done();
 		});
 	});
-	var database = new Database(dbConfig);
+	var database = new Database(dbConfig.database);
 	it("can prepare the database to fail", function(done) {
 		ResetDB.purgeDatabase(done);
 	});

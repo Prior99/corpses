@@ -18,8 +18,22 @@ var Winston = require('winston');
 var MySQL = require('mysql');
 var FS = require("fs");
 
+/**
+ * Open a connection to the database specified in config. If all goes well and
+ * provided, callback will be called when the connection was opened and all tables
+ * are setup correctly.
+ * @constructor
+ * @param {object} config - The configuration providing the information on how to connect
+ *                          to the database
+ * @param {string} config.host - The host of the database.
+ * @param {string} config.user - The user to use to connect to the database.
+ * @param {string} config.password - The password to use while connecting.
+ * @param {string} config.database - The database to connect to.
+ * @param {requestCallback} [callback] - Will be called once the connection is opened
+ * 										 and the database is fully usable.
+ */
 function Database(config, callback) {
-	this.pool = MySQL.createPool(config.database);
+	this.pool = MySQL.createPool(config);
 	Winston.info("Connecting to Database... ");
 	this.pool.getConnection(function(err, conn) {
 		if(err) {
@@ -65,10 +79,26 @@ var reportError = function(desc, err) {
 	Winston.error("Database error: \"" + desc + "\"\n", err);
 };
 
+/**
+ * Will shutdown the database and end all current connections.
+ * @param {requestCallback} [callback] - Called once the connection is down.
+ */
 Database.prototype.shutdown = function(callback) {
 	this.pool.end(callback);
 };
 
+/**
+ * Add a marker to the database.
+ * @param {object} obj - Information about the marker to store
+ * @param {string} obj.name - Name of the marker
+ * @param {string} obj.description - Description of the marker
+ * @param {number} obj.lat - Latitude of the marker
+ * @param {number} obj.lng - Longitude of the marker
+ * @param {string} obj.icon - Icon of the marker (font awesome id)
+ * @param {string} obj.visibility - Visibility of the marker ('public', 'friends' or 'private')
+ * @param {number} author - The database id of the author of this marker
+ * @param {Database~MarkerCallback} callback - called when the marker was added
+ */
 Database.prototype.addMarker = function(obj, author, callback) {
 	this.pool.query("INSERT INTO Markers (name, description, lat, lng, icon, visibility, author) VALUES(?, ?, ?, ?, ?, ?, ?)",
 		[obj.name, obj.description, obj.lat, obj.lng, obj.icon, obj.visibility, author], function(err, result) {
@@ -84,6 +114,11 @@ Database.prototype.addMarker = function(obj, author, callback) {
 	});
 };
 
+/**
+ * Will return a marker which is identified by the supplied id.
+ * @param {number} id - Id of the marker to look up
+ * @param {Database~MarkerCallback} callback - called when query suceeded
+ */
 Database.prototype.getMarker = function(id, callback) {
 	this.pool.query("SELECT id, name, description, lat, lng, icon, visibility, author FROM Markers WHERE id = ?", [id],
 		function(err, rows) {
@@ -103,6 +138,13 @@ Database.prototype.getMarker = function(id, callback) {
 	);
 };
 
+/**
+ * Remove a marker specified by its id from the database if the userid is authorized to do so.
+ * @param {number} id - Id of the marker to delete.
+ * @param {number} userid - Id of the user that tries to remove the marker. This
+ * 							will only suceed if the user is the author of the marker.
+ * @param {Database~VoidCallback} callback - Called once the query is done.
+ */
 Database.prototype.removeMarker = function(id, userid, callback) {
 	this.pool.query("DELETE FROM Markers WHERE id = ? AND author = ?", [id, userid], function(err) {
 		if(err) {
@@ -115,6 +157,12 @@ Database.prototype.removeMarker = function(id, userid, callback) {
 	});
 };
 
+/**
+ * Validates that a user with the given username and password exists.
+ * @param {string} username - The username of the user to validate
+ * @param {string} password - The SHA-128 checksum of the users password
+ * @param {Database~ValidationCallback} callback - Called when the query has completed.
+ */
 Database.prototype.validateUser = function(username, password, callback) {
 	if(username !== undefined && password !== undefined) {
 		this.pool.query("SELECT id FROM Users WHERE name = ? AND password = ? AND (enabled = true OR id = 1)", [username, password], function(err, rows) {
@@ -132,6 +180,13 @@ Database.prototype.validateUser = function(username, password, callback) {
 	}
 };
 
+/**
+ * Checks whether two users are friends. This implies that both users have added
+ * each other as friends and not just one of them.
+ * @param {number} user1 - Id of the first user
+ * @param {number} user2 - Id of the other user
+ * @param {Database~ValidationCallback} callback - Called when the query was finished
+ */
 Database.prototype.areFriends = function(user1, user2, callback) {
 	this.pool.query("SELECT " +
 						"(" +
@@ -154,7 +209,71 @@ Database.prototype.areFriends = function(user1, user2, callback) {
 		}
 	);
 };
+/**
+ * Called once the database finished something and a marker was returned.
+ * @callback Database~MarkerCallback
+ * @param {object} error - If this is not undefined it contains an error thrown
+ *						   from the database
+ * @param {Database~Marker} result - If the request succeeded, this contains an object
+ * 							with information about the marker.
+ */
+/**
+ * A user.
+ * @typedef {object} Database~User
+ * @property {string} name - Name of the user
+ * @property {string} steamid - Steam64 Id of the user used to associate him with an
+ *							   ingame player.
+ * @property {boolean} enabled - True if the user is enabled.
+ * @property {string} password - The password of the user as SHA-128 checksum.
+ * @property {number} id - Databaseid of the user.
+ */
+/**
+ * Called when the database is done looking up or creating a user.
+ * @callback Database~UserCallback
+ * @param {object} error - If this is not undefined it contains an error thrown
+ *						   from the database.
+ * @param {Database~User} user - The user that was found or undefined if no user
+ *								 was found.
+ */
+/**
+ * Called when the database is done validating something.
+ * @callback Database~ValidationCallback
+ * @param {object} error - If this is not undefined it contains an error thrown
+ *						   from the database.
+ * @param {boolean} result - True if the user that was tested is an admin.
+ */
+/**
+ * Called when the database is done performing an action without a return value.
+ * @callback Database~VoidCallback
+ * @param {object} error - If this is not undefined it contains an error thrown
+ *						   from the database.
+ */
+/**
+ * A single marker.
+ * @typedef {object} Database~Marker
+ * @property {string} name - Name of the marker
+ * @property {string} description - Description of the marker
+ * @property {number} lat - Latitude of the marker
+ * @property {number} lng - Longitude of the marker
+ * @property {string} icon - Icon of the marker (font awesome id)
+ * @property {string} visibility - Visibility of the marker ('public', 'friends' or 'private')
+ * @property {number} id - Database id of the created marker
+ * @property {number} author - Author of the marker.
+ */
+/**
+ * Called when fetching markers was done.
+ * @callback Database~MarkersCallback
+ * @param {object} error - If this is not undefined it contains an error thrown
+ *						   from the database.
+ * @param {Database~Marker[]} markers - Markers that were found.
+ */
 
+/**
+ * Will fetch all markers either specific for the supplied user or for the public.
+ * @param {number} id - Id of the user to fetch the markers for or undefined if
+ *						only public markers should be fetched.
+ * @param {Database~MarkersCallback} callback - Called on query finished.
+ */
 Database.prototype.fetchMarkers = function(id, callback) {
 	if(id === undefined) {
 		this.pool.query("SELECT id, name, description, lat, lng, visibility, author, icon " +
@@ -190,6 +309,16 @@ Database.prototype.fetchMarkers = function(id, callback) {
 	}
 };
 
+
+/**
+ * Add a user to the database.
+ * @param {object} obj - The user to add
+ * @param {string} obj.name - The users name
+ * @param {string} obj.password - The SHA-128 checksum of the users password
+ * @param {string} obj.steamid - The steam64 id of the user used to associate him
+ *								 with the correpsonding ingame player.
+ * @param {Database~VoidCallback} callback - Called on query done.
+ */
 Database.prototype.addUser = function(obj, callback) {
 	this.pool.query("INSERT INTO Users(name, steamid, password, enabled) VALUES(?, ?, ?, false)", [obj.name, obj.steamid, obj.password], function(err) {
 		if(err) {
@@ -202,6 +331,13 @@ Database.prototype.addUser = function(obj, callback) {
 	});
 };
 
+
+/**
+ * Add a friend.
+ * @param {number} user - Id of the user that wants to add a friend
+ * @param {number} friend - Id of the user the first user wants to add as a friend
+ * @param {Database~VoidCallback} - Called when the query was done.
+ */
 Database.prototype.addFriend = function(user, friend, callback) {
 	this.pool.query("INSERT INTO Friends(user, friend) VALUES(?, ?)", [user, friend], function(err) {
 		if(err) {
@@ -214,6 +350,12 @@ Database.prototype.addFriend = function(user, friend, callback) {
 	});
 };
 
+/**
+ * Remove a friend.
+ * @param {number} user - Id of the user that wants to remove a friend
+ * @param {number} friend - Id of the user the first user wants to remove as a friend
+ * @param {Database~VoidCallback} - Called when the query was done.
+ */
 Database.prototype.removeFriend = function(user, friend, callback) {
 	this.pool.query("DELETE FROM Friends WHERE user = ? AND friend = ?", [user, friend], function(err) {
 		if(err) {
@@ -226,6 +368,11 @@ Database.prototype.removeFriend = function(user, friend, callback) {
 	});
 };
 
+/**
+ * Add a user as admin.
+ * @param {number} id - Id of the user to add as admin.
+ * @param {Database~VoidCallback} callback - Called when query was finished.
+ */
 Database.prototype.addAdmin = function(id, callback) {
 	this.pool.query("INSERT INTO Admins(user) VALUES(?)", [id], function(err) {
 		if(err) {
@@ -238,6 +385,11 @@ Database.prototype.addAdmin = function(id, callback) {
 	});
 };
 
+/**
+ * Remove a user as admin.
+ * @param {number} id - Id of the user to remove as admin.
+ * @param {Database~VoidCallback} callback - Called when query was finished.
+ */
 Database.prototype.removeAdmin = function(id, callback) {
 	this.pool.query("DELETE FROM Admins WHERE user = ?", [id], function(err) {
 		if(err) {
@@ -250,6 +402,11 @@ Database.prototype.removeAdmin = function(id, callback) {
 	});
 };
 
+/**
+ * Enable a user.
+ * @param {number} id - Id of the user to enable.
+ * @param {Database~VoidCallback} - Called when the query was done.
+ */
 Database.prototype.enableUser = function(id, callback) {
 	this.pool.query("UPDATE Users SET enabled = TRUE WHERE id = ?", [id], function(err) {
 		if(err) {
@@ -262,6 +419,11 @@ Database.prototype.enableUser = function(id, callback) {
 	});
 };
 
+/**
+ * Disable a user.
+ * @param {number} id - Id of the user to disable.
+ * @param {Database~VoidCallback} - Called when the query was done.
+ */
 Database.prototype.disableUser = function(id, callback) {
 	this.pool.query("UPDATE Users SET enabled = FALSE WHERE id = ?", [id], function(err) {
 		if(err) {
@@ -274,6 +436,12 @@ Database.prototype.disableUser = function(id, callback) {
 	});
 };
 
+/**
+ * Validate if a user is an admin.
+ * @param {number} id - Id of the user to test.
+ * @param {Database~ValidationCallback} callback - Called when the database
+ * 												   is done.
+ */
 Database.prototype.validateAdmin = function(id, callback) {
 	if(id !== undefined) {
 		this.pool.query("SELECT id FROM Admins WHERE user = ?", [id], function(err, rows) {
@@ -292,6 +460,11 @@ Database.prototype.validateAdmin = function(id, callback) {
 	}
 };
 
+/**
+ * Look up a user by name.
+ * @param {string} username - The name of the user to look up.
+ * @param {Database~UserCallback} callback - Called when the lookup has finished.
+ */
 Database.prototype.getUserByName = function(username, callback) {
 	this.pool.query("SELECT id, name, steamid, enabled, password, id IN (SELECT user FROM Admins) AS admin FROM Users WHERE name = ?", [username], function(err, rows) {
 		if(err) {
@@ -309,6 +482,11 @@ Database.prototype.getUserByName = function(username, callback) {
 	});
 };
 
+/**
+ * Look up a user by his steamid.
+ * @param {string} steamid - The steamid to look up.
+ * @param {Database~UserCallback} - Called when the query was done.
+ */
 Database.prototype.getUserBySteamID = function(steamid, callback) {
 	this.pool.query("SELECT id, name, steamid, enabled, password, id IN (SELECT user FROM Admins) AS admin FROM Users WHERE steamid = ?", [steamid], function(err, rows) {
 		if(err) {
@@ -326,6 +504,29 @@ Database.prototype.getUserBySteamID = function(steamid, callback) {
 	});
 };
 
+/**
+ * A user from the view of another user.
+ * @typedef {object} Database~UserSpecificUser
+ * @property {string} name - Name of the user.
+ * @property {string} steamid - Steam64 Id of the user.
+ * @property {boolean} enabled - Whether the user is enabled or whether not.
+ * @property {boolean} friend - Whether this user is friend of the other user.
+ * @property {boolean} friendedBy - Whether this users befriended the other user.
+ * @property {boolean} admin - If the user is admin, this is true.
+ */
+/**
+ * Called once the database finished looking up all users specific to one user.
+ * @callback Database~UsersCallback
+ * @param {object} error - If this is not undefined it contains an error thrown
+ *						   from the database
+ * @param {Database~UserSpecificUser[]} users - All users that were found.
+ */
+/**
+ * Fetches all users from the perspective of a specific users. This means that
+ * all users will have relationships specific to this uers.
+ * @param {number} userid - Id of the user that wants to look up all other users.
+ * @param {Database~UsersCallback} callback - Called once the query was done.
+ */
 Database.prototype.getUsers = function(userid, callback) {
 	this.pool.query("SELECT u.name AS name, " +
 							"u.steamid AS steamid, " +
@@ -346,6 +547,12 @@ Database.prototype.getUsers = function(userid, callback) {
 	);
 };
 
+/**
+ * Will make a user ignore a specific marker.
+ * @param {number} user - Id of the user that wants to ignore a marker.
+ * @param {number} marker - Id of the marker the user wants to ignore.
+ * @param {Database~VoidCallback} - Called once the database finished.
+ */
 Database.prototype.ignoreMarker = function(user, marker, callback) {
 	this.pool.query("INSERT INTO MarkerIgnore(user, marker) VALUES(?, ?)", [user, marker], function(err) {
 		if(err) {

@@ -1,6 +1,6 @@
 var assert = require("assert");
 var Config = require("./config.json");
-var TelnetClient = require("../src/7dtd.js");
+var TelnetClient = require("../src/telnetclient.js");
 var net = require("net");
 var FS = require("fs");
 

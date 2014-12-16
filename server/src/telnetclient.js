@@ -21,7 +21,36 @@ var Regexes = require("./regex.js");
 var Events = require('events');
 var Util = require("util");
 
-function Connection(config) {
+/**
+ * Event that will be fired when something goes wrong.
+ * @event module:TelnetClient#error
+ */
+/**
+ * Event that will be fired when the connection to the 7 Days to Die server is opened.
+ * @event module:TelnetClient#open
+ */
+/**
+ * Event that will be fired when the connection to the 7 Days to Die server is closed.
+ * @event module:TelnetClient#close
+ */
+
+/**
+ * This module will connect to the 7 Days to Die server and run a number of triggers
+ * on it as well as fetching inromation provided by the server.
+ * It utilizes the regular expressions defined in regex.js in order to compute the
+ * messages provided by the server and retrieve the relevant data.
+ * Initialize the telnet client with a given configuration about host and port.
+ * You will most likely pass parsed json configurationfile here.
+ * Just constructing this module will not connect it. You will have to invoke
+ * {@link TelnetClient#connect} in order to connect.
+ * @constructor
+ * @param {object} config - The configuration this telnetclient will use to connect.
+ * @param {number} config.telnetPort - The port the 7 Days to Die server is running on.
+ * @param {string} config.telnetHost - The host of the 7DTD server.
+ * @fires module:TelnetClient#close
+ * @fires module:TelnetClient#error
+ */
+function TelnetClient(config) {
 	Winston.info("Initializing Telnetclient... ");
 	this.client = new net.Socket();
 	this.client.on("error", function() {
@@ -34,26 +63,38 @@ function Connection(config) {
 	this.buffer = "";
 	this.client.on("data", function(data) {
 		this.buffer += data.toString();
-		this.checkMessage();
+		this._checkMessage();
 	}.bind(this));
 	this.config = config;
 }
 
-Util.inherits(Connection, Events.EventEmitter);
-
-Connection.prototype.connect = function() {
+Util.inherits(TelnetClient, Events.EventEmitter);
+/**
+ * This will make the telnet client connect to the specified server.
+ * @fires module:TelnetClient#open
+ */
+TelnetClient.prototype.connect = function() {
 	this.client.connect(this.config.telnetPort, this.config.telnetHost, function() {
 		Winston.info("Initializing Telnetclient okay.");
 		this.emit("open");
 	}.bind(this));
 };
 
-Connection.prototype.shutdown = function(callback) {
+/**
+ * This callback is called when the request was fullfilled.
+ * @callback TelnetClient~requestCallback
+ */
+/**
+ * This will shutdown the connection to the 7 Days to Die server. After a
+ * successfull shutdown, the callback will be called.
+ * @param {TelnetClient~requestCallback} callback - Will be called once the client is closed.
+ */
+TelnetClient.prototype.shutdown = function(callback) {
 	this.client.once("close", callback);
 	this.client.end();
 };
 
-Connection.prototype.checkMessage = function() {
+TelnetClient.prototype._checkMessage = function() {
 	var index;
 	var reg = /^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\s\d+\.\d\d\d\s/gm;
 	if((index = this.buffer.search(reg)) !== -1) {
@@ -61,7 +102,7 @@ Connection.prototype.checkMessage = function() {
 		this.buffer = "";
 		while(msgs.length > 0) {
 			var string = msgs.shift();
-			if(this.parseMessage(string)) {
+			if(this._parseMessage(string)) {
 
 			}
 			else {
@@ -74,27 +115,54 @@ Connection.prototype.checkMessage = function() {
 	}
 };
 
-Connection.prototype.triggerGetTime = function() {
+/**
+ * This method will trigger the 7DTD server to refresh the information about the
+ * server time.
+ */
+TelnetClient.prototype.triggerGetTime = function() {
 	this.client.write("gettime\n");
 };
 
-Connection.prototype.triggerMem = function() {
+/**
+ * This method will trigger the 7DTD server to refresh the information about the
+ * general information as players, zombies and system stats.
+ * This will also trigger the server to do a garbage collection so use it with
+ * caution and not too frequently.
+ * Please also note, that this information also refreshes ever 30 seconds
+ * automatically.
+ */
+TelnetClient.prototype.triggerMem = function() {
 	this.client.write("mem\n");
 };
 
-Connection.prototype.triggerListKnownPlayers = function() {
+/**
+ * Will refresh the information about known players to the server.
+ */
+TelnetClient.prototype.triggerListKnownPlayers = function() {
 	this.client.write("listknownplayers\n");
 };
 
-Connection.prototype.triggerListPlayersExtended = function() {
+/**
+ * Will refresh the information about connected players and their extended
+ * information.
+ */
+TelnetClient.prototype.triggerListPlayersExtended = function() {
 	this.client.write("listplayers\n");
 };
 
-Connection.prototype.triggerKickPlayer = function(name, reason){
+
+/**
+ * Will kick a player by his name with an optional reason.
+ * @param {string} name - The name of the player that should be kicked.
+ * @param {string} [reason] - The reason to display the player. Please note that
+ *							  the current version of the 7DTD server does not
+ *							  support this.
+ */
+TelnetClient.prototype.triggerKickPlayer = function(name, reason){
 	this.client.write("kick " + name + (reason === undefined ? "": " " + reason) + "\n");
 };
 
-Connection.prototype.parseMessage = function(string) {
+TelnetClient.prototype._parseMessage = function(string) {
 	var result;
 	Events.EventEmitter.call(this);
 	for(var type in Regexes) {
@@ -106,10 +174,10 @@ Connection.prototype.parseMessage = function(string) {
 				while((result = regex.exec(string)) !== null) {
 					array.push(result);
 				}
-				this.computeMessage(type, array);
+				this._computeMessage(type, array);
 			}
 			else {
-				this.computeMessage(type, result);
+				this._computeMessage(type, result);
 			}
 			return true;
 		}
@@ -117,7 +185,7 @@ Connection.prototype.parseMessage = function(string) {
 	return false;
 };
 
-Connection.prototype.computeMessage = function(type, array) {
+TelnetClient.prototype._computeMessage = function(type, array) {
 	switch(type) {
 		case "info": {
 			this.emit("info", {
@@ -227,4 +295,4 @@ Connection.prototype.computeMessage = function(type, array) {
 	}
 };
 
-module.exports = Connection;
+module.exports = TelnetClient;

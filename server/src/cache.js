@@ -17,9 +17,11 @@
 var Winston = require('winston');
 
 /**
- * This class will save informations transmitted from the telnetconnection to the
+ * This cache will save informations transmitted from the telnetconnection to the
  * 7DTD server. It will trigger the refreshing of these information automatically
- * Every few seconds. You can specify these intervals in the options. module:corpses/server/cache
+ * every few seconds.
+ * Initialize the cache with a number of intervals that indicate how often the
+ * information stored by this cache should be polled from the 7DTD server.
  * @constructor
  * @param {object} times - Information about the duration of the intervals.
  * 						   This specifies how often the information of the cache should be refreshed,
@@ -36,6 +38,10 @@ function Cache(times) {
 	this.intervals = {};
 }
 
+/**
+ * This method should be called whenever the connection to the 7DTD server was
+ * lost. This will clear all intervals and reset the connection.
+ */
 Cache.prototype.connectionLost = function() {
 	this.telnetClient = undefined;
 	clearInterval(this.intervals.timeInterval);
@@ -43,6 +49,14 @@ Cache.prototype.connectionLost = function() {
 	clearInterval(this.intervals.playersExtendedInterval);
 };
 
+/**
+ * This method should be called to refresh the connection this cache gathers
+ * it's information from. The connection will be stored and intervals to
+ * refresh the cached data will be initialized.
+ * @param {TelnetClient} telnetClient - The connection that was established and
+ * 									    should now be used to gather information
+ * 										from.
+ */
 Cache.prototype.connectionEstablished = function(telnetClient) {
 	this.telnetClient = telnetClient;
 	var me = this;
