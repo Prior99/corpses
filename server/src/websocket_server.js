@@ -79,9 +79,7 @@ Websocket.prototype.addCloseListener = function(func) {
  * @param {Websocket~listener} listener - Will be called once the event was received.
  */
 Websocket.prototype.addListener = function(key, listener){
-	this.listeners[key] = {
-		listener: listener
-	};
+	this.listeners[key] = listener;
 };
 
 /**
@@ -141,8 +139,8 @@ Websocket.prototype._receive = function(message){
 	if(obj.type === "req" && obj.key !== undefined ){
 		var listener = this.listeners[obj.key];
 		if(listener !== undefined){
-			if(listener.listener.length === 2){
-				listener.listener(obj.param, function(ans){
+			if(listener.length === 2){
+				listener(obj.param, function(ans){
 					var answer = {
 						id: obj.id,
 						type: "res",
@@ -154,7 +152,7 @@ Websocket.prototype._receive = function(message){
 				});
 			}
 			else{
-				var ans = listener.listener(obj.param);
+				var ans = listener(obj.param);
 				var answer = {
 					id: obj.id,
 					type: "res",
