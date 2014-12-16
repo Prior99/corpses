@@ -16,6 +16,15 @@
  */
 var Winston = require('winston');
 
+/**
+ * This class represents a single client connected to the server. It wraps around
+ * the websocketwrapper and provides a number of handlers and sends certain
+ * events back. All of the client-server communication happens here.
+ * @constructor
+ * @param {Websocket} websocket - The websocket this client will use.
+ * @param {Database} database - Instance of the servers databaseconnection.
+ * @param {Server} server - The server itself, needed to broadcast certain events.
+ */
 function Client(websocket, database, server) {
 	this.websocket = websocket;
 	this.database = database;
@@ -451,7 +460,30 @@ function Client(websocket, database, server) {
 	}.bind(this), true);
 }
 
-
+/**
+ * Async answer. This is a method provided from the websocket as async return
+ * for the request the remote end did. If it is called, the request will be
+ * answered with the data provided and closed.
+ * @callback Client~AsyncAnswer
+ * @param {*} data - Any data. Will be sent as answer to the request.
+ */
+/**
+ * Will be called once a validation is done.
+ * @callback Client~ValidationCallback
+ * @param {boolean} result - Whether the validation has succeeded.
+ */
+/**
+ * Called when an action without a return value has finished.
+ * @callback Client~VoidCallback
+ */
+/**
+ * Will broadcast the removal of a marker to all users that are authorized
+ * to receive this event (depending on visibility and friendships).
+ * @param {number} id - Id of the marker to remove
+ * @param {boolean} friendsOnly - Whether this marker is friendsonly or public
+ * @param {Client~VoidCallback} callback - Called when this action has finished
+ *										   and all messages were queued to be sent.
+ */
 Client.prototype.broadcastRemoveMarker = function(id, friendsOnly, callback) {
 	var self = this;
 	var j = this.server.clients.length;
@@ -486,6 +518,14 @@ Client.prototype.broadcastRemoveMarker = function(id, friendsOnly, callback) {
 	}
 };
 
+/**
+* Will broadcast the adding of a marker to all users that are authorized
+* to receive this event (depending on visibility and friendships).
+* @param {Database~Marker} marker - Marker that will be broadcast.
+* @param {boolean} friendsOnly - Whether this marker is friendsonly or public
+* @param {Client~VoidCallback} callback - Called when this action has finished
+*										  and all messages were queued to be sent.
+*/
 Client.prototype.broadcastMarker = function(marker, friendsOnly, callback) {
 	var self = this;
 	var j = this.server.clients.length;
@@ -520,12 +560,21 @@ Client.prototype.broadcastMarker = function(marker, friendsOnly, callback) {
 	}
 };
 
+/**
+ * Checks whether this client is the user associated with the steamid provided.
+ * @param {string} steamid - Steam64 Id to test this client with.
+ * @return {boolean} Whether this client is associated with the steamid provided.
+ */
 Client.prototype.isUser = function(steamid) {
 	//jshint ignore:start
 	return this.isLoggedIn() && this.user.steamid == steamid; //== instead of === needed as string may be passed
 	//jshint ignore:end
 };
-
+/**
+ * Check whether this client is logged in into an account with admin privileges.
+ * @param {Client~ValidationCallback} callback - Called once the check was done.
+ * @param {Client~AsyncAnswer} async - Called if an error happens to terminate the request.
+ */
 Client.prototype.checkAdmin = function(callback, async) {
 	this.database.validateAdmin(this.user.id, function(err, admin) {
 		if(!checkError(err, async)) {
@@ -555,10 +604,21 @@ function checkError(err, async) {
 	}
 }
 
+/**
+ * Check whether this client is a logged in user or just a guest.
+ * @return {boolean} Whether the client is logged in.
+ */
 Client.prototype.isLoggedIn = function() {
 	return this.user !== undefined;
 };
 
+/**
+ * Will check whether this client is logged in and if not send the corresponding
+ * error message to the requester.
+ * @param {Client~AsyncAnswer} - Called when the user is not logged in to terminate
+ * 								 the request with the corresponding error message.
+ * @return {boolean} - True if the client is logged in.
+ */
 Client.prototype.checkLoggedIn = function(async) {
 	if(this.user === undefined) {
 		async({
@@ -572,10 +632,23 @@ Client.prototype.checkLoggedIn = function(async) {
 	}
 };
 
+/**
+ * Send a certain event to the remote end without listening for an answer.
+ * @param {string} action - The name of the event to send
+ * @param {*} obj - Any data that should be sent along with the event.
+ */
 Client.prototype.sendEvent = function(action, obj) {
 	this.websocket.send(action, obj);
 };
 
+/**
+ * Load the user specified by the username from the database and set this
+ * instance into logged in state. This also performs a check whether the
+ * user with the Id 1 is admin and enabled and fix this if he is not.
+ * @param {string} username - Username to load user for
+ * @param {Client~VoidCallback} callback - Called once the user was loaded and
+ *										   this instance is in logged in state.
+ */
 Client.prototype.loadUser = function(username, callback) {
 	this.database.getUserByName(username, function(err, user) {
 		if(!err) {
@@ -604,10 +677,18 @@ Client.prototype.loadUser = function(username, callback) {
 	}.bind(this));
 };
 
+/**
+ * Send the removal of a marker to the remote end.
+ * @param {number} id - Id of the removed marker
+ */
 Client.prototype.sendRemoveMarker = function(id) {
 	this.websocket.send("removeMarker", id);
 };
 
+/**
+ * Send a new marker to the remote end.
+ * @param {Database~Marker} marker - The marker to send
+ */
 Client.prototype.sendMarker = function(marker) {
 	this.websocket.send("marker", marker);
 };

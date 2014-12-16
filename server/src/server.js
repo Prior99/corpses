@@ -47,7 +47,7 @@ var HTTP = require('http');
  * @constructor
  * @param {Cache} cache - an instance of the cache that stores the information of the telnetclient
  * @param {TelnetClient} telnetClient - an instance of the telnetclient connected to the 7DTD server
- * @param {object} database - an instance of the wrapper for the databaseconnection
+ * @param {Database} database - an instance of the wrapper for the databaseconnection
  * @param {object} config - the parsed json of the configfile
  * @fires module:Server#started
  * @fires module:Server#error
