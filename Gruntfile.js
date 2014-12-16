@@ -144,7 +144,7 @@ module.exports = function(grunt) {
 		},
 		jsdoc : {
 			server : {
-				src: ['server/src/*.js'],
+				src: ['server/src/*.js', 'README.md'],
 				options: {
 					destination: 'doc/server'
 				}
