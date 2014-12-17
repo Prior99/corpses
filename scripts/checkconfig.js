@@ -1,10 +1,9 @@
-var config = require("./server/config.json");
+var config = require("../server/config.json");
 
 var okay = true;
 
 function check(key, config) {
-	if(typeof config[key] === undefined) {
-		console.log("Key \"" + key + "\" not found in config!");
+	if(config[key] === undefined) {
 		okay = false;
 	}
 }

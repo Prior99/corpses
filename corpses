@@ -94,17 +94,27 @@ fi
 echo -n "  Checking for config ... "
 if [ -f "server/config.json" ]; then
 	if node scripts/checkconfig.js ; then
-		echo -ne "\033[okay.\033[0m"
+		echo -ne "\033[32mokay.\033[0m"
 		echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
 	else
-		echo -ne "\033[31mfound but invalid!\033[0m Please add the missing keys."
+		echo -ne "\033[31mfound but invalid!\033[0m"
 		echo -e "\r\033[31m\xe2\x9c\x98\033[0m"
-		exit 1
+		if node scripts/genconfig.js ; then
+			echo -e "\033[32mOkay.\033[0m Configfile created."
+		else
+			echo "Please edit the configfile at server/config.json manually."
+			exit 1
+		fi
 	fi
 else
-	echo -ne "\033[31mnot found!\033[0m Please copy the file \"server/config.json.example\" to \"server/config.json\" and edit it according to your needs."
+	echo -ne "\033[31mnot found!\033[0m"
 	echo -e "\r\033[31m\xe2\x9c\x98\033[0m"
-	exit 1
+	if node scripts/genconfig.js ; then
+		echo -e "\033[Okay.\033[0m Configfile created."
+	else
+		echo "Please create the configfile manually by copying the server/config.json.example to server/config.json and edit it according to your needs."
+		exit 1
+	fi
 fi
 
 #
@@ -114,4 +124,5 @@ fi
 echo
 echo -e "\033[32mStarting server now.\033[0m"
 echo
+
 node server/src/startup.js
