@@ -8,8 +8,7 @@
     "host": "localhost",
     "user": "root",
     "password": "",
-    "database" : "7dtd",
-    "multipleStatements" : "true"
+    "database" : "7dtd"
   },
   "kickUnregistered": true,
   "website": "example.org"

@@ -187,6 +187,23 @@ Server.prototype.broadcastToUser = function(steamid, name, obj) {
 	}
 };
 
+/**
+ * This will return an array of all clients currently connected to the specified
+ * user.
+ * @param {number} steamid - SteamID of the user to get the clients of.
+ * @return {Client[]} Array of all clients connected as this user.
+ */
+Server.prototype.getUserClients = function(steamid) {
+	var list = [];
+	for(var i in this.clients) {
+		var client = this.clients[i];
+		if(client.isUser(steamid)) {
+			list.push(client);
+		}
+	}
+	return list;
+};
+
 Server.prototype._initTelnetClient = function() {
 	var me = this;
 	this.telnetClient.on("close", function() {
@@ -254,19 +271,34 @@ Server.prototype.shutdown = function() {
 		}
 	}
 	Winston.info("Server is about to shutdown...");
-	this.telnetClient.shutdown(function() {
-		Winston.info("Connection to 7DTD closed.");
+	if(this.telnetClient) {
+		this.telnetClient.shutdown(function() {
+			Winston.info("Connection to 7DTD closed.");
+			closed();
+		});
+	}
+	else {
 		closed();
-	});
-	this.wsServer.close();
-	this.httpServer.close(function() {
-		Winston.info("Websocketserver closed.");
+	}
+	if(this.wsServer && this.httpServer) {
+		this.wsServer.close();
+		this.httpServer.close(function() {
+			Winston.info("Websocketserver closed.");
+			closed();
+		});
+	}
+	else {
 		closed();
-	});
-	this.database.shutdown(function() {
-		Winston.info("Disconnected from database.");
+	}
+	if(this.database) {
+		this.database.shutdown(function() {
+			Winston.info("Disconnected from database.");
+			closed();
+		});
+	}
+	else {
 		closed();
-	});
+	}
 };
 
 module.exports = Server;

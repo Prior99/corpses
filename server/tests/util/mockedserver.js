@@ -20,6 +20,16 @@ MockServer = {
 				client.sendEvent(name, obj);
 			}
 		}
+	},
+	getUserClients : function(steamid, name, obj) {
+		var list = [];
+		for(var i in this.clients) {
+			var client = this.clients[i];
+			if(client.isUser(steamid)) {
+				list.push(client);
+			}
+		}
+		return list;
 	}
 };
 

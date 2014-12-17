@@ -213,6 +213,16 @@ describe('The server', function() {
 		});
 	});
 
+	it("can fetch the clients of a particular user", function(done) {
+		websocket.send("login", { name : "Test1", password : "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3"}, function(answer) {
+			assert(answer.okay);
+			var list = theServer.getUserClients(345);
+			assert.equal(list.length, 1);
+			assert.equal(list[0], theServer.clients[0]);
+			done();
+		});
+	});
+
 	it("can stop everything", function(done) {
 		theServer.shutdown();
 		theServer.once("stopped", function() {

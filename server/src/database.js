@@ -33,11 +33,17 @@ var FS = require("fs");
  * 										 and the database is fully usable.
  */
 function Database(config, callback) {
-	this.pool = MySQL.createPool(config);
+	this.pool = MySQL.createPool({
+		host : config.host,
+		user : config.user,
+		password : config.password,
+		database : config.database,
+		multipleStatements : true
+	});
 	Winston.info("Connecting to Database... ");
 	this.pool.getConnection(function(err, conn) {
 		if(err) {
-			Winston.info("Connecting to Database failed.");
+			Winston.error("Connecting to Database failed.");
 			if(callback) {
 				callback(false);
 			}
@@ -523,7 +529,7 @@ Database.prototype.getUserBySteamID = function(steamid, callback) {
  */
 /**
  * Fetches all users from the perspective of a specific users. This means that
- * all users will have relationships specific to this uers.
+ * all users will have relationships specific to this user.
  * @param {number} userid - Id of the user that wants to look up all other users.
  * @param {Database~UsersCallback} callback - Called once the query was done.
  */
