@@ -20,7 +20,7 @@ Winston.add(Winston.transports.Console, {
 
 Winston.add(Winston.transports.File, {
 	filename : 'server.log',
-	maxsize : '512000',
+	maxsize : '64000',
 	maxFiles : 7,
 	json: false,
 	colorize: true,
