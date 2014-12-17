@@ -1,0 +1,76 @@
+#!/bin/bash
+echo -n "  Checking for user ... "
+if [ $EUID -eq 0 ]; then
+	echo -ne "\033[31mnot okay.\033[0m Do not run this script as root."
+	echo -e "\r\033[31m\xe2\x9c\x98\033[0m"
+	exit 1
+else
+	echo -ne "\033[32mokay.\033[0m"
+	echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
+fi
+
+echo -n "  Checking for node ... "
+if ! type node &> /dev/null ; then
+	echo -ne "\033[31mnot found!\033[0m Please install nodejs (http://nodejs.org/)"
+	echo -e "\r\033[31m\xe2\x9c\x98\033[0m"
+	exit 1
+else
+	echo -ne "\033[32mfound.\033[0m"
+	echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
+fi
+
+echo -n "  Checking for npm ... "
+if ! type npm &> /dev/null ; then
+	echo -ne "\033[31mnot found!\033[0m Please install nodejs (http://nodejs.org/)"
+	echo -e "\r\033[31m\xe2\x9c\x98\033[0m"
+	exit 1
+else
+	echo -ne "\033[32mfound.\033[0m"
+	echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
+fi
+
+echo -n "  Installing npm dependencies ... "
+if npm install --silent ; then
+	echo -ne "\033[32mdone.\033[0m"
+	echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
+else
+	echo -ne "\033[31mfailed!\033[0m Please try to install the dependencies manually using \"npm install\" and investigate further."
+	echo -e "\r\033[31m\xe2\x9c\x98\033[0m"
+	exit 1
+fi
+
+echo -n "  Installing bower dependencies ... "
+if echo "n" | ./node_modules/bower/bin/bower install --silent ; then
+	echo -ne "\033[32mdone.\033[0m"
+	echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
+else
+	echo -ne "\033[31mfailed!\033[0m Please try to install the dependencies manually using \"bower install\" and investigate further."
+	echo -e "\r\033[31m\xe2\x9c\x98\033[0m"
+	exit 1
+fi
+
+echo -n "  Building ... "
+./node_modules/grunt-cli/bin/grunt build > grunt.log
+if grep --quiet "Done, without errors." grunt.log ; then
+	echo -ne "\033[32mdone.\033[0m"
+	echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
+else
+	echo -ne "\033[31mfailed!\033[0m Please report this incident to the developers. Make sure to include the \"grunt.log\" file in your report. Thank you for contributing."
+	echo -e "\r\033[31m\xe2\x9c\x98\033[0m"
+	exit 1
+fi
+
+echo -n "  Checking for config ... "
+if [ -f "server/config.json" ]; then
+	echo -ne "\033[32mfound.\033[0m"
+	echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
+else
+	echo -ne "\033[31mnot found!\033[0m Please copy the file \"server/config.json.example\" to \"server/config.json\" and edit it according to your needs."
+	echo -e "\r\033[31m\xe2\x9c\x98\033[0m"
+	exit 1
+fi
+
+echo
+echo -e "\033[32mStarting server now.\033[0m"
+echo
+node server/src/startup.js
