@@ -271,19 +271,34 @@ Server.prototype.shutdown = function() {
 		}
 	}
 	Winston.info("Server is about to shutdown...");
-	this.telnetClient.shutdown(function() {
-		Winston.info("Connection to 7DTD closed.");
+	if(this.telnetClient) {
+		this.telnetClient.shutdown(function() {
+			Winston.info("Connection to 7DTD closed.");
+			closed();
+		});
+	}
+	else {
 		closed();
-	});
-	this.wsServer.close();
-	this.httpServer.close(function() {
-		Winston.info("Websocketserver closed.");
+	}
+	if(this.wsServer && this.httpServer) {
+		this.wsServer.close();
+		this.httpServer.close(function() {
+			Winston.info("Websocketserver closed.");
+			closed();
+		});
+	}
+	else {
 		closed();
-	});
-	this.database.shutdown(function() {
-		Winston.info("Disconnected from database.");
+	}
+	if(this.database) {
+		this.database.shutdown(function() {
+			Winston.info("Disconnected from database.");
+			closed();
+		});
+	}
+	else {
 		closed();
-	});
+	}
 };
 
 module.exports = Server;

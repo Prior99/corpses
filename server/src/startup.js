@@ -26,6 +26,14 @@ require("./preparewinston.js");
 var cache = new Cache({time : 5000, knownPlayers : 10000, playersExtended : 1000});
 var telnetClient = new TelnetClient(config);
 var database = new Database(config.database, function() {
-	new Server(cache, telnetClient, database, config);
+	var serv = new Server(cache, telnetClient, database, config);
+	serv.on('error', function() {
+		Winston.info("Server emitted error. Shutting down.");
+		serv.shutdown();
+	});
+	telnetClient.on('error', function() {
+		Winston.info("Telnetclient emitted error. Shutting down.");
+		serv.shutdown();
+	});
 	telnetClient.connect();
 });
