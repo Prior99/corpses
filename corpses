@@ -1,4 +1,12 @@
 #!/bin/bash
+
+#
+# Make sure that this script is not run as root
+# running this server as root could lead to severe security risks
+# Generally speaking, do never run any serversoftware cloned from any
+# repository as root. Unless you want your server rootkitted and taken over.
+#
+
 echo -n "  Checking for user ... "
 if [ $EUID -eq 0 ]; then
 	echo -ne "\033[31mnot okay.\033[0m Do not run this script as root."
@@ -8,6 +16,10 @@ else
 	echo -ne "\033[32mokay.\033[0m"
 	echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
 fi
+
+#
+# Check for node and npm.
+#
 
 echo -n "  Checking for node ... "
 if ! type node &> /dev/null ; then
@@ -29,6 +41,12 @@ else
 	echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
 fi
 
+#
+# Install all npm dependencies.
+# This also includes bower and grunt-cli as local installations.
+# No need to install them system-wide.
+#
+
 echo -n "  Installing npm dependencies ... "
 if npm install --silent ; then
 	echo -ne "\033[32mdone.\033[0m"
@@ -39,6 +57,11 @@ else
 	exit 1
 fi
 
+#
+# Install all bower dependencies.
+# We do not want to send anonymous usage statistics to them I presume.
+#
+
 echo -n "  Installing bower dependencies ... "
 if echo "n" | ./node_modules/bower/bin/bower install --silent ; then
 	echo -ne "\033[32mdone.\033[0m"
@@ -48,6 +71,10 @@ else
 	echo -e "\r\033[31m\xe2\x9c\x98\033[0m"
 	exit 1
 fi
+
+#
+# Now try building this software.
+#
 
 echo -n "  Building ... "
 ./node_modules/grunt-cli/bin/grunt build > grunt.log
@@ -60,6 +87,10 @@ else
 	exit 1
 fi
 
+#
+# Check if the user created a configfile.
+#
+
 echo -n "  Checking for config ... "
 if [ -f "server/config.json" ]; then
 	echo -ne "\033[32mfound.\033[0m"
@@ -69,6 +100,10 @@ else
 	echo -e "\r\033[31m\xe2\x9c\x98\033[0m"
 	exit 1
 fi
+
+#
+# Everything went right, we may now start the server.
+#
 
 echo
 echo -e "\033[32mStarting server now.\033[0m"
