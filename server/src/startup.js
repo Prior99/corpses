@@ -21,19 +21,7 @@ var Database = require("./database.js");
 var Cache = require("./cache.js");
 var Server = require("./server.js");
 var config = require("../config.json");
-
-Winston.add(Winston.transports.File, {
-	filename : 'server.log',
-	maxsize : '512000',
-	maxFiles : 7,
-	json: false,
-	colorize: true,
-	timestamp: function() {
-		var d = new Date();
-		return d.getYear() + "." + (d.getMonth() + 1) + "." + d.getDate() + " " +
-		d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds() + "." + d.getMilliseconds();
-	}
-});
+require("./preparewinston.js");
 
 var cache = new Cache({time : 5000, knownPlayers : 10000, playersExtended : 1000});
 var telnetClient = new TelnetClient(config);

@@ -8,8 +8,18 @@ function fillZero(number, len) {
 	return number;
 }
 
+Winston.remove(Winston.transports.Console);
+Winston.add(Winston.transports.Console, {
+	colorize: true,
+	timestamp: function() {
+		var d = new Date();
+		return d.getYear() + 1900 + "-" + fillZero(d.getMonth() + 1, 1) + "-" + fillZero(d.getDate(), 2) + " " +
+		fillZero(d.getHours(), 2) + ":" + fillZero(d.getMinutes(), 2) + ":" + fillZero(d.getSeconds(),2);
+	}
+});
+
 Winston.add(Winston.transports.File, {
-	filename : 'server_test.log',
+	filename : 'server.log',
 	maxsize : '512000',
 	maxFiles : 7,
 	json: false,
@@ -20,7 +30,3 @@ Winston.add(Winston.transports.File, {
 		fillZero(d.getHours(), 2) + ":" + fillZero(d.getMinutes(), 2) + ":" + fillZero(d.getSeconds(),2);
 	}
 });
-
-Winston.remove(Winston.transports.Console);
-
-require("../src/server.js");
