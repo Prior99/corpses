@@ -25,15 +25,15 @@ var HTTP = require('http');
 
 /**
  * Event that will be fired when something goes wrong.
- * @event module:Server#error
+ * @event Server#error
  */
 /**
  * Event that will be fired when the server was stopped.
- * @event module:Server#stopped
+ * @event Server#stopped
  */
 /**
  * Event that will be fired when the server is fully started.
- * @event module:Server#started
+ * @event Server#started
  */
 
 /**

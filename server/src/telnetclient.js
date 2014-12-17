@@ -23,15 +23,15 @@ var Util = require("util");
 
 /**
  * Event that will be fired when something goes wrong.
- * @event module:TelnetClient#error
+ * @event TelnetClient#error
  */
 /**
  * Event that will be fired when the connection to the 7 Days to Die server is opened.
- * @event module:TelnetClient#open
+ * @event TelnetClient#open
  */
 /**
  * Event that will be fired when the connection to the 7 Days to Die server is closed.
- * @event module:TelnetClient#close
+ * @event TelnetClient#close
  */
 
 /**
