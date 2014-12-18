@@ -110,7 +110,7 @@ module.exports = function(grunt) {
 		},
 		mochacov: {
 			options : {
-				timeout : 5000,
+				timeout : 10000,
 				require: ['should']
 			},
 			server_html: {

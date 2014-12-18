@@ -51,8 +51,8 @@ describe("The interface to the client", function() {
 	require("./client/admin.js")(client1, client2, database, mockServer, mockSock1, mockSock2);
 
 	describe("Afterwards", function() {
-		it("can shutdown the database", function() {
-
+		it("can shutdown the database", function(done) {
+			database.shutdown(done);
 		});
 	});
 });
