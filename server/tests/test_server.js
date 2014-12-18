@@ -224,12 +224,15 @@ describe('The server', function() {
 	});
 
 	it("can stop everything", function(done) {
+		socket.once("data", function(data) {
+			assert.equal(data, "exit\n");
+			socket.end();
+		});
 		theServer.shutdown();
 		theServer.once("stopped", function() {
 			server.close(function() {
 				done();
 			});
-			socket.end();
 		});
 	});
 });
