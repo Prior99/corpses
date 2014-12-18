@@ -106,7 +106,7 @@ function startOver() {
 	});
 };
 
-Prompt.confirm("Do you want to generate a configfile interactivly?", function(err, okay) {
+Prompt.confirm("Do you want to generate a configfile interactivly? (yes/no)", function(err, okay) {
 	if(okay) {
 		startOver();
 	}
