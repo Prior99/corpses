@@ -53,8 +53,9 @@ var Util = require("util");
 function TelnetClient(config) {
 	Winston.info("Initializing Telnetclient... ");
 	this.client = new net.Socket();
-	this.client.on("error", function() {
-		Winston.error("Initializing Telnetclient failed. Is the server running and reachable?");
+	this.client.on("error", function(err) {
+		Winston.error("Telnetclient received error. Is the server running and reachable?");
+		Winston.error(err);
 		this.emit("error");
 	}.bind(this));
 	this.client.on("close", function() {
@@ -91,7 +92,8 @@ TelnetClient.prototype.connect = function() {
  */
 TelnetClient.prototype.shutdown = function(callback) {
 	this.client.once("close", callback);
-	this.client.end();
+	this._dead = true;
+	this.client.end("exit\n");
 };
 
 TelnetClient.prototype._checkMessage = function() {
@@ -115,12 +117,18 @@ TelnetClient.prototype._checkMessage = function() {
 	}
 };
 
+TelnetClient.prototype._write = function(str) {
+	if(!this._dead) {
+		this.client.write(str + "\n");
+	}
+};
+
 /**
  * This method will trigger the 7DTD server to refresh the information about the
  * server time.
  */
 TelnetClient.prototype.triggerGetTime = function() {
-	this.client.write("gettime\n");
+	this._write("gettime");
 };
 
 /**
@@ -132,14 +140,14 @@ TelnetClient.prototype.triggerGetTime = function() {
  * automatically.
  */
 TelnetClient.prototype.triggerMem = function() {
-	this.client.write("mem\n");
+	this._write("mem");
 };
 
 /**
  * Will refresh the information about known players to the server.
  */
 TelnetClient.prototype.triggerListKnownPlayers = function() {
-	this.client.write("listknownplayers\n");
+	this._write("listknownplayers");
 };
 
 /**
@@ -147,7 +155,7 @@ TelnetClient.prototype.triggerListKnownPlayers = function() {
  * information.
  */
 TelnetClient.prototype.triggerListPlayersExtended = function() {
-	this.client.write("listplayers\n");
+	this._write("listplayers");
 };
 
 
@@ -159,7 +167,7 @@ TelnetClient.prototype.triggerListPlayersExtended = function() {
  *							  support this.
  */
 TelnetClient.prototype.triggerKickPlayer = function(name, reason){
-	this.client.write("kick " + name + (reason === undefined ? "": " " + reason) + "\n");
+	this._write("kick " + name + (reason === undefined ? "": " " + reason));
 };
 
 TelnetClient.prototype._parseMessage = function(string) {

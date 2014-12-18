@@ -281,7 +281,7 @@ Server.prototype.shutdown = function() {
 		closed();
 	}
 	if(this.wsServer && this.httpServer) {
-		this.wsServer.close();
+		//this.wsServer.close();
 		this.httpServer.close(function() {
 			Winston.info("Websocketserver closed.");
 			closed();

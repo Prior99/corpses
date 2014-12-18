@@ -23,6 +23,8 @@ var Server = require("./server.js");
 var config = require("../config.json");
 require("./preparewinston.js");
 
+var _killed = false;
+
 var cache = new Cache({time : 5000, knownPlayers : 10000, playersExtended : 1000});
 var telnetClient = new TelnetClient(config);
 var database = new Database(config.database, function(okay) {
@@ -37,6 +39,18 @@ var database = new Database(config.database, function(okay) {
 			serv.shutdown();
 		});
 		telnetClient.connect();
+		process.on('SIGINT', function() {
+			if(_killed) {
+				Winston.error("CTRL^C detected. Terminating!");
+				process.exit(1);
+			}
+			else {
+				_killed = true;
+				Winston.warn("CTRL^C detected. Secure shutdown initiated.");
+				Winston.warn("Press CTRL^C again to terminate at your own risk.");
+				serv.shutdown();
+			}
+		});
 	}
 	else {
 		Winston.info("Not starting without connection to database.");
