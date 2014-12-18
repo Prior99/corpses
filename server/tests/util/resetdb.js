@@ -20,11 +20,11 @@ function runConnection(sql, done) {
 			console.error(err);
 		}
 		connection.query(sql, function(err) {
-			if(err) if(err) {
+			if(err) {
 				console.error(err);
 			}
 			connection.end(function(err) {
-				if(err) if(err) {
+				if(err) {
 					console.error(err);
 				}
 				done();

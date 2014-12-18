@@ -6,6 +6,8 @@ var MySQL = require('mysql');
 var ResetDB = require("./util/resetdb.js");
 
 describe("The database when failing", function() {
+	var database;
+
 	it("can not connect with wrong config", function(done) {
 		var database = new Database({
 			host : "exsdfamplegfgd.org",
@@ -34,6 +36,11 @@ describe("The database when failing", function() {
 			done();
 		});
 	});
+	it("can restart the database", function(done) {
+		database = new Database(dbConfig.database, function() {
+			done();
+		});
+	});
 	it("cannot validate user with no information given", function(done) {
 		database.validateUser(undefined, undefined, function(err, result) {
 			assert.notEqual(err, undefined);
@@ -53,7 +60,6 @@ describe("The database when failing", function() {
 			done();
 		});
 	});
-	var database = new Database(dbConfig.database);
 	it("can prepare the database to fail", function(done) {
 		ResetDB.purgeDatabase(done);
 	});
