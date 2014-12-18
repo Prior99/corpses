@@ -462,7 +462,7 @@ Database.prototype.validateAdmin = function(id, callback) {
 		});
 	}
 	else {
-		reportError("Unable to validate user, either username, password or both were not supplied.");
+		reportError("Unable to validate admin, either username, password or both were not supplied.");
 		callback(true);
 	}
 };
