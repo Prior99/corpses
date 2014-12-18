@@ -39,7 +39,7 @@ function Database(config, callback) {
 		password : config.password,
 		database : config.database,
 		multipleStatements : true,
-		connectTimeout : 4000
+		connectTimeout : config.connectTimeout ? config.connectTimeout : 4000
 	});
 	Winston.info("Connecting to Database... ");
 	this.pool.getConnection(function(err, conn) {
