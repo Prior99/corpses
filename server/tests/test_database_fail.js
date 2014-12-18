@@ -60,8 +60,15 @@ describe("The database when failing", function() {
 			done();
 		});
 	});
-	it("can prepare the database to fail", function(done) {
-		ResetDB.purgeDatabase(done);
+
+	it("can shutdown the database, purge it and restart it", function(done) {
+		database.shutdown(function() {
+			database = new Database(dbConfig.database, function() {
+				ResetDB.purgeDatabase(function() {
+					done();
+				});
+			});
+		});
 	});
 	it("reacts fine to adding a marker", function(done) {
 		database.addMarker({
