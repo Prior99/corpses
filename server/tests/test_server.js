@@ -235,4 +235,7 @@ describe('The server', function() {
 			});
 		});
 	});
+	it("can shutdown the database", function(done) {
+		database.shutdown(done);
+	});
 });

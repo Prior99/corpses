@@ -190,4 +190,7 @@ describe("The database when failing", function() {
 			done();
 		});
 	});
+	it("can shutdown the database", function(done) {
+		database.shutdown(done);
+	});
 });
