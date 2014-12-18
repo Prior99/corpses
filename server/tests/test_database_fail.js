@@ -8,9 +8,9 @@ var ResetDB = require("./util/resetdb.js");
 describe("The database when failing", function() {
 	it("can not connect with wrong config", function(done) {
 		var database = new Database({
-			host : "example.org",
-			user : "test",
-			password : "12345",
+			host : "exsdfamplegfgd.org",
+			user : "testsdf",
+			password : "12sdf34sdf5",
 			connectTimeout : 500,
 			database : "testdb"}, function(okay) {
 				assert(!okay);
