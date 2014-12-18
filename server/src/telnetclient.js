@@ -54,12 +54,14 @@ function TelnetClient(config) {
 	Winston.info("Initializing Telnetclient... ");
 	this.client = new net.Socket();
 	this.client.on("error", function(err) {
-		Winston.error("Telnetclient received error. Is the server running and reachable?");
-		Winston.error(err);
+		Winston.error("Could not connect to 7 Days to Die. Is the server running and reachable?");
 		this.emit("error");
 	}.bind(this));
 	this.client.on("close", function() {
 		this.emit("close");
+	}.bind(this));
+	this.client.once("connect", function() {
+		this._opened = true;
 	}.bind(this));
 	this.buffer = "";
 	this.client.on("data", function(data) {
@@ -91,6 +93,9 @@ TelnetClient.prototype.connect = function() {
  * @param {TelnetClient~requestCallback} callback - Will be called once the client is closed.
  */
 TelnetClient.prototype.shutdown = function(callback) {
+	if(this._dead || !this._opened) {
+		return;
+	}
 	this.client.once("close", callback);
 	this._dead = true;
 	this.client.end("exit\n");

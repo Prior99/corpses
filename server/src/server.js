@@ -261,6 +261,10 @@ Server.prototype._initTelnetClient = function() {
  * @fires module:Server#stopped
  */
 Server.prototype.shutdown = function() {
+	if(this._dead) {
+		return;
+	}
+	this._dead = true;
 	var i = 3;
 	var self = this;
 	function closed() {
@@ -271,17 +275,12 @@ Server.prototype.shutdown = function() {
 		}
 	}
 	Winston.info("Server is about to shutdown...");
-	if(this.telnetClient) {
-		this.telnetClient.shutdown(function() {
-			Winston.info("Connection to 7DTD closed.");
-			closed();
-		});
-	}
-	else {
+	this.telnetClient.shutdown(function() {
+		Winston.info("Connection to 7DTD closed.");
 		closed();
-	}
+	});
 	if(this.wsServer && this.httpServer) {
-		//this.wsServer.close();
+		this.wsServer.close();
 		this.httpServer.close(function() {
 			Winston.info("Websocketserver closed.");
 			closed();
@@ -290,15 +289,10 @@ Server.prototype.shutdown = function() {
 	else {
 		closed();
 	}
-	if(this.database) {
-		this.database.shutdown(function() {
-			Winston.info("Disconnected from database.");
-			closed();
-		});
-	}
-	else {
+	this.database.shutdown(function() {
+		Winston.info("Disconnected from database.");
 		closed();
-	}
+	});
 };
 
 module.exports = Server;
