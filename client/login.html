@@ -102,13 +102,17 @@
 			function showRegister(animationLength){
 				$(".help").hide();
 				$("#loginDiv").hide(animationLength);
-				$("#registerDiv").show(animationLength);
+				$("#registerDiv").show(animationLength, function(){
+					$(':input[id*="Name"]').focus();
+				});
 			}
 
 			function showLogin(animationLength){
 				$(".help").hide();
 				$("#registerDiv").hide(animationLength);
-				$("#loginDiv").show(animationLength);
+				$("#loginDiv").show(animationLength, function(){
+					$(':input[id*="Name"]').focus();
+				});
 			}
 
 			$(function(){
@@ -141,6 +145,24 @@
 						Login.login($("#loginName").val(), $("#loginPassword").val(), $("#loginRemember").is(":checked"), function(err) {
 							displayLoginError($("#loginError"), err);
 						});
+					});
+					
+					$(":input").keyup(function(event){
+						if(event.keyCode === 13){
+							event.preventDefault();
+							//shift focus to next input
+							var inputs = $(':input');
+							var nextIndex = inputs.index(this) + 1;
+							if(nextIndex < inputs.length){
+								inputs[nextIndex].focus();
+							}
+						}
+					});
+					$(":button").keypress(function(event){
+						if(event.keycode == 13){
+							event.preventDefault();
+							$(this).click();
+						}
 					});
 				});
 			});
