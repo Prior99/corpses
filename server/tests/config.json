@@ -5,8 +5,7 @@
       "host" : "localhost",
       "user" : "corpsestest",
       "password" : "HufuLSAAnuSmdCeD",
-      "database" : "corpsestest",
-      "multipleStatements" : "true"
+      "database" : "corpsestest"
   },
   "websocketPort" : 7434,
   "port" : 54678,

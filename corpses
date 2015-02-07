@@ -1,0 +1,155 @@
+#!/bin/bash
+
+function editconfig {
+	if node scripts/genconfig.js ; then
+		echo -e "\033[32mOkay.\033[0m Configfile created."
+	else
+		echo -e "\033[33mAborted by user.\033[0m\nPlease create the configfile manually by copying the server/config.json.example to server/config.json and edit it according to your needs."
+		exit 1
+	fi
+}
+
+function start {
+	#
+	# Make sure that this script is not run as root
+	# running this server as root could lead to severe security risks
+	# Generally speaking, do never run any serversoftware cloned from any
+	# repository as root. Unless you want your server rootkitted and taken over.
+	#
+
+	echo -n "  Checking for user ... "
+	if [ $EUID -eq 0 ]; then
+		echo -ne "\033[31mnot okay.\033[0m Do not run this script as root."
+		echo -e "\r\033[31m\xe2\x9c\x98\033[0m"
+		exit 1
+	else
+		echo -ne "\033[32mokay.\033[0m"
+		echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
+	fi
+
+	#
+	# Check for node and npm.
+	#
+
+	echo -n "  Checking for node ... "
+	if ! type node &> /dev/null ; then
+		echo -ne "\033[31mnot found!\033[0m Please install nodejs (http://nodejs.org/)"
+		echo -e "\r\033[31m\xe2\x9c\x98\033[0m"
+		exit 1
+	else
+		echo -ne "\033[32mfound.\033[0m"
+		echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
+	fi
+
+	echo -n "  Checking for npm ... "
+	if ! type npm &> /dev/null ; then
+		echo -ne "\033[31mnot found!\033[0m Please install nodejs (http://nodejs.org/)"
+		echo -e "\r\033[31m\xe2\x9c\x98\033[0m"
+		exit 1
+	else
+		echo -ne "\033[32mfound.\033[0m"
+		echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
+	fi
+
+	#
+	# Install all npm dependencies.
+	# This also includes bower and grunt-cli as local installations.
+	# No need to install them system-wide.
+	#
+
+	echo -n "  Installing npm dependencies ... "
+	if npm install --silent ; then
+		echo -ne "\033[32mdone.\033[0m"
+		echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
+	else
+		echo -ne "\033[31mfailed!\033[0m Please try to install the dependencies manually using \"npm install\" and investigate further."
+		echo -e "\r\033[31m\xe2\x9c\x98\033[0m"
+		exit 1
+	fi
+
+	#
+	# Install all bower dependencies.
+	# We do not want to send anonymous usage statistics to them I presume.
+	#
+
+	echo -n "  Installing bower dependencies ... "
+	if echo "n" | ./node_modules/bower/bin/bower install --silent ; then
+		echo -ne "\033[32mdone.\033[0m"
+		echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
+	else
+		echo -ne "\033[31mfailed!\033[0m Please try to install the dependencies manually using \"bower install\" and investigate further."
+		echo -e "\r\033[31m\xe2\x9c\x98\033[0m"
+		exit 1
+	fi
+
+	#
+	# Now try building this software.
+	#
+
+	echo -n "  Building ... "
+	./node_modules/grunt-cli/bin/grunt build > grunt.log
+	if grep --quiet "Done, without errors." grunt.log ; then
+		echo -ne "\033[32mdone.\033[0m"
+		echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
+	else
+		echo -ne "\033[31mfailed!\033[0m Please report this incident to the developers. Make sure to include the \"grunt.log\" file in your report. Thank you for contributing."
+		echo -e "\r\033[31m\xe2\x9c\x98\033[0m"
+		exit 1
+	fi
+
+	#
+	# Check if the user created a configfile.
+	#
+
+	echo -n "  Checking for config ... "
+	if [ -f "server/config.json" ]; then
+		if node scripts/checkconfig.js ; then
+			echo -ne "\033[32mokay.\033[0m"
+			echo -e "\r\033[32m\xe2\x9c\x94\033[0m"
+		else
+			echo -ne "\033[31mfound but invalid!\033[0m"
+			echo -e "\r\033[31m\xe2\x9c\x98\033[0m"
+			if node scripts/genconfig.js ; then
+				echo -e "\033[32mOkay.\033[0m Configfile created."
+			else
+				echo "Please edit the configfile at server/config.json manually."
+				exit 1
+			fi
+		fi
+	else
+		echo -ne "\033[31mnot found!\033[0m"
+		echo -e "\r\033[31m\xe2\x9c\x98\033[0m"
+		editconfig
+	fi
+
+	#
+	# Everything went right, we may now start the server.
+	#
+	echo
+	echo -e "\033[32mEnvironement is sane. You may start the server using $0 faststart next time.\033[0m"
+	echo
+	echo -e "\033[32mStarting server now.\033[0m"
+	echo
+
+	node server/src/startup.js
+}
+
+case $1 in
+	start)
+		start
+	;;
+	faststart)
+		echo
+		echo -e "\033[33mSkipping checking of dependencies and build. \nWhile this makes the startup significantly faster,\nplease make sure that all dependencies are correctly installed\nby starting the server normally ($0 start) at least once.\033[0m"
+		echo
+		echo -e "\033[32mStarting server now.\033[0m"
+		echo
+		node server/src/startup.js
+	;;
+	editconfig)
+		editconfig
+	;;
+	*)
+		echo "Usage: $0 {start|faststart|editconfig|help}"
+	;;
+esac

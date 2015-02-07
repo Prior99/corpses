@@ -17,8 +17,8 @@ describe("The interface to the client", function() {
 	var mockSock2;
 	var client1;
 	var client2;
-	
-	database = new Database(dbConfig);
+
+	database = new Database(dbConfig.database);
 	mockSock1 = new MockWebsocket();
 	mockSock2 = new MockWebsocket();
 
@@ -49,4 +49,10 @@ describe("The interface to the client", function() {
 	require("./client/gamequeries.js")(client1, client2, database, mockServer, mockSock1, mockSock2);
 	require("./client/markers.js")(client1, client2, database, mockServer, mockSock1, mockSock2);
 	require("./client/admin.js")(client1, client2, database, mockServer, mockSock1, mockSock2);
+
+	describe("Afterwards", function() {
+		it("can shutdown the database", function(done) {
+			database.shutdown(done);
+		});
+	});
 });

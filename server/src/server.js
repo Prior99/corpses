@@ -22,36 +22,32 @@ var FS = require("fs");
 var Client = require("./client.js");
 var Websocket = require("./websocket_server.js");
 var HTTP = require('http');
+
+/**
+ * Event that will be fired when something goes wrong.
+ * @event Server#error
+ */
+/**
+ * Event that will be fired when the server was stopped.
+ * @event Server#stopped
+ */
+/**
+ * Event that will be fired when the server is fully started.
+ * @event Server#started
+ */
+
 /**
  * This module represents the server that will attach to the 7 Days to Die server,
  * leech it's events and proxy it to the connected clients. It utilizes a database
  * in order to store users and created markers as well as relations between the users.
  * A cache makes sure to keep information from the 7DTD server stored and up-to-date.
- *
- * @module Server
- */
-
-/**
- * Event that will be fired when something goes wrong.
- * @event module:Server#error
- */
-/**
- * Event that will be fired when the server was stopped.
- * @event module:Server#stopped
- */
-/**
- * Event that will be fired when the server is fully started.
- * @event module:Server#started
- */
-
-/**
  * The constructor takes all necessary and not yet initalized modules it needs
  * to operate. Please start everything after passing it to the server so the
  * respective events can be catched and used.
  * @constructor
  * @param {Cache} cache - an instance of the cache that stores the information of the telnetclient
  * @param {TelnetClient} telnetClient - an instance of the telnetclient connected to the 7DTD server
- * @param {object} database - an instance of the wrapper for the databaseconnection
+ * @param {Database} database - an instance of the wrapper for the databaseconnection
  * @param {object} config - the parsed json of the configfile
  * @fires module:Server#started
  * @fires module:Server#error
@@ -191,6 +187,23 @@ Server.prototype.broadcastToUser = function(steamid, name, obj) {
 	}
 };
 
+/**
+ * This will return an array of all clients currently connected to the specified
+ * user.
+ * @param {number} steamid - SteamID of the user to get the clients of.
+ * @return {Client[]} Array of all clients connected as this user.
+ */
+Server.prototype.getUserClients = function(steamid) {
+	var list = [];
+	for(var i in this.clients) {
+		var client = this.clients[i];
+		if(client.isUser(steamid)) {
+			list.push(client);
+		}
+	}
+	return list;
+};
+
 Server.prototype._initTelnetClient = function() {
 	var me = this;
 	this.telnetClient.on("close", function() {
@@ -248,6 +261,10 @@ Server.prototype._initTelnetClient = function() {
  * @fires module:Server#stopped
  */
 Server.prototype.shutdown = function() {
+	if(this._dead) {
+		return;
+	}
+	this._dead = true;
 	var i = 3;
 	var self = this;
 	function closed() {
@@ -262,11 +279,16 @@ Server.prototype.shutdown = function() {
 		Winston.info("Connection to 7DTD closed.");
 		closed();
 	});
-	this.wsServer.close();
-	this.httpServer.close(function() {
-		Winston.info("Websocketserver closed.");
+	if(this.wsServer && this.httpServer) {
+		this.wsServer.close();
+		this.httpServer.close(function() {
+			Winston.info("Websocketserver closed.");
+			closed();
+		});
+	}
+	else {
 		closed();
-	});
+	}
 	this.database.shutdown(function() {
 		Winston.info("Disconnected from database.");
 		closed();

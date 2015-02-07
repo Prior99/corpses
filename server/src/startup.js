@@ -21,23 +21,38 @@ var Database = require("./database.js");
 var Cache = require("./cache.js");
 var Server = require("./server.js");
 var config = require("../config.json");
+require("./preparewinston.js");
 
-Winston.add(Winston.transports.File, {
-	filename : 'server.log',
-	maxsize : '512000',
-	maxFiles : 7,
-	json: false,
-	colorize: true,
-	timestamp: function() {
-		var d = new Date();
-		return d.getYear() + "." + (d.getMonth() + 1) + "." + d.getDate() + " " +
-		d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds() + "." + d.getMilliseconds();
-	}
-});
+var _killed = false;
 
 var cache = new Cache({time : 5000, knownPlayers : 10000, playersExtended : 1000});
 var telnetClient = new TelnetClient(config);
-var database = new Database(config, function() {
-	new Server(cache, telnetClient, database, config);
-	telnetClient.connect();
+var database = new Database(config.database, function(okay) {
+	if(okay) {
+		var serv = new Server(cache, telnetClient, database, config);
+		serv.on('error', function() {
+			Winston.info("Server emitted error. Shutting down.");
+			serv.shutdown();
+		});
+		telnetClient.on('error', function() {
+			Winston.info("Telnetclient emitted error. Shutting down.");
+			serv.shutdown();
+		});
+		telnetClient.connect();
+		process.on('SIGINT', function() {
+			if(_killed) {
+				Winston.error("CTRL^C detected. Terminating!");
+				process.exit(1);
+			}
+			else {
+				_killed = true;
+				Winston.warn("CTRL^C detected. Secure shutdown initiated.");
+				Winston.warn("Press CTRL^C again to terminate at your own risk.");
+				serv.shutdown();
+			}
+		});
+	}
+	else {
+		Winston.info("Not starting without connection to database.");
+	}
 });

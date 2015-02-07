@@ -37,8 +37,8 @@ Errors = {
 		description : "The username you chose was already taken. Please choose another username."
 	},
 	"username_or_password_wrong" : {
-		name : "Username and password don't match",
-		description : "The username and password you provided did not match any user in the database. Please check, that both are correct."
+		name : "Username and password don't match or account disabled",
+		description : "The username and password you provided did not match any user in the database. Please check, that both are correct. <i>Please note, that your account needs to be activated after it was registered or you were deactivated!</i>"
 	},
 	"no_admin" : {
 		name : "Not an admin",

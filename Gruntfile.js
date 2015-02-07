@@ -110,7 +110,7 @@ module.exports = function(grunt) {
 		},
 		mochacov: {
 			options : {
-				timeout : 5000,
+				timeout : 10000,
 				require: ['should']
 			},
 			server_html: {
@@ -144,7 +144,7 @@ module.exports = function(grunt) {
 		},
 		jsdoc : {
 			server : {
-				src: ['server/src/*.js'],
+				src: ['server/src/*.js', 'README.md'],
 				options: {
 					destination: 'doc/server'
 				}
@@ -182,6 +182,6 @@ module.exports = function(grunt) {
 		});
 	});
 	grunt.registerTask('client', 'Test and build the client.', ['test:client', 'build:client']);
-	grunt.registerTask('server', 'Test and build the server.', ['test:server', 'build:server', 'printcoverage', 'linkcoverage']);
-	grunt.registerTask('default', 'Test and build both client and server.', ['server', 'client']);
+	grunt.registerTask('server', 'Test and build the server.', ['test:server', 'build:server', 'printcoverage', 'linkcoverage', 'jsdoc:server']);
+	grunt.registerTask('default', 'Test and build both client and server.', ['client', 'server']);
 };

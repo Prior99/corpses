@@ -20,33 +20,29 @@ var net = require("net");
 var Regexes = require("./regex.js");
 var Events = require('events');
 var Util = require("util");
+
+/**
+ * Event that will be fired when something goes wrong.
+ * @event TelnetClient#error
+ */
+/**
+ * Event that will be fired when the connection to the 7 Days to Die server is opened.
+ * @event TelnetClient#open
+ */
+/**
+ * Event that will be fired when the connection to the 7 Days to Die server is closed.
+ * @event TelnetClient#close
+ */
+
 /**
  * This module will connect to the 7 Days to Die server and run a number of triggers
  * on it as well as fetching inromation provided by the server.
  * It utilizes the regular expressions defined in regex.js in order to compute the
  * messages provided by the server and retrieve the relevant data.
- *
- * @module TelnetClient
- */
-
-/**
- * Event that will be fired when something goes wrong.
- * @event module:TelnetClient#error
- */
-/**
- * Event that will be fired when the connection to the 7 Days to Die server is opened.
- * @event module:TelnetClient#open
- */
-/**
- * Event that will be fired when the connection to the 7 Days to Die server is closed.
- * @event module:TelnetClient#close
- */
-
-/**
  * Initialize the telnet client with a given configuration about host and port.
  * You will most likely pass parsed json configurationfile here.
  * Just constructing this module will not connect it. You will have to invoke
- * [connect()]{@link module:TelnetClient~TelnetClient#connect} in order to connect.
+ * {@link TelnetClient#connect} in order to connect.
  * @constructor
  * @param {object} config - The configuration this telnetclient will use to connect.
  * @param {number} config.telnetPort - The port the 7 Days to Die server is running on.
@@ -57,12 +53,15 @@ var Util = require("util");
 function TelnetClient(config) {
 	Winston.info("Initializing Telnetclient... ");
 	this.client = new net.Socket();
-	this.client.on("error", function() {
-		Winston.error("Initializing Telnetclient failed. Is the server running and reachable?");
+	this.client.on("error", function(err) {
+		Winston.error("Could not connect to 7 Days to Die. Is the server running and reachable?");
 		this.emit("error");
 	}.bind(this));
 	this.client.on("close", function() {
 		this.emit("close");
+	}.bind(this));
+	this.client.once("connect", function() {
+		this._opened = true;
 	}.bind(this));
 	this.buffer = "";
 	this.client.on("data", function(data) {
@@ -73,7 +72,6 @@ function TelnetClient(config) {
 }
 
 Util.inherits(TelnetClient, Events.EventEmitter);
-
 /**
  * This will make the telnet client connect to the specified server.
  * @fires module:TelnetClient#open
@@ -86,13 +84,21 @@ TelnetClient.prototype.connect = function() {
 };
 
 /**
+ * This callback is called when the request was fullfilled.
+ * @callback TelnetClient~requestCallback
+ */
+/**
  * This will shutdown the connection to the 7 Days to Die server. After a
  * successfull shutdown, the callback will be called.
- * @param {requestCallback} callback - Will be called once the client is closed.
+ * @param {TelnetClient~requestCallback} callback - Will be called once the client is closed.
  */
 TelnetClient.prototype.shutdown = function(callback) {
+	if(this._dead || !this._opened) {
+		return;
+	}
 	this.client.once("close", callback);
-	this.client.end();
+	this._dead = true;
+	this.client.end("exit\n");
 };
 
 TelnetClient.prototype._checkMessage = function() {
@@ -116,12 +122,18 @@ TelnetClient.prototype._checkMessage = function() {
 	}
 };
 
+TelnetClient.prototype._write = function(str) {
+	if(!this._dead) {
+		this.client.write(str + "\n");
+	}
+};
+
 /**
  * This method will trigger the 7DTD server to refresh the information about the
  * server time.
  */
 TelnetClient.prototype.triggerGetTime = function() {
-	this.client.write("gettime\n");
+	this._write("gettime");
 };
 
 /**
@@ -133,14 +145,14 @@ TelnetClient.prototype.triggerGetTime = function() {
  * automatically.
  */
 TelnetClient.prototype.triggerMem = function() {
-	this.client.write("mem\n");
+	this._write("mem");
 };
 
 /**
  * Will refresh the information about known players to the server.
  */
 TelnetClient.prototype.triggerListKnownPlayers = function() {
-	this.client.write("listknownplayers\n");
+	this._write("listknownplayers");
 };
 
 /**
@@ -148,7 +160,7 @@ TelnetClient.prototype.triggerListKnownPlayers = function() {
  * information.
  */
 TelnetClient.prototype.triggerListPlayersExtended = function() {
-	this.client.write("listplayers\n");
+	this._write("listplayers");
 };
 
 
@@ -160,7 +172,7 @@ TelnetClient.prototype.triggerListPlayersExtended = function() {
  *							  support this.
  */
 TelnetClient.prototype.triggerKickPlayer = function(name, reason){
-	this.client.write("kick " + name + (reason === undefined ? "": " " + reason) + "\n");
+	this._write("kick " + name + (reason === undefined ? "": " " + reason));
 };
 
 TelnetClient.prototype._parseMessage = function(string) {

@@ -15,14 +15,11 @@
  *  along with CORPSES. If not, see <http://www.gnu.org/licenses/>.
  */
 var Winston = require('winston');
+
 /**
  * This cache will save informations transmitted from the telnetconnection to the
  * 7DTD server. It will trigger the refreshing of these information automatically
  * every few seconds.
- *
- * @module Cache
- */
-/**
  * Initialize the cache with a number of intervals that indicate how often the
  * information stored by this cache should be polled from the 7DTD server.
  * @constructor

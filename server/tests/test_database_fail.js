@@ -6,11 +6,14 @@ var MySQL = require('mysql');
 var ResetDB = require("./util/resetdb.js");
 
 describe("The database when failing", function() {
+	var database;
+
 	it("can not connect with wrong config", function(done) {
 		var database = new Database({
-			host : "example.org",
-			user : "test",
-			password : "12345",
+			host : "exsdfamplegfgd.org",
+			user : "testsdf",
+			password : "12sdf34sdf5",
+			connectTimeout : 500,
 			database : "testdb"}, function(okay) {
 				assert(!okay);
 				done();
@@ -19,17 +22,22 @@ describe("The database when failing", function() {
 	});
 	it("cannot setup the database when file not existing", function(done) {
 		FS.renameSync("server/database.sql", "server/database.sql.tmp");
-		var database = new Database(dbConfig, function(okay) {
+		var database = new Database(dbConfig.database, function(okay) {
 			assert(!okay);
 			done();
 		});
 	});
 	it("cannot setup the database when file is wrong", function(done) {
 		FS.writeFileSync("server/database.sql", "THIS IS A TEST;\nTHIS IS NOT VALID SQL;");
-		var database = new Database(dbConfig, function(okay) {
+		var database = new Database(dbConfig.database, function(okay) {
 			assert(!okay);
 			FS.unlinkSync("server/database.sql");
 			FS.renameSync("server/database.sql.tmp", "server/database.sql");
+			done();
+		});
+	});
+	it("can restart the database", function(done) {
+		database = new Database(dbConfig.database, function() {
 			done();
 		});
 	});
@@ -52,9 +60,15 @@ describe("The database when failing", function() {
 			done();
 		});
 	});
-	var database = new Database(dbConfig);
-	it("can prepare the database to fail", function(done) {
-		ResetDB.purgeDatabase(done);
+
+	it("can shutdown the database, purge it and restart it", function(done) {
+		database.shutdown(function() {
+			database = new Database(dbConfig.database, function() {
+				ResetDB.purgeDatabase(function() {
+					done();
+				});
+			});
+		});
 	});
 	it("reacts fine to adding a marker", function(done) {
 		database.addMarker({
@@ -188,5 +202,8 @@ describe("The database when failing", function() {
 			assert.equal(err.code, 'ER_NO_SUCH_TABLE');
 			done();
 		});
+	});
+	it("can shutdown the database", function(done) {
+		database.shutdown(done);
 	});
 });

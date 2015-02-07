@@ -25,7 +25,7 @@ describe('The server', function() {
 
 	it("can setup a mocked 7dtd testserver", function(done) {
 		FS.unlink(config.clientDirectory + "/map", function() {
-			database = new Database(config, function() {
+			database = new Database(config.database, function() {
 				server = net.createServer(function(sock) {
 					socket = sock;
 					socket.setEncoding("utf8");
@@ -213,13 +213,29 @@ describe('The server', function() {
 		});
 	});
 
+	it("can fetch the clients of a particular user", function(done) {
+		websocket.send("login", { name : "Test1", password : "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3"}, function(answer) {
+			assert(answer.okay);
+			var list = theServer.getUserClients(345);
+			assert.equal(list.length, 1);
+			assert.equal(list[0], theServer.clients[0]);
+			done();
+		});
+	});
+
 	it("can stop everything", function(done) {
+		socket.once("data", function(data) {
+			assert.equal(data, "exit\n");
+			socket.end();
+		});
 		theServer.shutdown();
 		theServer.once("stopped", function() {
 			server.close(function() {
 				done();
 			});
-			socket.end();
 		});
+	});
+	it("can shutdown the database", function(done) {
+		database.shutdown(done);
 	});
 });

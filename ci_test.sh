@@ -11,12 +11,15 @@ cp server/config.json.example server/config.json
 echo "Now building/testing ... "
 grunt | iconv -ctascii | tee grunt.log
 grep --quiet "Done, without errors." grunt.log
+RESULT=$?
 echo "The log is as follows:"
 cat server_test.log
-RESULT=$?
 HTML=$(grep -P "server_\\d+.html" grunt.log)
 if [ "$RESULT" = "0" ]; then
 	echo "The build was successfull."
+	echo "Deploying current doc."
+	rm -Rf /var/websites/ci_drops/corpses_server_doc
+	cp -Rf doc/server /var/websites/ci_drops/corpses_server_doc
 	echo "Sharing codecoverage overview $HTML"
 	share "coverage/$HTML"
 	exit 0
