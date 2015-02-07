@@ -150,11 +150,17 @@
 					$(":input").keyup(function(event){
 						if(event.keyCode === 13){
 							event.preventDefault();
-							//shift focus to next input
-							var inputs = $(':input');
-							var nextIndex = inputs.index(this) + 1;
-							if(nextIndex < inputs.length){
-								inputs[nextIndex].focus();
+							
+							if($(this).attr("id") === "loginPassword" || $(this).attr("id") === "registerPasswordRepeat" || $(this).attr("type") === "checkbox"){
+								$(":button[id*=" + $(this).attr("id").substring(0,5) + "]").click();
+							}
+							else{
+								//shift focus to next input
+								var inputs = $(':input');
+								var nextIndex = inputs.index(this) + 1;
+								if(nextIndex < inputs.length){
+									inputs[nextIndex].focus();
+								}
 							}
 						}
 					});
