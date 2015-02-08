@@ -80,20 +80,35 @@ Server.prototype._websocketStarted = function() {
 };
 
 Server.prototype._symlinkMap = function() {
-	FS.symlink(this.config.mapDirectory, this.config.clientDirectory + "/map", function(err) {
-		if(err) {
-			if(err.errno !== 47) {
-				Winston.error("Unable to create symlink for map.\n" +
-					"Please create it manually by executing the following command:\n\n" +
-					"ln -s " + this.config.mapDirectory + " " + this.config.clientDirectory + "/map");
-				this.emit("error", err);
-			}
+	var self = this;
+	FS.exists(this.config.clientDirectory + "/map", function(exists){
+		if(!exists){
+			FS.symlink(this.config.mapDirectory, this.config.clientDirectory + "/map", function(err) {
+				if(err) {
+					if(err.errno !== 47) {
+						Winston.error("Unable to create symlink for map.\n" +
+							"Please create it manually by executing the following command:\n\n" +
+							"ln -s " + this.config.mapDirectory + " " + this.config.clientDirectory + "/map");
+						this.emit("error", err);
+					}
+				}
+				else {
+					Winston.info("Map successfully linked. (" + this.config.mapDirectory +
+						" -> " + this.config.clientDirectory + "/map");
+				}
+			}.bind(self));
 		}
-		else {
-			Winston.info("Map successfully linked. (" + this.config.mapDirectory +
-				" -> " + this.config.clientDirectory + "/map");
+		else{
+			FS.readlink(this.config.clientDirectory + "/map", function(err, link){
+				if(err){
+					console.log(err);
+				}
+				else{
+					Winston.info("Map link already exists. (" + this.config.clientDirectory + "/map -> " + link);
+				}
+			}.bind(this));
 		}
-	}.bind(this));
+	}.bind(self));
 };
 
 /**
