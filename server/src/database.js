@@ -62,10 +62,10 @@ function Database(config, callback) {
 					}
 				}
 				else {
-					pool.query(
-							if(cdata, function(err) {
+					pool.query(data, function(err) {
 						if(err) {
-							Winston.error("An error occured while configuring database:", err);allback) {
+							Winston.error("An error occured while configuring database:" + err);
+							if(callback) {
 								callback(false);
 							}
 						}
