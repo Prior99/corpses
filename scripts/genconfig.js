@@ -87,7 +87,13 @@ function startOver() {
 			console.log("This will be the content of your configfile:");
 			var json = JSON.stringify(results, null, 4);
 			console.log(json);
-			Prompt.confirm("Is that okay?", function(err, okay) {
+			Prompt.get({
+					validator: /y[es]*|n[o]?/,
+					required: true,
+					default: "yes",
+					warning: "Anwser 'yes' or 'no'!",
+					message: "Is that okay?"
+			}, function(err, okay) {
 				if(okay) {
 					FS.writeFile("server/config.json", json, function(err) {
 						if(!err) {
