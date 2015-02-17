@@ -39,10 +39,10 @@ UI.updateUsers = function(users) {
 		return false;
 	});
 	div.html("<tr>" +
-		"<td><i class='fa fa-user'></i></td>" +
-		"<td><i class='fa fa-check-circle'></td>" +
-		"<td><i class='fa fa-gavel'></i></td>" +
-		"<td><i class='fa fa-heart'></i></td>" +
+		"<td><i class='fa fa-user' title='Registered users'></i></td>" +
+		"<td><i class='fa fa-check-circle' title='Enabled'></td>" +
+		"<td><i class='fa fa-gavel' title='Admin'></i></td>" +
+		"<td><i class='fa fa-heart' title='Friends'></i></td>" +
 	"</tr>");
 	function boolToSymbol(bool) {
 		if(bool) {
@@ -55,16 +55,16 @@ UI.updateUsers = function(users) {
 
 	function friendSymbol(send, recv) {
 		if(send && recv) {
-			return "<i class='fa fa-check'></i>";
+			return "<i class='fa fa-check' title='You are friends'></i>";
 		}
 		else if(!send && !recv){
-			return "<i class='fa fa-times'></i>";
+			return "<i class='fa fa-times' title='You are not friends'></i>";
 		}
 		else if(send && !recv){
-			return "<i class='fa fa-exclamation'></i>";
+			return "<i class='fa fa-exclamation' title='You sent this user a friend request or they deleted you as a friend.'></i>";
 		}
 		else if(!send && recv){
-			return "<i class='fa fa-question'></i>";
+			return "<i class='fa fa-question' title='This user sent you a friend request or you deleted them as a friend.'></i>";
 		}
 	}
 
