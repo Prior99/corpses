@@ -8,6 +8,8 @@
 		<!-- endbower -->
 		<script src="port.js"></script>
 		<script src="7dtdwebinterface.min.js"></script>
+
+		<title>CORPSES</title>
 	</head>
 	<body>
 		<div class="header">
@@ -146,11 +148,11 @@
 							displayLoginError($("#loginError"), err);
 						});
 					});
-					
+
 					$(":input").keyup(function(event){
 						if(event.keyCode === 13){
 							event.preventDefault();
-							
+
 							if($(this).attr("id") === "loginPassword" || $(this).attr("id") === "registerPasswordRepeat" || $(this).attr("type") === "checkbox"){
 								$(":button[id*=" + $(this).attr("id").substring(0,5) + "]").click();
 							}

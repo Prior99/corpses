@@ -87,6 +87,8 @@
 			</tr>
 		</table>
 	</script>
+
+	<title>CORPSES</title>
 </head>
 <body>
 	<div class="stack">
@@ -180,6 +182,7 @@
 					window.location.href = "index.html";
 				}
 				else {
+					document.title = "CORPSES: " + Login.getUser().name;
 					MapSystem.init();
                     NET.init();
 				}
