@@ -81,8 +81,8 @@ Server.prototype._websocketStarted = function() {
 
 Server.prototype._symlinkMap = function() {
 	var self = this;
-	FS.exists(this.config.clientDirectory + "/map", function(exists){
-		if(!exists){
+	FS.lstat(this.config.clientDirectory + "/map", function(err, stats){
+		if(err || !stats.isSymbolicLink()){
 			FS.symlink(this.config.mapDirectory, this.config.clientDirectory + "/map", function(err) {
 				if(err) {
 					if(err.errno !== 47) {
@@ -94,7 +94,7 @@ Server.prototype._symlinkMap = function() {
 				}
 				else {
 					Winston.info("Map successfully linked. (" + this.config.mapDirectory +
-						" -> " + this.config.clientDirectory + "/map");
+						" -> " + this.config.clientDirectory + "/map)");
 				}
 			}.bind(self));
 		}
@@ -104,7 +104,7 @@ Server.prototype._symlinkMap = function() {
 					console.log(err);
 				}
 				else{
-					Winston.info("Map link already exists. (" + this.config.clientDirectory + "/map -> " + link);
+					Winston.info("Map link already exists. (" + this.config.clientDirectory + "/map -> " + link + ")");
 				}
 			}.bind(this));
 		}
