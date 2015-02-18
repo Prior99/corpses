@@ -1,0 +1,73 @@
+<div id="loginDiv">
+    <h1>Login</h1>
+    <table>
+        <tr>
+            <th colspan="2" id="loginError" class="error"></th>
+        </tr>
+        <tr>
+            <td>Username:</td>
+            <td><input type="text" id="loginName"></input><br/></td>
+        </tr>
+        <tr>
+            <td>Password:</td>
+            <td><input type="password" id="loginPassword"></input><br/></td>
+        </tr>
+        <tr>
+            <td>Remember me:</td>
+            <td><input type="checkbox" id="loginRemember"></input></td>
+        </tr>
+        <tr>
+            <th colspan="2"><button id="login">Login</button></th>
+        </tr>
+    </table>
+    <a href="#" id="gotoRegister">Not registered yet?</a>
+</div>
+
+<div id="registerDiv" >
+    <h1>Register</h1>
+    <table>
+        <tr>
+            <th colspan="2" id="registerError" class="error"></th>
+        </tr>
+        <tr>
+            <td>Username:</td>
+            <td><input type="text" id="registerName"></input></td>
+        </tr>
+        <tr>
+            <td>Steam64 ID:</td>
+            <td>
+                <input type="text" id="registerSteamID"></input>
+                <a id="registerSteamIDHelp" class="tipstrip">?</a>
+                <span id="registerSteamIDHelpText" class="help">
+                    Please enter your Steam ID 64 here so the webinterface can identify
+                    you ingame. If you don't know your Steam ID, you may look it up
+                    on pages like <a href="http://steamidconverter.com/">http://steamidconverter.com/</a>.
+                </span>
+            </td>
+        </tr>
+        <tr>
+            <td>Password:</td>
+            <td>
+                <input type="password" id="registerPassword"></input>
+                <a id="registerPasswordHelp" class="tipstrip">?</a>
+                <span id="registerPasswordHelpText" class="help">
+                    As we assume that you are grown up enough to choose a wise password.
+                    There are no restrictions for passwords here. Please keep in mind,
+                    that a stolen account may have negative impacts on you.
+                </span>
+            </td>
+        </tr>
+        <tr>
+            <td>Repeated password:</td>
+            <td><input type="password" id="registerPasswordRepeat"></input></td>
+        </tr>
+        <tr>
+            <td>Remember me:</td>
+            <td><input type="checkbox" id="registerRemember"></input></td>
+        </tr>
+        <tr>
+            <th colspan="2"><button id="register">Register</button></th>
+        </tr>
+    </table>
+    <a href="#" id="gotoLogin">I suddenly remembered my login!</a>
+</div>

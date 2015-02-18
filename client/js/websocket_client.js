@@ -147,5 +147,10 @@ var Websocket = {
 };
 
 $(function(){
-	Websocket.init();
+	if(window.WebSocket){
+		Websocket.init();
+	}
+	else{
+		console.err("This browser does not support WebSockets!");
+	}
 });

@@ -12,19 +12,33 @@
 		<title>CORPSES</title>
 	</head>
 	<body>
+		<div class="header">
+			7 Days To Die Interactive Map
+		</div>
+		<div id="notSupported" class="form">
+				To use this website, JavaScript must be enabled. Please enable JavaScript in your browerser settings.
+				<form action="#" method="get">
+					<input type="submit" value="Try again"/>
+				</form>
+		</div>
 		<script>
 			$(function() {
 				//Websocket.init();
-				Websocket.addOpenListener(function() {
-					Login.checkLogin(function(loginOkay) {
-						if(loginOkay) {
-							window.location.href = "map.html";
-						}
-						else {
-							window.location.href = "login.html";
-						}
+				if(window.WebSocket){ //WebSockets are supported by this browser
+					Websocket.addOpenListener(function() {
+						Login.checkLogin(function(loginOkay) {
+							if(loginOkay) {
+								window.location.href = "map.html";
+							}
+							else {
+								window.location.href = "login.html";
+							}
+						});
 					});
-				});
+				}
+				else{
+					$("#notSupported").html("Your browser does not support websockets. To use this website, please switch to a browser with websocket support.");
+				}
 			});
 		</script>
 	</body>
