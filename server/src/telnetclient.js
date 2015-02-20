@@ -65,8 +65,15 @@ function TelnetClient(config) {
 	}.bind(this));
 	this.buffer = "";
 	this.client.on("data", function(data) {
-		this.buffer += data.toString();
-		this._checkMessage();
+		var string = data.toString();
+		if(string.toLowerCase().indexOf("password incorrect") !== -1){
+			Winston.error("The password for the telnet server is invalid.");
+			this.emit("error");
+		}
+		else{
+			this.buffer += string;
+			this._checkMessage();
+		}
 	}.bind(this));
 	this.config = config;
 }
@@ -78,6 +85,7 @@ Util.inherits(TelnetClient, Events.EventEmitter);
  */
 TelnetClient.prototype.connect = function() {
 	this.client.connect(this.config.telnetPort, this.config.telnetHost, function() {
+		this._write(this.config.telnetPassword);
 		Winston.info("Initializing Telnetclient okay.");
 		this.emit("open");
 	}.bind(this));

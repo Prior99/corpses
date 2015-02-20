@@ -11,6 +11,7 @@ function check(key, config) {
 check("websocketPort", config);
 check("telnetPort", config);
 check("telnetHost", config);
+check("telnetPassword", config);
 check("clientDirectory", config);
 check("mapDirectory", config);
 check("database", config);

@@ -48,6 +48,10 @@ var schema = {
 			message : "Please enter a host!",
 			default : "localhost",
 			description : "What host does the 7DTD server run on? "
+		},
+		telnetPassword : {
+			required : false,
+			description : "What password does the telnet client use? "
 		}
 	}
 };
