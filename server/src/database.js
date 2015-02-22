@@ -45,6 +45,7 @@ function Database(config, callback) {
 	this.pool.getConnection(function(err, conn) {
 		if(err) {
 			Winston.error("Connecting to Database failed.");
+			Winston.error(err);
 			if(callback) {
 				callback(false);
 			}
