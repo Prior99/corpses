@@ -293,6 +293,7 @@ function Client(websocket, database, server) {
 						database.disableUser(toEnable.id, function(err) {
 							if(!checkError(err, async)) {
 								server.broadcastToUser(steamid, "reload");
+								server.telnetClient.triggerKickPlayer(toEnable.name, "Your account was disabled in the webinterface.");
 								var list = server.getUserClients(steamid);
 								for(var u in list) {
 									list[u].logout();
