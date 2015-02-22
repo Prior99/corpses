@@ -166,6 +166,7 @@ UI.updatePlayers = function(players) {
 			mapping = UI.newPlayerMapping(player);
 		}
 		if(mapping) {
+			mapping.playerObject = player;
 			UI.updatePlayer(mapping);
 		}
 	}
