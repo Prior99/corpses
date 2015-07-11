@@ -276,9 +276,10 @@ TelnetClient.prototype._computeMessage = function(type, array) {
 					zombieKills : p[12],
 					playerKills : p[13],
 					score : p[14],
-					steamid : p[15],
-					ip : p[16],
-					ping : p[17],
+					level : p[15],
+					steamid : p[16],
+					ip : p[17],
+					ping : p[18],
 				});
 			}
 			this.emit("listPlayersExtended", players);

@@ -53,6 +53,7 @@ var Regexes = {
 		'zombies=(\\d+),\\s' +
 		'players=(\\d+),\\s' +
 		'score=(\\d+),\\s' +
+		'level=(\\d+),\\s' +
 		'steamid=(\\d+),\\s' +
 		'ip=(.*?),\\s' +
 		'ping=(\\d+)', 'g'
