@@ -225,7 +225,7 @@ Server.prototype._initTelnetClient = function() {
 		me.cache.connectionLost();
 	});
 	this.telnetClient.on("playerConnected", function(evt) {
-		if(this.config.kickUnregistered !== undefined && this.config.kickUnregistered === "true"){
+		if(this.config.kickUnregistered !== undefined && (this.config.kickUnregistered === "true" || this.config.kickUnregistered === true)){
 			me.database.getUserBySteamID(evt.steamid, function(err, result){
 				if(err === undefined && (result === undefined || result.enabled === 0)){
 					me.telnetClient.triggerKickPlayer(evt.name,

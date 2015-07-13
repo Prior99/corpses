@@ -89,6 +89,15 @@ describe("The interconnect to the 7DTD-Server", function() {
 		socket.write(FS.readFileSync("server/tests/samples/telnet/time.txt"));
 	});
 
+	it("emits \"chat\" when chat message is written", function(done) {
+		telnetClient.once("chat", function(obj) {
+			assert.equal(obj.user, "ZÖMGL");
+			assert.equal(obj.message, "ALTER");
+			done();
+		});
+		socket.write(FS.readFileSync("server/tests/samples/telnet/chat.txt"));
+	});
+
 	it("emits \"listPlayersExtended\" when listPlayersExtended is written", function(done) {
 		telnetClient.once("listPlayersExtended", function(players) {
 			assert.equal(players.length, 3);

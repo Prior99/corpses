@@ -85,7 +85,9 @@ Util.inherits(TelnetClient, Events.EventEmitter);
  */
 TelnetClient.prototype.connect = function() {
 	this.client.connect(this.config.telnetPort, this.config.telnetHost, function() {
-		this._write(this.config.telnetPassword);
+		if(this.config.telnetPassword) {
+			this._write(this.config.telnetPassword);
+		}
 		Winston.info("Initializing Telnetclient okay.");
 		this.emit("open");
 	}.bind(this));
@@ -111,7 +113,7 @@ TelnetClient.prototype.shutdown = function(callback) {
 
 TelnetClient.prototype._checkMessage = function() {
 	var index;
-	var reg = /^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\s\d+\.\d\d\d\s/gm;
+	var reg = /^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\s\d+\.\d\d\d\s(?:INF\s)?/gm;
 	if((index = this.buffer.search(reg)) !== -1) {
 		var msgs = this.buffer.split(reg);
 		this.buffer = "";
@@ -250,6 +252,13 @@ TelnetClient.prototype._computeMessage = function(type, array) {
 				day : array[1],
 				hour : array[2],
 				minute : array[3],
+			});
+			break;
+		}
+		case "chat": {
+			this.emit("chat", {
+				user : array[1],
+				message : array[2]
 			});
 			break;
 		}

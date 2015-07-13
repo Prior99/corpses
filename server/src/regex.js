@@ -58,6 +58,9 @@ var Regexes = {
 		'ip=(.*?),\\s' +
 		'ping=(\\d+)', 'g'
 		),
+	chat : new RegExp(
+		'GMSG:\\s?(.*?):\\s?(.*)', 'g'
+	),
 	playerConnected : new RegExp(
 		'Player\\sconnected,\\s' +
 		'clientid=(\\d+),\\s' +

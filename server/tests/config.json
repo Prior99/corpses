@@ -3,8 +3,8 @@
   "mapDirectory" : "maptest",
   "database" : {
       "host" : "localhost",
-      "user" : "corpsestest",
-      "password" : "HufuLSAAnuSmdCeD",
+      "user" : "root",
+      "password" : "",
       "database" : "corpsestest"
   },
   "websocketPort" : 7434,

@@ -30,6 +30,9 @@ MockServer = {
 			}
 		}
 		return list;
+	},
+	telnetClient : {
+		triggerKickPlayer : function() {}
 	}
 };
 

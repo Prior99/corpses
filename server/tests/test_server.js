@@ -175,7 +175,7 @@ describe('The server', function() {
 	});
 
 	it("will kick unregistered players", function(done) {
-		config.kickUnregistered = true;
+		theServer.config.kickUnregistered = true;
 		socket.once("data", function(msg) {
 			assert.equal(msg, "kick Sascha You must have an enabled account on example.org to play on this server\n");
 			done();
@@ -184,7 +184,7 @@ describe('The server', function() {
 	});
 
 	it("will not kick registered players", function(done) {
-		config.kickUnregistered = true;
+		theServer.config.kickUnregistered = false;
 		websocket.addListener("playerConnected", function() {
 			websocket.removeListener("playerConnected");
 			done();
