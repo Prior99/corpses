@@ -9,7 +9,7 @@ echo "n" | bower install --silent | iconv -ctascii -c &> bower.log
 echo "Done."
 cp server/config.json.example server/config.json
 echo "Now building/testing ... "
-grunt | iconv -ctascii | tee grunt.log
+grunt| tee grunt.log
 grep --quiet "Done, without errors." grunt.log
 RESULT=$?
 echo "The log is as follows:"
