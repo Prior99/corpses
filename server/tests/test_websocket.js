@@ -77,7 +77,7 @@ describe("The websocketwrapper", function() {
 		}, 30);
 	});
 	it("stays stable when received a packet which is not even json", function(done) {
-		ws2.send(9);
+		ws2.send("k");
 		setTimeout(function() {
 			done();
 		}, 30);
