@@ -102,11 +102,8 @@ function Client(websocket, database, server) {
 						});
 					}
 					if(!checkError(err, async)) {
-						if(result.visibility === 'friends') {
-							this.broadcastMarker(result, true, done);
-						}
-						else if(result.visibility === 'public') {
-							this.broadcastMarker(result, false, done);
+						if(result.visibility === 'public' || result.visibility === 'friends') {
+							this.broadcastMarker(result, done);
 						}
 						else {
 							this.sendMarker(result);
@@ -527,42 +524,11 @@ Client.prototype.broadcastRemoveMarker = function(id, friendsOnly, callback) {
 * Will broadcast the adding of a marker to all users that are authorized
 * to receive this event (depending on visibility and friendships).
 * @param {Database~Marker} marker - Marker that will be broadcast.
-* @param {boolean} friendsOnly - Whether this marker is friendsonly or public
 * @param {Client~VoidCallback} callback - Called when this action has finished
 *										  and all messages were queued to be sent.
 */
-Client.prototype.broadcastMarker = function(marker, friendsOnly, callback) {
-	var self = this;
-	var j = this.server.clients.length;
-	function decrease() {
-		j--;
-		if(j === 0) {
-			callback();
-		}
-	}
-	function sendMarker(client) {
-		if(friendsOnly && client.user.id !== self.user.id) {
-			self.database.areFriends(client.user.id, self.user.id, function(err, okay) {
-				if(!err && okay) {
-					client.sendMarker(marker);
-				}
-				decrease();
-			});
-		}
-		else {
-			client.sendMarker(marker);
-			decrease();
-		}
-	}
-	for(var i in this.server.clients) {
-		var client = this.server.clients[i];
-		if(client.isLoggedIn()) {
-			sendMarker(client);
-		}
-		else {
-			decrease();
-		}
-	}
+Client.prototype.broadcastMarker = function(marker, callback) {
+	this.server.broadcastMarker(this.user, marker, false, callback);
 };
 
 /**

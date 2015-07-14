@@ -167,6 +167,15 @@ describe('The server', function() {
 		socket.write(FS.readFileSync("server/tests/samples/telnet/players.txt"));
 	});
 
+	it("create marker via chat", function(done) {
+		websocket.send("login", { name : "Test1", password : "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3"}, function(answer) {
+			websocket.addListener("marker", function(obj) {
+				done();
+			});
+			socket.write(FS.readFileSync("server/tests/samples/telnet/chat.txt"));
+		});
+	});
+
 	it("will broadcast correct on spawningWanderingHorde", function(done) {
 		websocket.addListener("spawningWanderingHorde", function(obj) {
 			done();

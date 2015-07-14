@@ -1,4 +1,5 @@
 var sample = require("../samples/cache_sampledata.js");
+var Server = require("../../src/server.js");
 
 MockServer = {
 	newUser : false,
@@ -13,6 +14,7 @@ MockServer = {
 		time : sample.time,
 		info : sample.info
 	},
+	broadcastMarker : Server.prototype.broadcastMarker,
 	broadcastToUser : function(steamid, name, obj) {
 		for(var i in this.clients) {
 			var client = this.clients[i];

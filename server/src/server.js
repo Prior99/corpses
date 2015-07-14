@@ -219,6 +219,88 @@ Server.prototype.getUserClients = function(steamid) {
 	return list;
 };
 
+Server.prototype._onChat = function(event) {
+	var result;
+	if(event.message && (result = event.message.match(/\!m\s+"(.*?)"\s*(?:"(.*?)"\s*(?:(public|private|friends))?)?/))) {
+		var name = result[1];
+		var description = result[2];
+		var visibility = result[3];
+		for(var i in this.cache.playersExtended) {
+			var player = this.cache.playersExtended[i];
+			if(player.name === event.user) {
+				this._addMarkerFromChat(player, name, description, visibility);
+			}
+		}
+	}
+};
+
+
+/**
+ * Will broadcast the adding of a marker to all users that are authorized
+ * to receive this event (depending on visibility and friendships).
+ * @param {Database~User} user - User that created the marker.
+ * @param {Database~Marker} marker - Marker that will be broadcast.
+ * @param {boolean} toSelf - Whether this marker should be sent to own client.
+ * @param {Client~VoidCallback} callback - Called when this action has finished
+ *										  and all messages were queued to be sent.
+ */
+Server.prototype.broadcastMarker = function(user, marker, toSelf, callback) {
+	var j = this.clients.length;
+	var decrease = function() {
+		j--;
+		if(j === 0) {
+			if(callback) { callback(); }
+		}
+	};
+	var sendMarker = function(client) {
+		if(client.user.id === user.id) {
+			if(toSelf) {
+				client.sendMarker(marker);
+			}
+			decrease();
+		}
+		else if(marker.visibility === "friends") {
+			this.database.areFriends(client.user.id, user.id, function(err, okay) {
+				if(!err && okay) {
+					client.sendMarker(marker);
+				}
+				decrease();
+			});
+		}
+		else {
+			client.sendMarker(marker);
+			decrease();
+		}
+	}.bind(this);
+	for(var i in this.clients) {
+		var client = this.clients[i];
+		if(client.isLoggedIn()) {
+			sendMarker(client);
+		}
+		else {
+			decrease();
+		}
+	}
+};
+
+Server.prototype._addMarkerFromChat = function(player, name, description, visibility) {
+	this.database.getUserBySteamID(player.steamid, function(err, user) {
+		if(!err && user) {
+			var marker = {
+				name : name,
+				description : description,
+				lat : player.position.x,
+				lng : player.position.z,
+				icon : "thumb-tack",
+				visibility : visibility
+			};
+			this.database.addMarker(marker, user.id, function(err, id) {
+				this.broadcastMarker(user, marker, true);
+			}.bind(this));
+		}
+	}.bind(this));
+};
+
 Server.prototype._initTelnetClient = function() {
 	var me = this;
 	this.telnetClient.on("close", function() {
@@ -243,6 +325,7 @@ Server.prototype._initTelnetClient = function() {
 			me.broadcast("playerConnected", evt);
 		}
 	}.bind(this));
+	this.telnetClient.on("chat", this._onChat.bind(this));
 	this.telnetClient.on("playerDisconnected", function(evt) {
 		me.broadcast("playerDisconnected", evt);
 	});

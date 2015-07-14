@@ -91,8 +91,8 @@ describe("The interconnect to the 7DTD-Server", function() {
 
 	it("emits \"chat\" when chat message is written", function(done) {
 		telnetClient.once("chat", function(obj) {
-			assert.equal(obj.user, "ZÖMGL");
-			assert.equal(obj.message, "ALTER");
+			assert.equal(obj.user, "Test1");
+			assert.equal(obj.message, '!m "Test marker" "This marker was created by chat" public');
 			done();
 		});
 		socket.write(FS.readFileSync("server/tests/samples/telnet/chat.txt"));
@@ -112,7 +112,7 @@ describe("The interconnect to the 7DTD-Server", function() {
 			assert.equal(p.zombieKills, 1682);
 			assert.equal(p.playerKills, 6);
 			assert.equal(p.score, 3);
-			assert.equal(p.steamid, 61725147);
+			assert.equal(p.steamid, 345);
 			assert.equal(p.ip, "127.0.0.1");
 			assert.equal(p.ping, 3);
 
