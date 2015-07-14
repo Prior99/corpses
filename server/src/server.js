@@ -284,6 +284,9 @@ Server.prototype.broadcastMarker = function(user, marker, toSelf, callback) {
 };
 
 Server.prototype._addMarkerFromChat = function(player, name, description, visibility) {
+	if(!description) { description = "" }
+	if(!visibility) { visibility = "friends" }
+	if(!name) { name = "" }
 	this.database.getUserBySteamID(player.steamid, function(err, user) {
 		if(!err && user) {
 			var marker = {
