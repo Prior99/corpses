@@ -25,7 +25,19 @@ require("./preparewinston.js");
 
 var _killed = false;
 
-var cache = new Cache({time : 5000, knownPlayers : 10000, playersExtended : 1000});
+var times;
+if(config.updateIntervals) {
+	times = config.updateIntervals;
+}
+else {
+	times = {
+		time : 5000,
+		knownPlayers : 10000,
+		playersExtended : 1000
+	};
+}
+
+var cache = new Cache(times);
 var telnetClient = new TelnetClient(config);
 var database = new Database(config.database, function(okay) {
 	if(okay) {
