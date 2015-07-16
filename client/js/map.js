@@ -49,6 +49,14 @@ MapSystem.newPlayerMapping = function(player) {
 	return mapping;
 };
 
+MapSystem.follow = function(player) {
+	MapSystem._following = player;
+};
+
+MapSystem.unfollow = function() {
+	MapSystem._following = null;
+};
+
 MapSystem.updatePlayers = function(players) {
 	for(var i in players) {
 		var player = players[i];
@@ -58,6 +66,9 @@ MapSystem.updatePlayers = function(players) {
 		}
 		mapping.marker.setLatLng([player.position.x, player.position.z]);
 		mapping.icon.setRotation(player.rotation.y);
+		if(MapSystem._following && MapSystem._following.id === player.id) {
+			MapSystem.map.panTo([player.position.x, player.position.z]);
+		}
 	}
 };
 

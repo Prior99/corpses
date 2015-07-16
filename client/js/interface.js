@@ -135,7 +135,25 @@ UI.newPlayerMapping = function(player) {
 		row : UI.generatePlayerRow(),
 		playerObject : player
 	};
+	mapping.row.click(function() {
+		UI.follow(mapping);
+	});
 	UI.playerMapping[player.steamid] = mapping;
+};
+
+UI.follow = function(mapping) {
+	if(UI._selectedRow) {
+		UI._selectedRow.removeClass('selected');
+		UI._selectedRow = null;
+	}
+	if(UI._selectedRow === mapping.row) {
+		MapSystem.unfollow();
+	}
+	else {
+		UI._selectedRow = mapping.row;
+		mapping.row.addClass('selected');
+		MapSystem.follow(mapping.playerObject);
+	}
 };
 
 UI.clearPlayers = function() {
