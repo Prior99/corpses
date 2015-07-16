@@ -19,6 +19,7 @@
     "leaflet": "~0.7.3",
     "Leaflet.awesome-markers": "~2.0.2",
     "jsSHA": "~1.5.0",
-    "font-awesome": "~4.2.0"
+    "font-awesome": "~4.2.0",
+    "bootstrap": "~3.3.5"
   }
 }
